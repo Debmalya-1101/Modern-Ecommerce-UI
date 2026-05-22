@@ -1,0 +1,64 @@
+:host {
+  display: block;
+}
+
+.shell-home {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.hero-card,
+.info-grid mat-card,
+.notes-card {
+  border-color: rgba(87, 61, 44, 0.14);
+  background: rgba(255, 252, 247, 0.9);
+  box-shadow: 0 14px 32px rgba(80, 54, 36, 0.07);
+}
+
+.hero-card {
+  padding: 1rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: #b55f34;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+h2,
+h3 {
+  margin-top: 0;
+  color: #2d241f;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.hero-copy,
+.info-grid p,
+.notes-card li {
+  color: #6e5d52;
+  line-height: 1.7;
+}
+
+.info-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.notes-card {
+  padding: 1rem;
+}
+
+.notes-card ul {
+  margin: 1rem 0 0;
+  padding-left: 1.2rem;
+}
+
+@media (max-width: 900px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

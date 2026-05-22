@@ -2,6 +2,7 @@
 
 html {
   height: 100%;
+  color-scheme: light;
 
   @include mat.theme(
     (
@@ -16,11 +17,22 @@ html {
 }
 
 body {
-  color-scheme: dark;
-  background-color: #121212;
-  color: white;
+  background:
+    linear-gradient(180deg, #fcf7f1 0%, #f2ebe2 100%);
+  color: #2d241f;
   font: var(--mat-sys-body-medium);
 
   margin: 0;
   height: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+button,
+a {
+  font: inherit;
 }

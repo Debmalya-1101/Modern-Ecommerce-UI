@@ -245,3 +245,156 @@ This app already uses a solid modern Angular foundation:
 - signal usage
 
 That is enough to start cleanly without overengineering.
+
+## Feature Update: Basic Application Shell
+
+What was added:
+- a header at the top of the app
+- a responsive sidebar using Angular Material drawer navigation
+- a footer at the bottom of the app
+- a main content area connected to the Angular router
+- a simple route-level placeholder page for shell content only
+
+Why it was added:
+- every larger frontend app needs a stable layout before real business pages are added
+- it gives future product, cart, and checkout pages a place to render
+- it introduces Angular Material navigation in a practical way
+- it keeps the project enterprise-relevant without adding backend or feature complexity too early
+
+### Standalone Components Explained Again
+
+Simple idea:
+- each component can declare what it needs by itself
+- there is less hidden wiring than the older module-based style
+
+Where this appears in this project:
+- the root `App` component is standalone
+- the route-level `ShellHomePage` component is standalone
+
+Beginner-friendly example:
+
+```ts
+@Component({
+  selector: 'app-shell-home-page',
+  imports: [MatCardModule],
+  templateUrl: './shell-home.page.html'
+})
+export class ShellHomePage {}
+```
+
+What to notice:
+- `MatCardModule` is imported directly into the component
+- the component does not need to be declared in an NgModule
+
+Why this is useful:
+- easier to trace dependencies
+- easier to read one file at a time
+- better fit for modern Angular projects
+
+### Angular Material Usage Explained Simply
+
+Angular Material is a ready-made UI component library for Angular.
+
+In this shell, it is used for:
+- `mat-toolbar` for the header
+- `mat-drawer-container` and `mat-drawer` for the responsive sidebar
+- `mat-nav-list` for navigation links
+- `mat-card` for clean content blocks
+- `mat-divider` for visual separation
+
+Small example:
+
+```html
+<mat-drawer-container>
+  <mat-drawer [mode]="isMobile() ? 'over' : 'side'">
+    Sidebar content
+  </mat-drawer>
+
+  <mat-drawer-content>
+    Main content
+  </mat-drawer-content>
+</mat-drawer-container>
+```
+
+What this means:
+- Angular Material provides layout building blocks
+- the sidebar can slide over the page on small screens
+- the same structure can stay visible on larger screens
+
+Why Angular Material was added here:
+- navigation is a good early use case for Material
+- it improves consistency without requiring lots of custom code
+- it keeps the app closer to enterprise frontend practices
+
+### Routing Basics Explained Simply
+
+Routing means Angular decides which component should appear for a given URL path.
+
+In this project, the shell stays in place and the routed page appears inside the main content area.
+
+Small route example:
+
+```ts
+export const routes: Routes = [
+  {
+    path: '',
+    loadComponent: () =>
+      import('./pages/shell-home/shell-home.page').then((m) => m.ShellHomePage)
+  }
+];
+```
+
+What this means:
+- `path: ''` is the default home route
+- `loadComponent` tells Angular which standalone page to load
+- the page is shown inside `<router-outlet />`
+
+Template example:
+
+```html
+<main>
+  <router-outlet />
+</main>
+```
+
+Backend analogy:
+- think of routing like mapping a URL to a handler
+- but instead of returning server data directly, Angular displays a frontend component
+
+Why routing was used even for a simple shell:
+- it keeps the layout ready for future pages
+- it teaches route-based composition early
+- it avoids putting all future UI into one giant root component
+
+### Responsive Sidebar Basics
+
+The sidebar changes behavior based on screen size.
+
+Simple idea:
+- desktop: sidebar stays visible
+- mobile: sidebar slides over the content
+
+Small TypeScript example:
+
+```ts
+this.breakpointObserver.observe('(max-width: 768px)').subscribe(({ matches }) => {
+  this.isMobile.set(matches);
+  this.isSidebarOpen.set(!matches);
+});
+```
+
+What this means:
+- Angular watches the screen width
+- when the screen is small, the app marks itself as mobile
+- the sidebar mode changes based on that state
+
+Why this feature was added:
+- responsive layout is required for real frontend work
+- it is easier to design responsiveness early than retrofit it later
+
+## What I Learned From This Step
+
+- a basic app shell is a structural feature, not a business feature
+- standalone components stay readable even when Angular Material is added
+- Angular routing becomes more useful when the main content area is separated from the layout shell
+- Angular Material can be introduced gradually without making the app feel overbuilt

@@ -1,0 +1,143 @@
+:host {
+  --shell-background: #f5f1eb;
+  --shell-surface: rgba(255, 252, 247, 0.88);
+  --shell-border: rgba(87, 61, 44, 0.14);
+  --shell-shadow: 0 18px 45px rgba(80, 54, 36, 0.08);
+  --shell-text: #2d241f;
+  --shell-muted: #6e5d52;
+  --shell-accent: #b55f34;
+  --shell-accent-soft: rgba(181, 95, 52, 0.12);
+
+  display: block;
+  min-height: 100dvh;
+  color: var(--shell-text);
+}
+
+.shell-container {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top left, rgba(255, 222, 196, 0.7), transparent 28%),
+    linear-gradient(180deg, #fbf6f0 0%, #f3ede6 100%);
+}
+
+.shell-sidebar {
+  width: min(18rem, 85vw);
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid var(--shell-border);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 241, 0.98) 0%, rgba(246, 237, 228, 0.98) 100%);
+  color: var(--shell-text);
+}
+
+.sidebar-brand,
+.sidebar-planned {
+  padding: 0.5rem 0.25rem;
+}
+
+.sidebar-eyebrow,
+.header-eyebrow,
+.section-label {
+  margin: 0 0 0.4rem;
+  color: var(--shell-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebar-brand h2,
+.header-copy h1 {
+  margin: 0;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.sidebar-brand h2 {
+  font-size: 1.75rem;
+}
+
+.sidebar-copy {
+  margin: 0.75rem 0 0;
+  color: var(--shell-muted);
+  line-height: 1.6;
+}
+
+.sidebar-nav {
+  padding: 1rem 0;
+}
+
+.active-link {
+  border-radius: 1rem;
+  background: var(--shell-accent-soft);
+}
+
+.sidebar-planned ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--shell-muted);
+  line-height: 1.9;
+}
+
+.shell-content {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.shell-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  min-height: 5rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--shell-border);
+  background: rgba(255, 249, 243, 0.88);
+  backdrop-filter: blur(18px);
+  color: var(--shell-text);
+}
+
+.menu-button,
+.header-link {
+  flex-shrink: 0;
+}
+
+.header-copy {
+  min-width: 0;
+}
+
+.header-copy h1 {
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+}
+
+.shell-main {
+  flex: 1;
+  padding: 1.25rem;
+}
+
+.shell-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem 1.5rem;
+  border-top: 1px solid var(--shell-border);
+  color: var(--shell-muted);
+  font-size: 0.95rem;
+}
+
+.shell-footer p {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .shell-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .shell-footer {
+    flex-direction: column;
+  }
+}
