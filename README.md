@@ -1,59 +1,90 @@
-# ModernEcommerceUi
+# Modern Ecommerce UI
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.12.
+A personal Angular project focused on building a modern e-commerce frontend with enterprise-relevant structure and beginner-readable code.
 
-## Development server
+## Project Goals
 
-To start a local development server, run:
+- use the latest Angular patterns
+- stay readable for someone still growing in Angular
+- use scalable structure without overengineering
+- build responsive UI with SCSS
+- move toward Angular Material-based UI patterns
 
-```bash
-ng serve
-```
+## Tech Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Angular 21
+- Standalone components
+- Angular Router
+- SCSS
+- TypeScript
+- Vitest via Angular tooling
 
-## Code scaffolding
+Note:
+- Angular Material is part of the intended project direction, but it is not installed in the codebase yet.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Current State
 
-```bash
-ng generate component component-name
-```
+The app currently includes a small modern Angular foundation:
+- standalone application bootstrap
+- root component
+- router configuration
+- SCSS styling setup
+- signal usage in the root component
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+This is intentional. The project is being set up with documentation and architecture first before expanding the actual UI.
 
-```bash
-ng generate --help
-```
+## Documentation
 
-## Building
+- [AI_DEVELOPMENT_RULES.md](/C:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/AI_DEVELOPMENT_RULES.md)
+- [LEARNING_JOURNAL.md](/C:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/LEARNING_JOURNAL.md)
+- [ARCHITECTURE.md](/C:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/ARCHITECTURE.md)
+- [INTERVIEW_NOTES.md](/C:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/INTERVIEW_NOTES.md)
 
-To build the project run:
+## Development
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+Install dependencies:
 
 ```bash
-ng e2e
+npm install
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Start the development server:
 
-## Additional Resources
+```bash
+npm start
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Open:
+
+```text
+http://localhost:4200/
+```
+
+## Build
+
+```bash
+npm run build
+```
+
+## Test
+
+```bash
+npm test
+```
+
+## Intended Feature Direction
+
+As the project grows, it is expected to include:
+- responsive e-commerce pages
+- reusable product and cart UI components
+- feature-based folder organization
+- Angular Material components where they improve consistency and accessibility
+- forms and validation for user flows such as checkout
+
+## Guiding Principle
+
+This project is meant to feel professional without becoming hard to learn from.
+
+The main rule is:
+
+build the next clean step, not the most complex possible version.
