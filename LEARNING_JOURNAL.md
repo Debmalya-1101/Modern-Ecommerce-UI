@@ -536,3 +536,176 @@ Why this is useful:
 - dependency injection keeps components cleaner by moving repeated logic into services
 - a `shared` folder is most useful when it contains real reused UI, not speculative code
 - Angular Material can support reusable patterns beyond just page-level layout
+
+## Feature Update: Backend Integration Foundation
+
+What was added:
+- environment configuration for backend URL and token storage key
+- typed frontend models for auth, API responses, products, cart, wishlist, and orders
+- a reusable API service layer
+- auth service structure
+- JWT interceptor structure
+- error interceptor structure
+- route guard structure for auth and admin access
+
+Why it was added:
+- the frontend needs a stable way to talk to the Spring Boot backend before real feature screens are built
+- typed models make backend contracts easier to understand and safer to use
+- interceptors and guards let shared auth behavior live in one place instead of every screen
+
+### Services Explained Simply
+
+A service is a class that holds reusable logic that should not live inside a component template.
+
+In this project:
+- `ApiService` handles generic HTTP requests
+- `AuthService` handles login, signup, token state, and current user state
+- `TokenStorageService` handles saving and reading the JWT
+
+Small example:
+
+```ts
+login(request: LoginRequest): Observable<AuthResponse> {
+  return this.apiService.post<AuthResponse, LoginRequest>('/auth/login', request);
+}
+```
+
+Why this is useful:
+- components stay focused on UI behavior
+- backend logic is reused from one place
+- changing API details later is easier
+
+Spring Boot comparison:
+- Angular services are similar to Spring `@Service` classes
+- components are more like controllers/views combined at the UI level
+- the service layer keeps business communication out of the screen code
+
+### Interceptors Explained Simply
+
+An interceptor is a shared place to inspect or modify every HTTP request or response.
+
+Think of it like a filter around API calls.
+
+In this project:
+- the JWT interceptor adds `Authorization: Bearer <token>` to protected requests
+- the error interceptor turns mixed backend errors into a more consistent frontend error shape
+
+Small example idea:
+
+```ts
+provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor]))
+```
+
+What this means:
+- every HTTP call goes through these interceptors
+- you do not need to manually add the JWT header in every service
+- error handling logic can stay centralized
+
+Spring Boot comparison:
+- Angular interceptors are similar to servlet filters or Spring security filters
+- they sit around requests before the request reaches the main business code
+
+### Observables Explained Simply
+
+An observable is a value that arrives over time.
+
+With HTTP calls, the value usually arrives once, later, after the backend responds.
+
+Small example:
+
+```ts
+this.authService.login(request).subscribe((response) => {
+  console.log(response.token);
+});
+```
+
+What this means:
+- the HTTP request starts
+- the frontend waits for the backend response
+- when the result arrives, the code inside `subscribe` runs
+
+Simple mental model:
+- method call returns a promise-like stream
+- subscribe means "run this when the value arrives"
+
+Spring Boot comparison:
+- if you are used to synchronous service calls in Spring, observables feel more like asynchronous pipelines
+- they are conceptually closer to `Mono` or `Flux` than to a plain Java method return
+- for normal frontend HTTP, think of them like "async response containers"
+
+### JWT Interceptor Explained
+
+The JWT interceptor checks whether:
+- a token exists
+- the request is protected
+
+If both are true, it adds the bearer token header automatically.
+
+Why this is useful:
+- avoids repeated header code in every API service
+- keeps auth behavior consistent
+
+Spring Boot comparison:
+- this is similar in purpose to adding auth details in a client filter before requests reach secured backend endpoints
+
+### Error Interceptor Explained
+
+The backend reference shows that errors are not always returned in one consistent format.
+
+Sometimes the backend returns:
+- a wrapped JSON error
+- a raw plain-text message
+- a framework-level security error
+
+The error interceptor helps by:
+- reading the different backend shapes
+- extracting one readable message
+- turning `401` into a logout event
+
+Why this matters:
+- frontend screens can handle errors more consistently later
+- backend inconsistency is hidden behind one shared frontend layer
+
+### Shared Backend Foundation Architecture
+
+The project now has a `core` layer for app-wide backend concerns.
+
+Simple idea:
+- `models` describe data
+- `services` talk to the backend
+- `interceptors` wrap requests and responses
+- `guards` protect routes
+
+Simple mental model:
+
+```text
+component -> service -> HttpClient -> interceptor -> backend
+backend -> interceptor -> service -> component
+```
+
+Why this structure helps:
+- route pages stay simpler
+- backend communication is centralized
+- auth behavior stays consistent across the app
+
+### Environment Configuration Explained
+
+Environment configuration stores app-wide values such as the backend base URL.
+
+In this project it is used for:
+- `apiBaseUrl`
+- token storage key
+
+Why this is useful:
+- you can change backend hosts without rewriting many services
+- local development and future deployment can use different settings
+
+Spring Boot comparison:
+- this is similar to using `application.yml` or `application.properties` for shared configuration values
+
+## What I Learned From This Step
+
+- a backend foundation can be added before business screens exist
+- Angular services play a role similar to Spring services, but for frontend communication and state
+- interceptors are a clean place for repeated HTTP behavior such as auth headers and error shaping
+- observables are easier to understand when treated as asynchronous response streams

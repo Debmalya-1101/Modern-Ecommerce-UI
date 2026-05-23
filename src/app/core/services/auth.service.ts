@@ -1,0 +1,113 @@
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, catchError, map, of, tap } from 'rxjs';
+
+import { ApiService } from './api.service';
+import { TokenStorageService } from './token-storage.service';
+import { AuthResponse, AuthSession, AuthUserInfo, JwtTokenPayload, LoginRequest, SignupRequest, UserRole } from '../models/auth.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private readonly apiService = inject(ApiService);
+  private readonly tokenStorage = inject(TokenStorageService);
+
+  private readonly token = signal<string | null>(this.tokenStorage.getToken());
+  private readonly currentUser = signal<AuthUserInfo | null>(this.createUserFromToken(this.token()));
+
+  readonly session = computed<AuthSession>(() => ({
+    token: this.token(),
+    user: this.currentUser()
+  }));
+  readonly isAuthenticated = computed(() => !!this.token());
+  readonly currentRole = computed(() => this.currentUser()?.role ?? this.readRoleFromToken(this.token()));
+
+  login(request: LoginRequest): Observable<AuthResponse> {
+    return this.apiService
+      .post<AuthResponse, LoginRequest>('/auth/login', request)
+      .pipe(
+        tap((response) => this.setSessionToken(response.token)),
+        tap(() => this.refreshCurrentUser().subscribe())
+      );
+  }
+
+  signup(request: SignupRequest): Observable<string> {
+    return this.apiService.post<string, SignupRequest>('/auth/signup', request);
+  }
+
+  refreshCurrentUser(): Observable<AuthUserInfo | null> {
+    if (!this.token()) {
+      this.currentUser.set(null);
+      return of(null);
+    }
+
+    return this.apiService.get<AuthUserInfo>('/auth/me').pipe(
+      tap((user) => this.currentUser.set(user)),
+      catchError(() => {
+        this.currentUser.set(this.createUserFromToken(this.token()));
+        return of(this.currentUser());
+      })
+    );
+  }
+
+  logout(): void {
+    this.tokenStorage.clearToken();
+    this.token.set(null);
+    this.currentUser.set(null);
+  }
+
+  hasToken(): boolean {
+    return !!this.token();
+  }
+
+  hasRole(role: UserRole): boolean {
+    return this.currentRole() === role;
+  }
+
+  getToken(): string | null {
+    return this.token();
+  }
+
+  private setSessionToken(token: string): void {
+    this.tokenStorage.setToken(token);
+    this.token.set(token);
+    this.currentUser.set(this.createUserFromToken(token));
+  }
+
+  private createUserFromToken(token: string | null): AuthUserInfo | null {
+    const payload = this.readTokenPayload(token);
+
+    if (!payload?.sub || !payload.role) {
+      return null;
+    }
+
+    return {
+      username: payload.sub,
+      emailId: '',
+      role: payload.role
+    };
+  }
+
+  private readRoleFromToken(token: string | null): UserRole | null {
+    return this.readTokenPayload(token)?.role ?? null;
+  }
+
+  private readTokenPayload(token: string | null): JwtTokenPayload | null {
+    if (!token) {
+      return null;
+    }
+
+    const tokenParts = token.split('.');
+
+    if (tokenParts.length < 2) {
+      return null;
+    }
+
+    try {
+      const payload = atob(tokenParts[1].replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(payload) as JwtTokenPayload;
+    } catch {
+      return null;
+    }
+  }
+}
