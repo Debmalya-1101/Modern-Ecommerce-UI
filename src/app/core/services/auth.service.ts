@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 
+import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import { ApiService } from './api.service';
 import { TokenStorageService } from './token-storage.service';
 import { AuthResponse, AuthSession, AuthUserInfo, JwtTokenPayload, LoginRequest, SignupRequest, UserRole } from '../models/auth.model';
@@ -24,7 +25,7 @@ export class AuthService {
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.apiService
-      .post<AuthResponse, LoginRequest>('/auth/login', request)
+      .post<AuthResponse, LoginRequest>(API_ENDPOINTS.auth.login, request)
       .pipe(
         tap((response) => this.setSessionToken(response.token)),
         tap(() => this.refreshCurrentUser().subscribe())
@@ -32,7 +33,7 @@ export class AuthService {
   }
 
   signup(request: SignupRequest): Observable<string> {
-    return this.apiService.post<string, SignupRequest>('/auth/signup', request);
+    return this.apiService.post<string, SignupRequest>(API_ENDPOINTS.auth.signup, request);
   }
 
   refreshCurrentUser(): Observable<AuthUserInfo | null> {
@@ -41,7 +42,7 @@ export class AuthService {
       return of(null);
     }
 
-    return this.apiService.get<AuthUserInfo>('/auth/me').pipe(
+    return this.apiService.get<AuthUserInfo>(API_ENDPOINTS.auth.me).pipe(
       tap((user) => this.currentUser.set(user)),
       catchError(() => {
         this.currentUser.set(this.createUserFromToken(this.token()));

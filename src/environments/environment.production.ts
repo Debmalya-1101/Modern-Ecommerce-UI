@@ -1,7 +1,7 @@
 import { AppEnvironment } from './environment.model';
 
 export const environment: AppEnvironment = {
-  production: false,
-  apiBaseUrl: 'http://localhost:8080',
+  production: true,
+  apiBaseUrl: 'https://api.modern-commerce.example',
   tokenStorageKey: 'modern-commerce-token'
 };

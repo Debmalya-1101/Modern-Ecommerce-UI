@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { APP_CONSTANTS } from '../config/app.constants';
 import { environment } from '../../../environments/environment';
 import { ApiQueryParams } from '../models/api.model';
 
@@ -11,6 +12,7 @@ import { ApiQueryParams } from '../models/api.model';
 export class ApiService {
   private readonly http = inject(HttpClient);
   private readonly apiBaseUrl = environment.apiBaseUrl;
+  protected readonly requestTimeoutMs = APP_CONSTANTS.requestTimeoutMs;
 
   get<T>(path: string, params?: ApiQueryParams): Observable<T> {
     return this.http.get<T>(this.buildUrl(path), {

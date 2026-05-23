@@ -1,10 +1,16 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 
+import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import { AuthService } from '../services/auth.service';
 
-const publicPaths = ['/auth/login', '/auth/signup'];
-const publicPrefixes = ['/api/products'];
+const publicPaths = [
+  API_ENDPOINTS.auth.login,
+  API_ENDPOINTS.auth.signup
+];
+const publicPrefixes = [
+  API_ENDPOINTS.products.list
+];
 
 export const jwtInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);

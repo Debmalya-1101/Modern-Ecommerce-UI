@@ -1061,3 +1061,121 @@ This improves perceived polish because:
 - reusable product UI is easier to scale when the card is composed from smaller pieces
 - `@Input` is one of the simplest ways to make components flexible without making them complex
 - component composition keeps the code beginner-readable while still feeling enterprise-relevant
+
+## Feature Update: Scalable Environment Configuration
+
+What was added:
+- explicit development environment
+- explicit production environment
+- a typed environment shape
+- centralized app constants
+- reusable API endpoint constants
+
+Why it was added:
+- configuration should live in one predictable place
+- services should not depend on scattered hardcoded strings
+- this makes the project feel closer to a real enterprise frontend while staying easy to follow
+
+### Angular Environments Explained Simply
+
+Angular environments are files that hold configuration values for different runtime situations.
+
+In this project:
+- development uses a local backend URL
+- production uses a production-style backend URL placeholder
+
+Simple idea:
+- development config for local work
+- production config for deployed app behavior
+
+Small example:
+
+```ts
+export const environment = {
+  production: false,
+  apiBaseUrl: 'http://localhost:8080'
+};
+```
+
+What this means:
+- the app can read config values from one place
+- the same code can behave differently depending on which environment file Angular builds with
+
+### Comparison With Spring Boot `application.yml`
+
+If you come from Spring Boot, Angular environment files are similar in purpose to `application.yml` or `application.properties`.
+
+Simple comparison:
+- Angular `environment.development.ts` is like a dev profile config
+- Angular `environment.production.ts` is like a production profile config
+
+They are not identical, but they solve a similar problem:
+- keeping environment-specific values outside of normal business logic
+
+### Why Centralized Config Matters
+
+Centralized config means:
+- backend base URLs live in one place
+- token storage keys live in one place
+- shared app constants live in one place
+- API paths live in one place
+
+Why this is useful:
+- fewer magic strings
+- easier updates later
+- less risk of mismatched endpoint paths
+- better readability for new developers
+
+For example:
+- if the backend host changes, you update config instead of hunting through many services
+- if an endpoint path changes, one constants file can update multiple future services
+
+### App Constants Explained
+
+App constants are shared values that are not tied to one component.
+
+Examples in this project:
+- app name
+- default currency code
+- request timeout placeholder value
+
+Why they help:
+- they reduce repeated literals
+- they keep shared values named clearly
+
+### Endpoint Constants Explained
+
+Endpoint constants store backend route paths in one reusable structure.
+
+Small example:
+
+```ts
+API_ENDPOINTS.auth.login
+```
+
+What this means:
+- services can reference a named endpoint instead of writing `'/auth/login'` everywhere
+
+This is helpful because:
+- naming becomes clearer
+- duplication goes down
+- future backend changes are easier to manage
+
+### Beginner-Friendly Architecture Takeaway
+
+The important pattern is:
+
+```text
+environment = where the backend lives
+constants = shared app values
+endpoint constants = backend route paths
+services = code that uses those values
+```
+
+That separation keeps the app easier to understand.
+
+## What I Learned From This Step
+
+- environment files are the frontend version of profile-based app config
+- centralized config makes service code cleaner and less fragile
+- endpoint constants are a simple way to keep backend integration readable without overengineering
