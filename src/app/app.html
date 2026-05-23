@@ -44,26 +44,60 @@
   </mat-drawer>
 
   <mat-drawer-content class="shell-content">
-    <mat-toolbar class="shell-header">
-      <button
-        mat-button
-        type="button"
-        class="menu-button"
-        (click)="toggleSidebar()"
-      >
-        Menu
-      </button>
+    <header class="shell-header">
+      <mat-toolbar class="shell-toolbar">
+        <div class="toolbar-left">
+          <button
+            mat-button
+            type="button"
+            class="menu-button"
+            (click)="toggleSidebar()"
+          >
+            Menu
+          </button>
 
-      <div class="header-copy">
-        <p class="header-eyebrow">Modern Angular layout</p>
-        <h1>{{ title }}</h1>
+          <a routerLink="/" class="brand-mark">
+            <span class="brand-mark__eyebrow">Modern Storefront</span>
+            <span class="brand-mark__title">{{ title }}</span>
+          </a>
+        </div>
+
+        <div class="toolbar-search" aria-label="Application search placeholder">
+          <span class="toolbar-search__category">Browse</span>
+          <span class="toolbar-search__prompt">Search products, brands, and categories</span>
+          <button mat-flat-button appButtonStyle="primary" type="button">
+            Search
+          </button>
+        </div>
+
+        <nav class="toolbar-links" aria-label="Quick links">
+          <a routerLink="/orders" class="toolbar-link">Orders</a>
+          <a routerLink="/profile" class="toolbar-link">Profile</a>
+        </nav>
+      </mat-toolbar>
+
+      <div class="shell-subnav">
+        <p class="shell-subnav__label">Explore</p>
+        <div class="shell-subnav__links">
+          @for (item of navigationItems; track item.path) {
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="shell-subnav__link--active"
+              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+              class="shell-subnav__link"
+              (click)="closeSidebarOnMobile()"
+            >
+              {{ item.label }}
+            </a>
+          }
+        </div>
       </div>
-
-      <a mat-button routerLink="/" class="header-link">Shell Home</a>
-    </mat-toolbar>
+    </header>
 
     <main class="shell-main">
-      <router-outlet />
+      <div class="shell-main__container">
+        <router-outlet />
+      </div>
     </main>
 
     <footer class="shell-footer">

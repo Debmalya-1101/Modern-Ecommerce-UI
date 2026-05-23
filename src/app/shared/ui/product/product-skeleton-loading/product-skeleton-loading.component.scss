@@ -1,0 +1,60 @@
+:host {
+  display: block;
+}
+
+.product-skeleton-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.product-skeleton-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid rgba(87, 61, 44, 0.12);
+  border-radius: 1.4rem;
+  background: rgba(255, 252, 247, 0.96);
+}
+
+.product-skeleton-card__media {
+  min-height: 14rem;
+  border-radius: 1.3rem;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(233, 223, 213, 0.82) 0%,
+      rgba(248, 242, 236, 0.95) 50%,
+      rgba(233, 223, 213, 0.82) 100%
+    );
+  background-size: 200% 100%;
+  animation: product-skeleton-shimmer 1.6s linear infinite;
+}
+
+@keyframes product-skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 1200px) {
+  .product-skeleton-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .product-skeleton-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .product-skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+}

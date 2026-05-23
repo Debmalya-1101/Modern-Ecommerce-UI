@@ -1,111 +1,189 @@
 <section class="home-page">
-  <mat-card class="hero-card" appearance="outlined">
-    <p class="eyebrow">Home feature route</p>
-    <h2>Scalable feature routing starts with a clear landing page</h2>
-    <p class="hero-copy">
-      This home route is lazy loaded and keeps the application shell separate from future business screens.
-    </p>
-  </mat-card>
-
-  <div class="info-grid">
-    <mat-card appearance="outlined">
-      <h3>Loading spinner</h3>
-      <app-loading-spinner label="Loading shared components" />
-    </mat-card>
-
-    <mat-card appearance="outlined">
-      <h3>Skeleton loader</h3>
-      <p>
-        Use a skeleton when page structure is known but data is still on the way.
+  <section class="hero-panel">
+    <mat-card class="hero-card" appearance="outlined">
+      <p class="eyebrow">Home feature route</p>
+      <h2>Scalable feature routing with a storefront-style landing experience</h2>
+      <p class="hero-copy">
+        This home route is lazy loaded and organized like a real application shell:
+        clear hero messaging, grouped feature previews, and consistent interaction zones.
       </p>
-      <app-skeleton-loader />
-    </mat-card>
 
-    <mat-card appearance="outlined">
-      <h3>Reusable buttons</h3>
-      <div class="button-row">
-        <button mat-flat-button appButtonStyle="primary" type="button">
-          Primary
+      <div class="hero-actions">
+        <button
+          mat-flat-button
+          appButtonStyle="primary"
+          type="button"
+          (click)="showInfoMessage()"
+        >
+          Explore shared UI
         </button>
-        <button mat-stroked-button appButtonStyle="secondary" type="button">
-          Secondary
-        </button>
-        <button mat-flat-button appButtonStyle="tonal" type="button">
-          Tonal
-        </button>
-        <button mat-flat-button appButtonStyle="danger" type="button">
-          Danger
+        <button
+          mat-stroked-button
+          appButtonStyle="secondary"
+          type="button"
+          (click)="openConfirmationDialog()"
+        >
+          Preview interaction flow
         </button>
       </div>
     </mat-card>
-  </div>
 
-  <div class="state-grid">
-    <app-empty-state
-      title="No featured collections yet"
-      description="This reusable empty state can be used anywhere the app needs a clear placeholder."
-      actionLabel="Show snackbar"
-      (action)="handleEmptyAction()"
-    />
+    <div class="hero-side">
+      <mat-card appearance="outlined">
+        <p class="mini-label">Feature routes</p>
+        <strong>7 placeholders</strong>
+        <span>Home, products, details, cart, checkout, orders, and profile.</span>
+      </mat-card>
 
-    <app-error-state
-      title="Could not load a future home section"
-      description="This shared error state gives screens a consistent retry experience."
-      actionLabel="Retry example"
-      (action)="handleRetryAction()"
-    />
-  </div>
+      <mat-card appearance="outlined">
+        <p class="mini-label">Shared patterns</p>
+        <strong>Reusable UI system</strong>
+        <span>Buttons, feedback states, loading patterns, snackbars, and dialogs.</span>
+      </mat-card>
 
-  <mat-card class="notes-card" appearance="outlined">
-    <h3>Shared interaction utilities</h3>
-    <mat-divider />
-    <p class="card-copy">
-      These actions use a shared snackbar service and a shared confirmation dialog service.
-    </p>
-    <div class="button-row">
-      <button
-        mat-flat-button
-        appButtonStyle="primary"
-        type="button"
-        (click)="showInfoMessage()"
-      >
-        Show info snackbar
-      </button>
-      <button
-        mat-stroked-button
-        appButtonStyle="secondary"
-        type="button"
-        (click)="showSuccessMessage()"
-      >
-        Show success snackbar
-      </button>
-      <button
-        mat-flat-button
-        appButtonStyle="tonal"
-        type="button"
-        (click)="showWarningMessage()"
-      >
-        Show warning snackbar
-      </button>
-      <button
-        mat-flat-button
-        appButtonStyle="tonal"
-        type="button"
-        (click)="openConfirmationDialog()"
-      >
-        Open confirmation dialog
-      </button>
+      <mat-card appearance="outlined">
+        <p class="mini-label">Architecture</p>
+        <strong>Feature-first structure</strong>
+        <span>Organized for future storefront growth without adding business screens yet.</span>
+      </mat-card>
     </div>
-    <p class="last-action">Last action: {{ lastAction() }}</p>
-  </mat-card>
+  </section>
 
-  <mat-card class="notes-card" appearance="outlined">
-    <h3>Why this route structure exists</h3>
-    <mat-divider />
-    <ul>
-      <li>Each feature now has its own route file instead of one growing route list.</li>
-      <li>Sidebar navigation points to route-level placeholders that are ready for real feature work.</li>
-      <li>Product details already has its own dynamic route shape for future backend integration.</li>
-    </ul>
-  </mat-card>
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Shared building blocks</p>
+        <h3>Core interface patterns</h3>
+      </div>
+      <p class="section-copy">
+        These pieces show the reusable UI foundation that future feature screens can rely on.
+      </p>
+    </div>
+
+    <div class="info-grid">
+      <mat-card appearance="outlined">
+      <h3>Loading spinner</h3>
+      <app-loading-spinner label="Loading shared components" />
+      </mat-card>
+
+      <mat-card appearance="outlined">
+        <h3>Skeleton loader</h3>
+        <p>
+          Use a skeleton when page structure is known but data is still on the way.
+        </p>
+        <app-skeleton-loader />
+      </mat-card>
+
+      <mat-card appearance="outlined">
+        <h3>Reusable buttons</h3>
+        <div class="button-row">
+          <button mat-flat-button appButtonStyle="primary" type="button">
+            Primary
+          </button>
+          <button mat-stroked-button appButtonStyle="secondary" type="button">
+            Secondary
+          </button>
+          <button mat-flat-button appButtonStyle="tonal" type="button">
+            Tonal
+          </button>
+          <button mat-flat-button appButtonStyle="danger" type="button">
+            Danger
+          </button>
+        </div>
+      </mat-card>
+    </div>
+  </section>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">UI states</p>
+        <h3>Empty and recovery experiences</h3>
+      </div>
+      <p class="section-copy">
+        A real app needs clean fallback states, not just happy-path content cards.
+      </p>
+    </div>
+
+    <div class="state-grid">
+      <app-empty-state
+        title="No featured collections yet"
+        description="This reusable empty state can be used anywhere the app needs a clear placeholder."
+        actionLabel="Show snackbar"
+        (action)="handleEmptyAction()"
+      />
+
+      <app-error-state
+        title="Could not load a future home section"
+        description="This shared error state gives screens a consistent retry experience."
+        actionLabel="Retry example"
+        (action)="handleRetryAction()"
+      />
+    </div>
+  </section>
+
+  <section class="utility-layout">
+    <mat-card class="notes-card" appearance="outlined">
+      <div class="card-header">
+        <div>
+          <p class="eyebrow">Interaction utilities</p>
+          <h3>Reusable feedback actions</h3>
+        </div>
+      </div>
+      <mat-divider />
+      <p class="card-copy">
+        These actions use a shared snackbar service and a shared confirmation dialog service.
+      </p>
+      <div class="button-row">
+        <button
+          mat-flat-button
+          appButtonStyle="primary"
+          type="button"
+          (click)="showInfoMessage()"
+        >
+          Show info snackbar
+        </button>
+        <button
+          mat-stroked-button
+          appButtonStyle="secondary"
+          type="button"
+          (click)="showSuccessMessage()"
+        >
+          Show success snackbar
+        </button>
+        <button
+          mat-flat-button
+          appButtonStyle="tonal"
+          type="button"
+          (click)="showWarningMessage()"
+        >
+          Show warning snackbar
+        </button>
+        <button
+          mat-flat-button
+          appButtonStyle="tonal"
+          type="button"
+          (click)="openConfirmationDialog()"
+        >
+          Open confirmation dialog
+        </button>
+      </div>
+      <p class="last-action">Last action: {{ lastAction() }}</p>
+    </mat-card>
+
+    <mat-card class="notes-card notes-card--compact" appearance="outlined">
+      <div class="card-header">
+        <div>
+          <p class="eyebrow">Routing rationale</p>
+          <h3>Why the structure looks like this</h3>
+        </div>
+      </div>
+      <mat-divider />
+      <ul>
+        <li>Each feature now has its own route file instead of one growing route list.</li>
+        <li>Sidebar navigation points to route-level placeholders that are ready for real feature work.</li>
+        <li>Product details already has its own dynamic route shape for future backend integration.</li>
+      </ul>
+    </mat-card>
+  </section>
 </section>

@@ -1,0 +1,39 @@
+<mat-card class="product-card" appearance="outlined">
+  <div class="product-card__media">
+    <app-product-image-placeholder [label]="product.imageLabel" />
+
+    @if (product.badge) {
+      <div class="product-card__badge">
+        <app-product-badge [label]="product.badge" />
+      </div>
+    }
+  </div>
+
+  <div class="product-card__content">
+    <div class="product-card__meta">
+      <app-product-category-chip [label]="product.category" />
+      <span class="product-card__brand">{{ product.brand }}</span>
+    </div>
+
+    <h3>{{ product.name }}</h3>
+
+    <app-product-rating-display
+      [rating]="product.rating"
+      [reviewCount]="product.reviewCount"
+    />
+
+    <app-product-price-display
+      [price]="product.price"
+      [originalPrice]="product.originalPrice"
+    />
+
+    <button
+      mat-flat-button
+      appButtonStyle="primary"
+      type="button"
+      (click)="openQuickView()"
+    >
+      Quick view
+    </button>
+  </div>
+</mat-card>

@@ -1,0 +1,70 @@
+<section class="products-page">
+  <section class="products-hero">
+    <mat-card class="products-hero__content" appearance="outlined">
+      <p class="eyebrow">Products feature route</p>
+      <h2>Reusable product UI components for a real storefront foundation</h2>
+      <p class="hero-copy">
+        This page uses mock data only, but the component structure is ready for real product listings, filters, and product interactions later.
+      </p>
+
+      <div class="hero-actions">
+        <button mat-flat-button appButtonStyle="primary" type="button">
+          Browse collections
+        </button>
+        <button mat-stroked-button appButtonStyle="secondary" type="button">
+          View category layout
+        </button>
+      </div>
+    </mat-card>
+
+    <mat-card class="products-hero__side" appearance="outlined">
+      <p class="mini-label">Why this matters</p>
+      <ul>
+        <li>Product UI is now reusable instead of being rebuilt per screen.</li>
+        <li>Cards, ratings, prices, badges, and grids now share one visual language.</li>
+        <li>The products route feels like a storefront instead of a placeholder page.</li>
+      </ul>
+    </mat-card>
+  </section>
+
+  <section class="products-strip">
+    @for (item of categoryHighlights; track item) {
+      <mat-card class="products-strip__item" appearance="outlined">
+        <p class="mini-label">Category spotlight</p>
+        <strong>{{ item }}</strong>
+        <span>Mock category highlight using the shared design system.</span>
+      </mat-card>
+    }
+  </section>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Featured products</p>
+        <h3>Reusable product grid</h3>
+      </div>
+      <p class="section-copy">
+        The grid, card, badge, price, image, rating, and category components are all shared and reusable.
+      </p>
+    </div>
+
+    <app-product-grid
+      [products]="featuredProducts"
+      (quickView)="showQuickView($event)"
+    />
+  </section>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Loading state</p>
+        <h3>Product skeleton loading</h3>
+      </div>
+      <p class="section-copy">
+        This skeleton component is ready for future product API loading states.
+      </p>
+    </div>
+
+    <app-product-skeleton-loading [cards]="4" />
+  </section>
+</section>

@@ -944,3 +944,120 @@ Why this matters:
 - feature routing is easier to manage when each feature owns its own route file
 - lazy loading keeps route growth cleaner and more scalable
 - Angular route structure can feel familiar to a backend developer because it mirrors path-based organization
+
+## Feature Update: Reusable E-commerce Product UI Components
+
+What was added:
+- product card
+- product grid
+- product badge
+- product price display
+- product image placeholder
+- product rating display
+- product category chip
+- product skeleton loading state
+
+Why it was added:
+- product UI is one of the most repeated patterns in an e-commerce app
+- building these as shared components keeps future category pages, search pages, and featured sections consistent
+- the products route can now look like a real storefront using only mock data
+
+### Reusable Component Architecture Explained Simply
+
+Reusable component architecture means breaking a larger UI into smaller parts that each do one clear job.
+
+In this project:
+- `ProductCardComponent` is the main product display block
+- `ProductGridComponent` arranges multiple cards
+- smaller components handle pieces inside the card such as rating, price, badge, category, and image placeholder
+
+Simple idea:
+- one big screen becomes many small reusable parts
+- each part stays easier to understand and reuse
+
+Why this helps:
+- the products page stays readable
+- the same product card can later be used on home, category, search, and wishlist screens
+
+### `@Input` Explained Simply
+
+`@Input` lets a parent component pass data into a child component.
+
+Small example:
+
+```ts
+@Input() label = 'Featured';
+```
+
+What this means:
+- the component has a default value
+- a parent can replace that value when using the component
+
+Template example:
+
+```html
+<app-product-badge [label]="product.badge" />
+```
+
+Why this is useful:
+- the badge component stays reusable
+- different cards can show different labels without changing the badge component code
+
+### Component Composition Explained Simply
+
+Component composition means building one component by combining other smaller components.
+
+In this project:
+- `ProductCardComponent` composes:
+  - `ProductBadgeComponent`
+  - `ProductCategoryChipComponent`
+  - `ProductImagePlaceholderComponent`
+  - `ProductPriceDisplayComponent`
+  - `ProductRatingDisplayComponent`
+
+Simple mental model:
+
+```text
+product grid
+  -> product card
+    -> badge
+    -> category chip
+    -> image placeholder
+    -> rating
+    -> price
+```
+
+Why this matters:
+- each piece stays focused
+- visual consistency becomes easier
+- updates to one piece can improve many screens
+
+### Product Grid Explained
+
+The product grid is the layout component that arranges many product cards.
+
+Why it exists:
+- product card logic should not also manage the full responsive layout
+- the grid can decide how cards respond on desktop, tablet, and mobile
+
+Small idea:
+- card = one product
+- grid = many products arranged together
+
+### Product Skeleton Loading Explained
+
+The product skeleton loading component is a placeholder version of the grid.
+
+Why it exists:
+- in real apps, products take time to load
+- a skeleton shows the page structure before the data arrives
+
+This improves perceived polish because:
+- the screen looks intentional
+- layout does not suddenly jump from empty to full
+
+## What I Learned From This Step
+
+- reusable product UI is easier to scale when the card is composed from smaller pieces
+- `@Input` is one of the simplest ways to make components flexible without making them complex
+- component composition keeps the code beginner-readable while still feeling enterprise-relevant

@@ -4,10 +4,11 @@
 
 .home-page {
   display: grid;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .hero-card,
+.hero-side mat-card,
 .info-grid mat-card,
 .notes-card {
   border-color: rgba(87, 61, 44, 0.14);
@@ -15,8 +16,52 @@
   box-shadow: 0 14px 32px rgba(80, 54, 36, 0.07);
 }
 
+.hero-panel {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.8fr) minmax(18rem, 0.9fr);
+}
+
 .hero-card {
-  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.hero-side {
+  display: grid;
+  gap: 1rem;
+}
+
+.hero-side mat-card {
+  display: grid;
+  gap: 0.45rem;
+  padding: 1.1rem;
+}
+
+.mini-label {
+  margin: 0;
+  color: #b55f34;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-side strong {
+  color: #2d241f;
+  font-size: 1.05rem;
+}
+
+.hero-side span {
+  color: #6e5d52;
+  line-height: 1.65;
 }
 
 .eyebrow {
@@ -38,9 +83,28 @@ h3 {
 .hero-copy,
 .info-grid p,
 .card-copy,
+.section-copy,
 .notes-card li {
   color: #6e5d52;
   line-height: 1.7;
+}
+
+.section-block {
+  display: grid;
+  gap: 1rem;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+}
+
+.section-copy {
+  max-width: 30rem;
+  margin: 0;
+  text-align: right;
 }
 
 .info-grid {
@@ -56,7 +120,24 @@ h3 {
 }
 
 .notes-card {
-  padding: 1rem;
+  padding: 1.25rem;
+}
+
+.utility-layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.45fr) minmax(19rem, 0.85fr);
+}
+
+.notes-card--compact {
+  align-self: start;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
 }
 
 .button-row {
@@ -78,8 +159,20 @@ h3 {
 }
 
 @media (max-width: 900px) {
+  .hero-panel,
+  .utility-layout,
   .info-grid,
   .state-grid {
     grid-template-columns: 1fr;
+  }
+
+  .section-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .section-copy {
+    max-width: none;
+    text-align: left;
   }
 }

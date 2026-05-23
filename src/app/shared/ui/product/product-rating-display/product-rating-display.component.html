@@ -1,0 +1,9 @@
+<div class="rating-display" aria-label="Product rating">
+  <div class="stars">
+    @for (star of stars; track star) {
+      <span [class.star--filled]="isFilled(star)" class="star">★</span>
+    }
+  </div>
+  <span class="rating-value">{{ rating.toFixed(1) }}</span>
+  <span class="review-count">({{ reviewCount }})</span>
+</div>

@@ -1,0 +1,11 @@
+<div class="product-skeleton-grid">
+  @for (placeholder of placeholders; track placeholder) {
+    <div class="product-skeleton-card">
+      <div class="product-skeleton-card__media"></div>
+      <app-skeleton-loader [lines]="1" height="1rem" />
+      <app-skeleton-loader [lines]="1" height="0.85rem" width="70%" />
+      <app-skeleton-loader [lines]="1" height="1.1rem" width="45%" />
+      <app-skeleton-loader [lines]="1" height="2.7rem" [rounded]="true" />
+    </div>
+  }
+</div>

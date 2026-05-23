@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+.price-display {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.price-row {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+strong {
+  color: #2d241f;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.original-price {
+  color: #8a776d;
+  text-decoration: line-through;
+}
+
+.discount-copy {
+  color: #4b6a50;
+  font-size: 0.86rem;
+  font-weight: 700;
+}

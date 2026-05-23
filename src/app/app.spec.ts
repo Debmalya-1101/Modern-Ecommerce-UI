@@ -18,10 +18,10 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the shell title', async () => {
+  it('should render the shell brand title', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Modern Commerce');
+    expect(compiled.querySelector('.brand-mark__title')?.textContent).toContain('Modern Commerce');
   });
 });

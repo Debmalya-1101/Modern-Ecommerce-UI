@@ -1,0 +1,34 @@
+:host {
+  display: block;
+}
+
+.rating-display {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stars {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.star {
+  color: #d7c0ab;
+  font-size: 0.95rem;
+}
+
+.star--filled {
+  color: #b9782f;
+}
+
+.rating-value {
+  color: #2d241f;
+  font-weight: 700;
+}
+
+.review-count {
+  color: #8a776d;
+  font-size: 0.9rem;
+}

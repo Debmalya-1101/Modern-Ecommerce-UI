@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { ButtonStyleDirective } from './shared/directives/button-style.directive';
 
 interface NavigationItem {
   label: string;
@@ -26,7 +27,8 @@ interface NavigationItem {
     MatDividerModule,
     MatListModule,
     MatSidenavModule,
-    MatToolbarModule
+    MatToolbarModule,
+    ButtonStyleDirective
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'

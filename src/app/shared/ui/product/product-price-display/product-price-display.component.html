@@ -1,0 +1,15 @@
+<div class="price-display">
+  <div class="price-row">
+    <strong>{{ price | currency: currencyCode : 'symbol' : '1.0-0' }}</strong>
+
+    @if (originalPrice) {
+      <span class="original-price">
+        {{ originalPrice | currency: currencyCode : 'symbol' : '1.0-0' }}
+      </span>
+    }
+  </div>
+
+  @if (discountPercentage) {
+    <span class="discount-copy">Save {{ discountPercentage }}%</span>
+  }
+</div>
