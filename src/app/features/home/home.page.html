@@ -1,10 +1,9 @@
-<section class="shell-home">
+<section class="home-page">
   <mat-card class="hero-card" appearance="outlined">
-    <p class="eyebrow">Application shell and shared UI</p>
-    <h2>Reusable interface building blocks before business features</h2>
+    <p class="eyebrow">Home feature route</p>
+    <h2>Scalable feature routing starts with a clear landing page</h2>
     <p class="hero-copy">
-      This starter view now demonstrates a shared UI layer: reusable feedback,
-      loading, action, and dialog patterns built with standalone Angular Material pieces.
+      This home route is lazy loaded and keeps the application shell separate from future business screens.
     </p>
   </mat-card>
 
@@ -43,14 +42,14 @@
 
   <div class="state-grid">
     <app-empty-state
-      title="No saved views yet"
+      title="No featured collections yet"
       description="This reusable empty state can be used anywhere the app needs a clear placeholder."
       actionLabel="Show snackbar"
       (action)="handleEmptyAction()"
     />
 
     <app-error-state
-      title="Could not load a future feature"
+      title="Could not load a future home section"
       description="This shared error state gives screens a consistent retry experience."
       actionLabel="Retry example"
       (action)="handleRetryAction()"
@@ -84,6 +83,14 @@
         mat-flat-button
         appButtonStyle="tonal"
         type="button"
+        (click)="showWarningMessage()"
+      >
+        Show warning snackbar
+      </button>
+      <button
+        mat-flat-button
+        appButtonStyle="tonal"
+        type="button"
         (click)="openConfirmationDialog()"
       >
         Open confirmation dialog
@@ -93,23 +100,12 @@
   </mat-card>
 
   <mat-card class="notes-card" appearance="outlined">
-    <h3>Why these shared pieces exist</h3>
+    <h3>Why this route structure exists</h3>
     <mat-divider />
     <ul>
-      <li>They prevent future pages from duplicating the same loading and feedback UI.</li>
-      <li>They keep reusable patterns inside a dedicated `shared` layer.</li>
-      <li>They provide enterprise-relevant structure without adding product logic yet.</li>
+      <li>Each feature now has its own route file instead of one growing route list.</li>
+      <li>Sidebar navigation points to route-level placeholders that are ready for real feature work.</li>
+      <li>Product details already has its own dynamic route shape for future backend integration.</li>
     </ul>
-  </mat-card>
-
-  <mat-card class="notes-card" appearance="outlined">
-    <h3>Beginner-friendly architecture idea</h3>
-    <mat-divider />
-    <p class="card-copy">
-      Pages can now import shared UI pieces instead of rebuilding them from scratch.
-    </p>
-    <p class="card-copy">
-      That keeps route pages focused on screen composition while shared components handle repeatable UI patterns.
-    </p>
   </mat-card>
 </section>

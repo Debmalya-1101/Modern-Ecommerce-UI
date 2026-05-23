@@ -44,13 +44,38 @@ export class App {
     {
       label: 'Home',
       path: '/',
-      description: 'Application shell overview'
+      description: 'Feature routing overview'
+    },
+    {
+      label: 'Products',
+      path: '/products',
+      description: 'Product listing placeholder'
+    },
+    {
+      label: 'Cart',
+      path: '/cart',
+      description: 'Cart route placeholder'
+    },
+    {
+      label: 'Checkout',
+      path: '/checkout',
+      description: 'Checkout route placeholder'
+    },
+    {
+      label: 'Orders',
+      path: '/orders',
+      description: 'Orders route placeholder'
+    },
+    {
+      label: 'Profile',
+      path: '/profile',
+      description: 'Profile route placeholder'
     }
   ];
   protected readonly plannedAreas = [
-    'Product catalog',
-    'Shopping cart',
-    'Checkout flow'
+    'Product details route',
+    'Protected order history',
+    'Future admin area'
   ];
 
   constructor() {

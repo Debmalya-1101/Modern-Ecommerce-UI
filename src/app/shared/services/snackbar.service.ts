@@ -15,6 +15,10 @@ export class SnackbarService {
     this.open(message, action, ['app-snackbar', 'app-snackbar--success']);
   }
 
+  warning(message: string, action = 'Dismiss'): void {
+    this.open(message, action, ['app-snackbar', 'app-snackbar--warning']);
+  }
+
   error(message: string, action = 'Dismiss'): void {
     this.open(message, action, ['app-snackbar', 'app-snackbar--error']);
   }

@@ -1,5 +1,31 @@
 @use '@angular/material' as mat;
 
+:root {
+  --color-brand-500: #b55f34;
+  --color-brand-600: #9e522c;
+  --color-brand-050: #f6e7db;
+
+  --color-neutral-900: #2d241f;
+  --color-neutral-700: #5a473d;
+  --color-neutral-600: #6e5d52;
+  --color-neutral-300: rgba(87, 61, 44, 0.25);
+  --color-neutral-100: #f3e9df;
+  --color-surface-soft: #fffaf5;
+
+  --color-danger-600: #a14634;
+  --color-danger-050: #f6e4df;
+  --color-danger-border: rgba(161, 70, 52, 0.28);
+
+  --color-success-700: #4b6a50;
+  --color-success-050: #e8f0e6;
+
+  --color-warning-700: #8a6433;
+  --color-warning-050: #f5ead7;
+
+  --color-info-700: #4d3d34;
+  --color-info-050: #efe4da;
+}
+
 html {
   height: 100%;
   color-scheme: light;
@@ -41,44 +67,78 @@ a {
   border-radius: 999px;
   padding-inline: 1rem;
   letter-spacing: 0.01em;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .shared-button--primary.mdc-button {
-  background: #b55f34;
+  background: var(--color-brand-500);
   color: #fff8f2;
   box-shadow: 0 10px 24px rgba(181, 95, 52, 0.2);
 }
 
+.shared-button--primary.mdc-button:hover {
+  background: var(--color-brand-600);
+}
+
 .shared-button--secondary.mdc-button {
-  border-color: rgba(87, 61, 44, 0.25);
-  color: #5a473d;
+  background: transparent;
+  border-color: var(--color-neutral-300);
+  color: var(--color-neutral-700);
+}
+
+.shared-button--secondary.mdc-button:hover {
+  background: rgba(243, 233, 223, 0.5);
 }
 
 .shared-button--tonal.mdc-button {
-  background: #ead7c8;
-  color: #5c3f2f;
+  background: var(--color-brand-050);
+  color: var(--color-brand-600);
+}
+
+.shared-button--tonal.mdc-button:hover {
+  background: #eddcca;
 }
 
 .shared-button--danger.mdc-button {
-  background: #b04f38;
+  background: var(--color-danger-600);
   color: #fff7f4;
+  box-shadow: 0 10px 24px rgba(161, 70, 52, 0.18);
+}
+
+.shared-button--danger.mdc-button:hover {
+  background: #913c2c;
 }
 
 .app-snackbar .mat-mdc-snackbar-surface {
   border-radius: 1rem;
+  box-shadow: 0 14px 30px rgba(45, 36, 31, 0.14);
 }
 
 .app-snackbar--info .mat-mdc-snackbar-surface {
-  background: #4d3d34;
+  background: var(--color-info-700);
   color: #fffaf6;
 }
 
 .app-snackbar--success .mat-mdc-snackbar-surface {
-  background: #496f4f;
+  background: var(--color-success-700);
   color: #f8fff8;
 }
 
+.app-snackbar--warning .mat-mdc-snackbar-surface {
+  background: var(--color-warning-700);
+  color: #fffaf1;
+}
+
 .app-snackbar--error .mat-mdc-snackbar-surface {
-  background: #8c4433;
+  background: var(--color-danger-600);
   color: #fff8f6;
+}
+
+.app-snackbar .mdc-snackbar__label,
+.app-snackbar .mat-mdc-button {
+  color: inherit;
 }

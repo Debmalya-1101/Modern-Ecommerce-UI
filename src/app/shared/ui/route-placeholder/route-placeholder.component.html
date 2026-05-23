@@ -1,0 +1,16 @@
+<section class="route-placeholder">
+  <mat-card class="hero-card" appearance="outlined">
+    <p class="eyebrow">{{ eyebrow }}</p>
+    <h2>{{ title }}</h2>
+    <p class="description">{{ description }}</p>
+  </mat-card>
+
+  <mat-card class="notes-card" appearance="outlined">
+    <h3>What this route is ready for</h3>
+    <ul>
+      @for (item of highlights; track item) {
+        <li>{{ item }}</li>
+      }
+    </ul>
+  </mat-card>
+</section>

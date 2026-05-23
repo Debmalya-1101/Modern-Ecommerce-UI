@@ -709,3 +709,238 @@ Spring Boot comparison:
 - Angular services play a role similar to Spring services, but for frontend communication and state
 - interceptors are a clean place for repeated HTTP behavior such as auth headers and error shaping
 - observables are easier to understand when treated as asynchronous response streams
+
+## Feature Update: Semantic Design System Colors
+
+What was improved:
+- primary buttons now use the main brand color more consistently
+- secondary buttons use a clearer neutral outlined treatment
+- tonal buttons use a softer muted brand tint
+- danger buttons use a more clearly destructive red-brown tone
+- snackbars now have consistent success, error, warning, and info variants
+
+Why it was improved:
+- semantic colors should communicate meaning, not just decoration
+- shared UI patterns become easier to trust when the same meaning uses the same color language
+- the app keeps its warm e-commerce aesthetic while becoming more consistent
+
+### Angular Material Theming Explained Simply
+
+Angular Material has its own theme system for colors, typography, and component behavior.
+
+In this project:
+- Material provides the base component structure
+- shared SCSS adds project-specific semantic meaning on top
+
+Simple idea:
+- Material gives the starting design system
+- project styles refine it for this app's brand and semantics
+
+Small example:
+
+```scss
+@include mat.theme(
+  (
+    color: (
+      primary: mat.$orange-palette,
+      tertiary: mat.$blue-palette,
+    )
+  )
+);
+```
+
+What this means:
+- Angular Material gets a base color setup
+- buttons, snackbars, and surfaces can then be adjusted with reusable app styles
+
+Why this is useful:
+- you do not style every component from scratch
+- Material stays consistent
+- app-level semantic styling can still reflect the brand
+
+### Reusable Styling Concepts Explained Simply
+
+Reusable styling means defining a style once and applying it in many places.
+
+In this project, semantic styling now works like this:
+- `primary` means main action
+- `secondary` means supporting neutral action
+- `tonal` means softer low-emphasis action
+- `danger` means destructive action
+
+For snackbars:
+- `success` means a positive result
+- `warning` means caution
+- `error` means failure
+- `info` means neutral message
+
+Why this matters:
+- users learn what colors mean
+- new screens can reuse the same visual rules
+- the UI feels more intentional and less random
+
+### Semantic Colors Explained Simply
+
+Semantic color means a color is chosen for meaning, not only for appearance.
+
+Examples:
+- primary button: "this is the main action"
+- danger button: "this action can remove, delete, or cause loss"
+- success snackbar: "something completed correctly"
+
+That is better than choosing one-off colors every time because:
+- meaning stays consistent
+- accessibility review is easier
+- future feature teams can reuse the same rules
+
+## What I Learned From This Step
+
+- a design system becomes stronger when color meaning is standardized
+- Angular Material theming works well as a base layer, while shared SCSS handles app-specific semantics
+- reusable styling is not just about saving time; it also improves consistency and clarity
+
+## Feature Update: Scalable Feature Routing Structure
+
+What was added:
+- placeholder feature routes for home, products, product details, cart, checkout, orders, and profile
+- lazy-loaded route files for each feature area
+- standalone route components inside `features`
+- sidebar navigation links for the new feature routes
+
+Why it was added:
+- the app needs route structure before real product and account screens are implemented
+- feature-level routing keeps the app organized as more screens are added
+- lazy loading helps keep the initial app smaller and cleaner
+
+### Angular Routing Explained Simply
+
+Angular routing decides which component appears for a given URL.
+
+Simple idea:
+- `/` shows the home route
+- `/products` shows the products route
+- `/products/42` shows the product details route for item `42`
+
+Small example:
+
+```ts
+{
+  path: 'products',
+  loadChildren: () =>
+    import('./features/products/products.routes').then((m) => m.PRODUCTS_ROUTES)
+}
+```
+
+What this means:
+- when the user visits `/products`
+- Angular loads the products route configuration
+- then Angular loads the correct standalone page component
+
+Why this is useful:
+- route structure stays centralized
+- features can grow without making `app.routes.ts` too large
+
+### Lazy Loading Explained Simply
+
+Lazy loading means Angular does not load every feature page immediately on first app load.
+
+Instead:
+- it loads a feature only when that route is visited
+
+Simple example:
+
+```ts
+loadChildren: () =>
+  import('./features/checkout/checkout.routes').then((m) => m.CHECKOUT_ROUTES)
+```
+
+What this means:
+- the checkout route files are not loaded until the user opens checkout
+- the first app load stays lighter
+
+Why this is useful:
+- faster startup
+- clearer feature separation
+- closer to how real apps scale
+
+### Standalone Route Components Explained Again
+
+Each route page is still a standalone component.
+
+That means:
+- each page imports what it needs
+- each page can be lazy loaded directly
+- no large route NgModule is needed
+
+Small example:
+
+```ts
+@Component({
+  selector: 'app-products-page',
+  imports: [RoutePlaceholderComponent],
+  template: `...`
+})
+export class ProductsPage {}
+```
+
+Why this helps:
+- each route is easier to read in isolation
+- feature folders stay small and explicit
+
+### Feature Route Organization Explained
+
+The app now organizes routes by feature:
+- `features/home`
+- `features/products`
+- `features/cart`
+- `features/checkout`
+- `features/orders`
+- `features/profile`
+
+The products feature also contains the product details route.
+
+Why this structure is useful:
+- related routes stay together
+- future product-specific UI can live near product routes
+- route growth follows business language instead of one large generic pages folder
+
+### Backend Comparison: Routing and Controllers
+
+If you are used to backend controller organization, think of Angular routes like frontend controller entry points.
+
+Simple comparison:
+- Angular route path: `/products`
+- backend controller path: `/api/products`
+
+Angular route purpose:
+- decide which screen to show
+
+Backend controller purpose:
+- decide which server handler should process the request
+
+Product details comparison:
+- Angular route: `/products/:id`
+- backend endpoint: `/api/products/{id}`
+
+That is not the same layer, but the structure feels similar:
+- path-based organization
+- one area for listing
+- one area for details
+
+### Responsive Routing Behavior Explained
+
+The app shell already supports mobile behavior through the sidebar.
+
+With the new route links:
+- desktop keeps the sidebar visible
+- mobile closes the sidebar after navigation click
+
+Why this matters:
+- routing should feel natural on both large and small screens
+- navigation behavior is part of route usability, not just route definitions
+
+## What I Learned From This Step
+
+- feature routing is easier to manage when each feature owns its own route file
+- lazy loading keeps route growth cleaner and more scalable
+- Angular route structure can feel familiar to a backend developer because it mirrors path-based organization

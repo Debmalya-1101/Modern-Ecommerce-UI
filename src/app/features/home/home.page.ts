@@ -13,7 +13,7 @@ import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading
 import { SkeletonLoaderComponent } from '../../shared/ui/skeleton-loader/skeleton-loader.component';
 
 @Component({
-  selector: 'app-shell-home-page',
+  selector: 'app-home-page',
   imports: [
     MatButtonModule,
     MatCardModule,
@@ -25,10 +25,10 @@ import { SkeletonLoaderComponent } from '../../shared/ui/skeleton-loader/skeleto
     LoadingSpinnerComponent,
     SkeletonLoaderComponent
   ],
-  templateUrl: './shell-home.page.html',
-  styleUrl: './shell-home.page.scss'
+  templateUrl: './home.page.html',
+  styleUrl: './home.page.scss'
 })
-export class ShellHomePage {
+export class HomePage {
   private readonly snackbarService = inject(SnackbarService);
   private readonly confirmationDialogService = inject(ConfirmationDialogService);
 
@@ -42,6 +42,11 @@ export class ShellHomePage {
   protected showSuccessMessage(): void {
     this.snackbarService.success('Success snackbar example shown.');
     this.lastAction.set('Success snackbar opened.');
+  }
+
+  protected showWarningMessage(): void {
+    this.snackbarService.warning('Warning snackbar example shown.');
+    this.lastAction.set('Warning snackbar opened.');
   }
 
   protected handleEmptyAction(): void {
