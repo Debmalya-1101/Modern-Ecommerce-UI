@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+.skeleton-loader {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.skeleton-line {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(225, 214, 203, 0.7) 0%,
+      rgba(245, 238, 231, 0.95) 50%,
+      rgba(225, 214, 203, 0.7) 100%
+    );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s linear infinite;
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}

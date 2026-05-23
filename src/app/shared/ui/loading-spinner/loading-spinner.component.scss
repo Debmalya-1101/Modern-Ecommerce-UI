@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+.loading-spinner {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  color: #6e5d52;
+  text-align: center;
+}
+
+.loading-spinner p {
+  margin: 0;
+}

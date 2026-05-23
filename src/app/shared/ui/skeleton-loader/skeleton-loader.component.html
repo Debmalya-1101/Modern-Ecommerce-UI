@@ -1,0 +1,10 @@
+<div class="skeleton-loader" aria-hidden="true">
+  @for (placeholder of placeholders; track placeholder) {
+    <div
+      class="skeleton-line"
+      [style.height]="height"
+      [style.width]="width"
+      [style.border-radius]="rounded ? '999px' : '0.25rem'"
+    ></div>
+  }
+</div>

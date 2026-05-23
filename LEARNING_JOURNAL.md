@@ -398,3 +398,141 @@ Why this feature was added:
 - standalone components stay readable even when Angular Material is added
 - Angular routing becomes more useful when the main content area is separated from the layout shell
 - Angular Material can be introduced gradually without making the app feel overbuilt
+
+## Feature Update: Reusable Shared UI Components
+
+What was added:
+- a reusable loading spinner
+- a reusable skeleton loader
+- reusable button styling through a shared directive
+- a reusable empty state component
+- a reusable error state component
+- a snackbar utility service
+- a confirmation dialog component and service
+
+Why it was added:
+- future pages will need the same loading, feedback, and action patterns
+- placing these pieces in `shared` avoids rebuilding them in every route page
+- it keeps the project scalable without adding product logic yet
+
+### Reusable Components Explained Simply
+
+A reusable component is a UI building block you can use in many places.
+
+Simple idea:
+- write it once
+- use it in multiple screens
+- keep the design and behavior consistent
+
+Examples from this project:
+- `LoadingSpinnerComponent`
+- `SkeletonLoaderComponent`
+- `EmptyStateComponent`
+- `ErrorStateComponent`
+
+Small example:
+
+```html
+<app-empty-state
+  title="No saved views yet"
+  description="This reusable empty state can be shown anywhere data is missing."
+></app-empty-state>
+```
+
+Why this is useful:
+- route pages stay smaller
+- repeated UI becomes consistent
+- styling changes are easier later because one component can update many screens
+
+### Dependency Injection Explained Simply
+
+Dependency injection means Angular can give a class the tool or service it needs.
+
+Instead of manually creating a service with `new`, Angular provides it.
+
+Small example:
+
+```ts
+private readonly snackbarService = inject(SnackbarService);
+```
+
+What this means:
+- the component needs snackbar behavior
+- Angular creates or provides the service
+- the component can use it without managing service creation itself
+
+Backend analogy:
+- similar to a framework giving a controller access to a registered service
+
+Where this is used in the project:
+- `ShellHomePage` injects the snackbar service
+- `ShellHomePage` injects the confirmation dialog service
+- shared services inject Angular Material services such as `MatSnackBar` and `MatDialog`
+
+Why this matters:
+- components stay focused on UI actions
+- service logic can be reused across many screens
+- shared behavior lives in one place
+
+### Shared Architecture Explained Simply
+
+The `shared` layer is for UI and utilities that are not owned by one business feature.
+
+In this project, `shared` now contains:
+- reusable UI components
+- a button styling directive
+- utility services for snackbar and confirmation dialog behavior
+
+Simple mental model:
+
+```text
+pages use shared UI
+shared UI stays generic
+business features can adopt shared UI later
+```
+
+Why this structure helps:
+- `pages` stay focused on screen composition
+- `shared` holds repeatable UI patterns
+- future `features` like products or cart can reuse the same building blocks
+
+### Snackbar Utility Explained
+
+The snackbar utility wraps Angular Material's snackbar service in a simpler project-level API.
+
+Small example:
+
+```ts
+this.snackbarService.success('Saved successfully.');
+```
+
+Why this is helpful:
+- components do not need to repeat snackbar configuration
+- colors, duration, and position stay consistent
+- the app gets one simple place to adjust feedback behavior later
+
+### Confirmation Dialog Explained
+
+A confirmation dialog is a reusable way to ask:
+- should this action continue?
+- or should the user cancel?
+
+Small example:
+
+```ts
+this.confirmationDialogService.open({
+  title: 'Confirm action',
+  message: 'Do you want to continue?'
+});
+```
+
+Why this is useful:
+- future delete, reset, or submit actions can reuse the same pattern
+- dialog wording and button structure stay consistent
+
+## What I Learned From This Step
+
+- shared components reduce duplication before feature pages grow
+- dependency injection keeps components cleaner by moving repeated logic into services
+- a `shared` folder is most useful when it contains real reused UI, not speculative code
+- Angular Material can support reusable patterns beyond just page-level layout

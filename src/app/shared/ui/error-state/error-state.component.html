@@ -1,0 +1,14 @@
+<mat-card class="state-card state-card--error" appearance="outlined">
+  <p class="state-label">Error state</p>
+  <h3>{{ title }}</h3>
+  <p>{{ description }}</p>
+
+  <button
+    mat-flat-button
+    appButtonStyle="danger"
+    type="button"
+    (click)="handleAction()"
+  >
+    {{ actionLabel }}
+  </button>
+</mat-card>

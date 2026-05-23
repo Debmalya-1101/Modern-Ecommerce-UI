@@ -1,46 +1,115 @@
 <section class="shell-home">
   <mat-card class="hero-card" appearance="outlined">
-    <p class="eyebrow">Application shell</p>
-    <h2>Responsive structure before feature complexity</h2>
+    <p class="eyebrow">Application shell and shared UI</p>
+    <h2>Reusable interface building blocks before business features</h2>
     <p class="hero-copy">
-      This starter view focuses on layout only: header, sidebar, footer, and a
-      flexible main content area that can hold future pages.
+      This starter view now demonstrates a shared UI layer: reusable feedback,
+      loading, action, and dialog patterns built with standalone Angular Material pieces.
     </p>
   </mat-card>
 
   <div class="info-grid">
     <mat-card appearance="outlined">
-      <h3>Header</h3>
-      <p>
-        The top bar keeps navigation simple and gives the app a stable brand
-        area on every screen size.
-      </p>
+      <h3>Loading spinner</h3>
+      <app-loading-spinner label="Loading shared components" />
     </mat-card>
 
     <mat-card appearance="outlined">
-      <h3>Sidebar</h3>
+      <h3>Skeleton loader</h3>
       <p>
-        The sidebar stays visible on larger screens and becomes a slide-over
-        drawer on mobile screens.
+        Use a skeleton when page structure is known but data is still on the way.
       </p>
+      <app-skeleton-loader />
     </mat-card>
 
     <mat-card appearance="outlined">
-      <h3>Main content</h3>
-      <p>
-        This area is powered by the Angular router so future pages can appear
-        here without changing the shell layout.
-      </p>
+      <h3>Reusable buttons</h3>
+      <div class="button-row">
+        <button mat-flat-button appButtonStyle="primary" type="button">
+          Primary
+        </button>
+        <button mat-stroked-button appButtonStyle="secondary" type="button">
+          Secondary
+        </button>
+        <button mat-flat-button appButtonStyle="tonal" type="button">
+          Tonal
+        </button>
+        <button mat-flat-button appButtonStyle="danger" type="button">
+          Danger
+        </button>
+      </div>
     </mat-card>
   </div>
 
+  <div class="state-grid">
+    <app-empty-state
+      title="No saved views yet"
+      description="This reusable empty state can be used anywhere the app needs a clear placeholder."
+      actionLabel="Show snackbar"
+      (action)="handleEmptyAction()"
+    />
+
+    <app-error-state
+      title="Could not load a future feature"
+      description="This shared error state gives screens a consistent retry experience."
+      actionLabel="Retry example"
+      (action)="handleRetryAction()"
+    />
+  </div>
+
   <mat-card class="notes-card" appearance="outlined">
-    <h3>Why this shell exists</h3>
+    <h3>Shared interaction utilities</h3>
+    <mat-divider />
+    <p class="card-copy">
+      These actions use a shared snackbar service and a shared confirmation dialog service.
+    </p>
+    <div class="button-row">
+      <button
+        mat-flat-button
+        appButtonStyle="primary"
+        type="button"
+        (click)="showInfoMessage()"
+      >
+        Show info snackbar
+      </button>
+      <button
+        mat-stroked-button
+        appButtonStyle="secondary"
+        type="button"
+        (click)="showSuccessMessage()"
+      >
+        Show success snackbar
+      </button>
+      <button
+        mat-flat-button
+        appButtonStyle="tonal"
+        type="button"
+        (click)="openConfirmationDialog()"
+      >
+        Open confirmation dialog
+      </button>
+    </div>
+    <p class="last-action">Last action: {{ lastAction() }}</p>
+  </mat-card>
+
+  <mat-card class="notes-card" appearance="outlined">
+    <h3>Why these shared pieces exist</h3>
     <mat-divider />
     <ul>
-      <li>It creates a professional starting layout without business logic.</li>
-      <li>It keeps the structure scalable for future route-based pages.</li>
-      <li>It introduces Angular Material navigation in a beginner-readable way.</li>
+      <li>They prevent future pages from duplicating the same loading and feedback UI.</li>
+      <li>They keep reusable patterns inside a dedicated `shared` layer.</li>
+      <li>They provide enterprise-relevant structure without adding product logic yet.</li>
     </ul>
+  </mat-card>
+
+  <mat-card class="notes-card" appearance="outlined">
+    <h3>Beginner-friendly architecture idea</h3>
+    <mat-divider />
+    <p class="card-copy">
+      Pages can now import shared UI pieces instead of rebuilding them from scratch.
+    </p>
+    <p class="card-copy">
+      That keeps route pages focused on screen composition while shared components handle repeatable UI patterns.
+    </p>
   </mat-card>
 </section>

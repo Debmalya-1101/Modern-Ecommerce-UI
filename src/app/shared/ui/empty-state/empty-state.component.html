@@ -1,0 +1,16 @@
+<mat-card class="state-card" appearance="outlined">
+  <p class="state-label">Empty state</p>
+  <h3>{{ title }}</h3>
+  <p>{{ description }}</p>
+
+  @if (actionLabel) {
+    <button
+      mat-stroked-button
+      appButtonStyle="secondary"
+      type="button"
+      (click)="handleAction()"
+    >
+      {{ actionLabel }}
+    </button>
+  }
+</mat-card>

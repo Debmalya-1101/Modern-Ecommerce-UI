@@ -36,3 +36,49 @@ button,
 a {
   font: inherit;
 }
+
+.shared-button.mdc-button {
+  border-radius: 999px;
+  padding-inline: 1rem;
+  letter-spacing: 0.01em;
+}
+
+.shared-button--primary.mdc-button {
+  background: #b55f34;
+  color: #fff8f2;
+  box-shadow: 0 10px 24px rgba(181, 95, 52, 0.2);
+}
+
+.shared-button--secondary.mdc-button {
+  border-color: rgba(87, 61, 44, 0.25);
+  color: #5a473d;
+}
+
+.shared-button--tonal.mdc-button {
+  background: #ead7c8;
+  color: #5c3f2f;
+}
+
+.shared-button--danger.mdc-button {
+  background: #b04f38;
+  color: #fff7f4;
+}
+
+.app-snackbar .mat-mdc-snackbar-surface {
+  border-radius: 1rem;
+}
+
+.app-snackbar--info .mat-mdc-snackbar-surface {
+  background: #4d3d34;
+  color: #fffaf6;
+}
+
+.app-snackbar--success .mat-mdc-snackbar-surface {
+  background: #496f4f;
+  color: #f8fff8;
+}
+
+.app-snackbar--error .mat-mdc-snackbar-surface {
+  background: #8c4433;
+  color: #fff8f6;
+}
