@@ -2,8 +2,8 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 
-import { AppHttpError } from '../models/api.model';
 import { AuthService } from '../services/auth.service';
+import { normalizeApiError } from '../utils/api-error.util';
 
 export const errorInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
@@ -14,39 +14,7 @@ export const errorInterceptor: HttpInterceptorFn = (request, next) => {
         authService.logout();
       }
 
-      const appError = new AppHttpError(
-        extractErrorMessage(error),
-        error.status,
-        error.error
-      );
-
-      return throwError(() => appError);
+      return throwError(() => normalizeApiError(error));
     })
   );
 };
-
-function extractErrorMessage(error: HttpErrorResponse): string {
-  const errorBody = error.error;
-
-  if (typeof errorBody === 'string' && errorBody.trim()) {
-    return errorBody;
-  }
-
-  if (errorBody?.message) {
-    return errorBody.message;
-  }
-
-  if (error.status === 0) {
-    return 'Could not connect to the backend server.';
-  }
-
-  if (error.status === 403) {
-    return 'You do not have permission to perform this action.';
-  }
-
-  if (error.status === 404) {
-    return 'The requested resource was not found.';
-  }
-
-  return 'Something went wrong while talking to the backend.';
-}

@@ -1179,3 +1179,207 @@ That separation keeps the app easier to understand.
 - environment files are the frontend version of profile-based app config
 - centralized config makes service code cleaner and less fragile
 - endpoint constants are a simple way to keep backend integration readable without overengineering
+
+## Feature Update: Reusable API Infrastructure
+
+What was added:
+- a reusable `HttpWrapperService` around Angular `HttpClient`
+- a centralized `ApiService` for shared request behavior
+- typed API request and response models
+- a shared loading state service
+- reusable API error utilities
+- mock placeholder feature API services for products, cart, wishlist, and orders
+
+Why it was added:
+- backend-facing code should grow in one predictable structure
+- screens should not need to know request timing, base URLs, or error parsing details
+- we still are not calling the real backend yet, so mock methods let the architecture grow safely first
+
+### Angular Services Explained Simply
+
+An Angular service is a class for reusable logic that should not live inside a component.
+
+In this project:
+- `HttpWrapperService` handles low-level HTTP concerns
+- `ApiService` handles shared request behavior and mock request helpers
+- `ProductsApiService`, `CartApiService`, `OrdersApiService`, and `WishlistApiService` represent feature-focused API access
+- `ApiLoadingService` tracks whether API work is currently running
+
+Simple idea:
+- component = shows UI
+- service = does reusable work
+
+Why this helps:
+- components stay smaller
+- API logic stays in one place
+- feature code becomes easier to test and replace later
+
+### Dependency Injection Explained Again
+
+Dependency injection means Angular provides a class with the tools it needs.
+
+Small example:
+
+```ts
+private readonly apiService = inject(ApiService);
+```
+
+What this means:
+- the class needs `ApiService`
+- Angular creates or reuses the service instance
+- the class can use it right away
+
+Why this is useful:
+- no manual `new ApiService(...)`
+- shared services can be reused from many places
+- wiring stays consistent across the app
+
+Spring Boot comparison:
+- this is similar to constructor injection with Spring-managed beans
+- Angular services are frontend framework-managed objects in the same spirit
+
+### `HttpClient` Explained Simply
+
+`HttpClient` is Angular's built-in tool for making HTTP requests.
+
+Small example:
+
+```ts
+return this.http.get<ProductDetail>('/api/products/1');
+```
+
+What this means:
+- Angular sends a GET request
+- the expected response shape is `ProductDetail`
+- the result comes back as an observable
+
+In this project, `HttpClient` is wrapped by `HttpWrapperService` so that:
+- base URL handling stays in one place
+- query param building stays in one place
+- timeout behavior stays in one place
+
+That keeps feature services cleaner.
+
+### Why We Added a Wrapper Service
+
+`HttpWrapperService` is not extra complexity for its own sake.
+
+It exists because low-level concerns repeat:
+- base URL joining
+- query parameter creation
+- timeout setup
+
+By placing those in one service:
+- `ApiService` can stay focused on request flow
+- feature API services can stay focused on business resource shapes
+
+### Centralized API Service Layer Explained
+
+The centralized API layer in this project now looks like this:
+
+```text
+feature component
+  -> feature API service
+  -> ApiService
+  -> HttpWrapperService
+  -> HttpClient
+```
+
+Simple meaning:
+- feature service knows what resource it wants
+- `ApiService` knows shared request behavior
+- `HttpWrapperService` knows low-level HTTP details
+
+This is scalable, but still readable because each class has one main job.
+
+### Mock Placeholder Methods Explained
+
+We are still not calling the real backend.
+
+So the feature API services currently return mock observables such as:
+- mock product list
+- mock product detail
+- mock cart
+- mock wishlist
+- mock orders
+
+Why this is useful:
+- frontend architecture can be built before backend integration is turned on
+- future screens can start using typed services without waiting for live APIs
+- switching later is easier because the service contracts already exist
+
+### Loading State Handling Explained
+
+The `ApiLoadingService` tracks how many requests are active.
+
+Simple idea:
+- request starts
+- loading count increases
+- request ends
+- loading count decreases
+
+That gives the app one reusable place to answer:
+- "Is any API work running right now?"
+
+This is helpful for:
+- global loading indicators
+- page loading states
+- disabling actions during requests
+
+### Reusable Error Handling Explained
+
+Backend errors are rarely perfectly consistent.
+
+That is why `api-error.util.ts` was added.
+
+Its job is to:
+- normalize different error shapes
+- return a readable frontend error message
+- keep interceptor and service code simpler
+
+This matters because:
+- screens should not repeat error parsing logic
+- backend inconsistencies should be handled centrally
+
+### Observable Mental Model for API Calls
+
+API calls return observables because the data arrives later.
+
+Small example:
+
+```ts
+this.productsApiService.getProducts().subscribe((page) => {
+  console.log(page.content);
+});
+```
+
+Simple meaning:
+- ask for data now
+- receive it when the async work finishes
+
+For mock methods, the same observable shape is used.
+That is good because:
+- real and mock APIs can look the same to the rest of the app
+- switching from mock to live backend later causes less change
+
+### Spring Boot Comparison
+
+A useful comparison is:
+
+```text
+Angular component -> similar to UI controller/view layer
+Angular service -> similar to Spring service bean
+HttpClient call -> similar to a REST client call
+interceptor -> similar to servlet filter or client interceptor
+```
+
+The layers are not identical, but the separation idea is familiar:
+- UI layer should not contain transport details
+- service layer should centralize reusable communication logic
+
+## What I Learned From This Step
+
+- Angular services are easiest to understand when each one has a single responsibility
+- dependency injection in Angular plays a similar role to Spring bean injection
+- `HttpClient` is powerful on its own, but a small wrapper makes larger apps easier to maintain
+- mock API methods are useful when building structure before turning on real backend calls

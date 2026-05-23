@@ -1,75 +1,84 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, delay, map, of, throwError } from 'rxjs';
 
-import { APP_CONSTANTS } from '../config/app.constants';
-import { environment } from '../../../environments/environment';
-import { ApiQueryParams } from '../models/api.model';
+import { ApiLoadingService } from './api-loading.service';
+import { HttpWrapperService } from './http-wrapper.service';
+import { ApiQueryParams, ApiRequestOptions, ApiResponse, MockRequestOptions } from '../models/api.model';
+import { createMockApiError } from '../utils/api-error.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly http = inject(HttpClient);
-  private readonly apiBaseUrl = environment.apiBaseUrl;
-  protected readonly requestTimeoutMs = APP_CONSTANTS.requestTimeoutMs;
+  private readonly httpWrapper = inject(HttpWrapperService);
+  private readonly apiLoadingService = inject(ApiLoadingService);
 
-  get<T>(path: string, params?: ApiQueryParams): Observable<T> {
-    return this.http.get<T>(this.buildUrl(path), {
-      params: this.createParams(params)
-    });
+  get<T>(path: string, params?: ApiQueryParams, options?: ApiRequestOptions): Observable<T> {
+    return this.runRequest(this.httpWrapper.get<T>(path, {
+      ...options,
+      params
+    }), options?.trackLoading);
   }
 
-  post<TResponse, TBody>(path: string, body: TBody): Observable<TResponse> {
-    return this.http.post<TResponse>(this.buildUrl(path), body);
+  post<TResponse, TBody>(path: string, body: TBody, options?: ApiRequestOptions): Observable<TResponse> {
+    return this.runRequest(this.httpWrapper.post<TResponse, TBody>(path, body, options), options?.trackLoading);
   }
 
-  put<TResponse, TBody>(path: string, body: TBody, params?: ApiQueryParams): Observable<TResponse> {
-    return this.http.put<TResponse>(this.buildUrl(path), body, {
-      params: this.createParams(params)
-    });
+  put<TResponse, TBody>(path: string, body: TBody, params?: ApiQueryParams, options?: ApiRequestOptions): Observable<TResponse> {
+    return this.runRequest(this.httpWrapper.put<TResponse, TBody>(path, body, {
+      ...options,
+      params
+    }), options?.trackLoading);
   }
 
-  patch<TResponse, TBody>(path: string, body: TBody): Observable<TResponse> {
-    return this.http.patch<TResponse>(this.buildUrl(path), body);
+  patch<TResponse, TBody>(path: string, body: TBody, options?: ApiRequestOptions): Observable<TResponse> {
+    return this.runRequest(this.httpWrapper.patch<TResponse, TBody>(path, body, options), options?.trackLoading);
   }
 
-  delete<T>(path: string, params?: ApiQueryParams): Observable<T> {
-    return this.http.delete<T>(this.buildUrl(path), {
-      params: this.createParams(params)
-    });
+  delete<T>(path: string, params?: ApiQueryParams, options?: ApiRequestOptions): Observable<T> {
+    return this.runRequest(this.httpWrapper.delete<T>(path, {
+      ...options,
+      params
+    }), options?.trackLoading);
   }
 
-  private buildUrl(path: string): string {
-    if (path.startsWith('http')) {
-      return path;
+  mockResponse<T>(data: T, options?: MockRequestOptions): Observable<ApiResponse<T>> {
+    const request$ = options?.shouldFail
+      ? throwError(() => createMockApiError(
+          options.failureMessage ?? 'Mock request failed.',
+          options.failureStatus ?? 500
+        ))
+      : of(this.createApiResponse(data, options?.message));
+
+    return this.runRequest(request$.pipe(delay(options?.delayMs ?? 250)), options?.trackLoading);
+  }
+
+  mockData<T>(data: T, options?: MockRequestOptions): Observable<T> {
+    return this.mockResponse(data, options).pipe(
+      map((response) => {
+        if (response.data === null) {
+          throw createMockApiError('Mock response did not contain data.', 500);
+        }
+
+        return response.data;
+      })
+    );
+  }
+
+  private createApiResponse<T>(data: T, message = 'Mock request completed successfully.'): ApiResponse<T> {
+    return {
+      success: true,
+      message,
+      data,
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  private runRequest<T>(request$: Observable<T>, trackLoading = true): Observable<T> {
+    if (!trackLoading) {
+      return request$;
     }
 
-    return `${this.apiBaseUrl}${path}`;
-  }
-
-  private createParams(params?: ApiQueryParams): HttpParams | undefined {
-    if (!params) {
-      return undefined;
-    }
-
-    let httpParams = new HttpParams();
-
-    for (const [key, value] of Object.entries(params)) {
-      if (value === undefined || value === null || value === '') {
-        continue;
-      }
-
-      if (Array.isArray(value)) {
-        value.forEach((item) => {
-          httpParams = httpParams.append(key, String(item));
-        });
-        continue;
-      }
-
-      httpParams = httpParams.set(key, String(value));
-    }
-
-    return httpParams;
+    return this.apiLoadingService.track(request$);
   }
 }

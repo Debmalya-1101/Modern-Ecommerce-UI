@@ -25,15 +25,26 @@ export class AuthService {
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.apiService
-      .post<AuthResponse, LoginRequest>(API_ENDPOINTS.auth.login, request)
+      .mockResponse<AuthResponse>(this.createMockAuthResponse(request), {
+        delayMs: 300,
+        message: `Mock POST ${API_ENDPOINTS.auth.login}`,
+        trackLoading: true
+      })
       .pipe(
+        map((response) => response.data ?? this.createMockAuthResponse(request)),
         tap((response) => this.setSessionToken(response.token)),
         tap(() => this.refreshCurrentUser().subscribe())
       );
   }
 
   signup(request: SignupRequest): Observable<string> {
-    return this.apiService.post<string, SignupRequest>(API_ENDPOINTS.auth.signup, request);
+    return this.apiService
+      .mockResponse<string>(`Mock signup completed for ${request.userName}.`, {
+        delayMs: 300,
+        message: `Mock POST ${API_ENDPOINTS.auth.signup}`,
+        trackLoading: true
+      })
+      .pipe(map((response) => response.data ?? 'Mock signup completed.'));
   }
 
   refreshCurrentUser(): Observable<AuthUserInfo | null> {
@@ -42,13 +53,20 @@ export class AuthService {
       return of(null);
     }
 
-    return this.apiService.get<AuthUserInfo>(API_ENDPOINTS.auth.me).pipe(
-      tap((user) => this.currentUser.set(user)),
-      catchError(() => {
-        this.currentUser.set(this.createUserFromToken(this.token()));
-        return of(this.currentUser());
+    return this.apiService
+      .mockResponse<AuthUserInfo>(this.createMockCurrentUser(), {
+        delayMs: 200,
+        message: `Mock GET ${API_ENDPOINTS.auth.me}`,
+        trackLoading: false
       })
-    );
+      .pipe(
+        map((response) => response.data ?? this.createMockCurrentUser()),
+        tap((user) => this.currentUser.set(user)),
+        catchError(() => {
+          this.currentUser.set(this.createUserFromToken(this.token()));
+          return of(this.currentUser());
+        })
+      );
   }
 
   logout(): void {
@@ -73,6 +91,41 @@ export class AuthService {
     this.tokenStorage.setToken(token);
     this.token.set(token);
     this.currentUser.set(this.createUserFromToken(token));
+  }
+
+  private createMockAuthResponse(request: LoginRequest): AuthResponse {
+    const username = request.usernameOrEmail.includes('@')
+      ? request.usernameOrEmail.split('@')[0]
+      : request.usernameOrEmail;
+
+    const payload = {
+      sub: username,
+      role: 'ROLE_USER' as const,
+      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24
+    };
+
+    return {
+      token: this.createMockJwtToken(payload),
+      tokenType: 'Bearer'
+    };
+  }
+
+  private createMockCurrentUser(): AuthUserInfo {
+    return this.createUserFromToken(this.token()) ?? {
+      username: 'demo-user',
+      emailId: 'demo@modern-commerce.dev',
+      role: 'ROLE_USER'
+    };
+  }
+
+  private createMockJwtToken(payload: JwtTokenPayload): string {
+    const header = { alg: 'none', typ: 'JWT' };
+
+    return [
+      btoa(JSON.stringify(header)),
+      btoa(JSON.stringify(payload)),
+      'mock-signature'
+    ].join('.');
   }
 
   private createUserFromToken(token: string | null): AuthUserInfo | null {
