@@ -15,7 +15,8 @@
 
 .products-hero__content,
 .products-hero__side,
-.products-strip__item {
+.products-strip__item,
+.state-summary {
   border-color: rgba(87, 61, 44, 0.14);
   background: rgba(255, 252, 247, 0.94);
   box-shadow: 0 14px 32px rgba(80, 54, 36, 0.07);
@@ -88,6 +89,24 @@ h3 {
 .section-block {
   display: grid;
   gap: 1rem;
+}
+
+.state-summary {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.1rem 1.2rem;
+}
+
+.state-summary__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  color: #6e5d52;
+}
+
+.state-summary__row strong {
+  color: #2d241f;
 }
 
 .section-heading {

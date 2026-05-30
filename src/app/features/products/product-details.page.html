@@ -1,0 +1,100 @@
+<section class="product-details-page">
+  <section class="page-header">
+    <div>
+      <p class="eyebrow">Product details route</p>
+      <h2>Placeholder product details powered by mock service data</h2>
+      <p class="page-copy">
+        This route uses the product id from the URL, asks the mock product service for data, and renders loading or error feedback when needed.
+      </p>
+    </div>
+
+    <button
+      mat-stroked-button
+      appButtonStyle="secondary"
+      type="button"
+      routerLink="/products"
+    >
+      Back to products
+    </button>
+  </section>
+
+  @if (product().loading) {
+    <mat-card class="detail-loading" appearance="outlined">
+      <app-loading-spinner label="Loading product details" [diameter]="52" />
+    </mat-card>
+  } @else if (product().error) {
+    <app-error-state
+      title="Could not load this product"
+      [description]="product().error ?? 'Please try again in a moment.'"
+      actionLabel="Retry product details"
+      (action)="reloadProduct()"
+    />
+  } @else if (product().data; as productDetail) {
+    <section class="detail-layout">
+      <mat-card class="detail-media" appearance="outlined">
+        <app-product-image-placeholder [label]="productDetail.imageLabel" />
+      </mat-card>
+
+      <mat-card class="detail-summary" appearance="outlined">
+        <div class="detail-summary__top">
+          <app-product-category-chip [label]="productDetail.categoryName" />
+
+          @if (productDetail.badge) {
+            <app-product-badge [label]="productDetail.badge" />
+          }
+        </div>
+
+        <div class="detail-summary__heading">
+          <div>
+            <p class="detail-brand">{{ productDetail.brand }}</p>
+            <h3>{{ productDetail.name }}</h3>
+          </div>
+
+          <app-product-rating-display
+            [rating]="productDetail.rating"
+            [reviewCount]="productDetail.reviewCount"
+          />
+        </div>
+
+        <app-product-price-display
+          [price]="productDetail.price"
+          [originalPrice]="productDetail.originalPrice"
+        />
+
+        <p class="detail-description">{{ productDetail.description }}</p>
+
+        <div class="detail-actions">
+          <button mat-flat-button appButtonStyle="primary" type="button">
+            Add to cart later
+          </button>
+          <button mat-stroked-button appButtonStyle="secondary" type="button">
+            Save for later
+          </button>
+        </div>
+      </mat-card>
+    </section>
+
+    <mat-card class="detail-specifications" appearance="outlined">
+      <div class="detail-specifications__header">
+        <div>
+          <p class="eyebrow">Placeholder product content</p>
+          <h3>Product specifications</h3>
+        </div>
+        <p class="detail-specifications__copy">
+          These values come from the same mock service layer and keep the detail route ready for real backend data later.
+        </p>
+      </div>
+
+      <mat-divider />
+
+      <div class="spec-grid">
+        @for (specification of productDetail.specifications; track specification.key) {
+          <div class="spec-grid__item">
+            <span>{{ specification.key }}</span>
+            <strong>{{ specification.value }}</strong>
+          </div>
+        }
+      </div>
+    </mat-card>
+  }
+</section>

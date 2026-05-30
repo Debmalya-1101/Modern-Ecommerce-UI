@@ -1,9 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
-import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import { ApiService } from './api.service';
-import { ApiQueryParams, PageResponse } from '../models/api.model';
 import { ProductDetail, ProductListItem } from '../models/product.model';
 
 @Injectable({
@@ -11,100 +9,181 @@ import { ProductDetail, ProductListItem } from '../models/product.model';
 })
 export class ProductsApiService {
   private readonly apiService = inject(ApiService);
+  private readonly products = this.createMockProducts();
+  private readonly productDetails = this.createMockProductDetails();
 
-  getProducts(params?: ApiQueryParams): Observable<PageResponse<ProductListItem>> {
-    return this.apiService
-      .mockResponse<PageResponse<ProductListItem>>(this.createMockProductPage(params), {
-        delayMs: 300,
-        message: `Mock GET ${API_ENDPOINTS.products.list}`,
-        trackLoading: true
-      })
-      .pipe(map((response) => response.data ?? this.createEmptyProductPage(params)));
+  getProducts(): Observable<ProductListItem[]> {
+    return this.apiService.mockData(this.products, {
+      delayMs: 350,
+      message: 'Mock products loaded successfully.',
+      trackLoading: true
+    });
   }
 
   getProductDetail(productId: number): Observable<ProductDetail> {
-    return this.apiService
-      .mockResponse<ProductDetail>(this.createMockProductDetail(productId), {
-        delayMs: 250,
-        message: `Mock GET ${API_ENDPOINTS.products.detail(productId)}`,
+    const productDetail = this.productDetails.find((product) => product.id === productId);
+
+    if (!productDetail) {
+      return this.apiService.mockFailure(`Product #${productId} could not be found.`, 404, {
+        delayMs: 300,
         trackLoading: true
-      })
-      .pipe(map((response) => response.data ?? this.createMockProductDetail(productId)));
+      });
+    }
+
+    return this.apiService.mockData(productDetail, {
+      delayMs: 300,
+      message: `Mock product #${productId} loaded successfully.`,
+      trackLoading: true
+    });
   }
 
-  private createMockProductPage(params?: ApiQueryParams): PageResponse<ProductListItem> {
-    const products: ProductListItem[] = [
+  private createMockProducts(): ProductListItem[] {
+    return [
       {
         id: 101,
-        name: 'Everyday Carry Backpack',
+        name: 'Luma Carry Pro Backpack',
         price: 3299,
+        originalPrice: 4499,
         imageUrl: '',
+        imageLabel: 'Travel backpack',
         rating: 4.6,
+        reviewCount: 184,
         active: true,
         brand: 'Northline',
-        categoryName: 'Accessories'
+        categoryName: 'Backpacks',
+        badge: 'Best Seller',
+        shortDescription: 'A clean travel-ready backpack with padded storage and everyday organization.'
       },
       {
         id: 102,
-        name: 'Studio Wireless Headphones',
+        name: 'Aero Noise-Lite Headphones',
         price: 8999,
+        originalPrice: 10999,
         imageUrl: '',
+        imageLabel: 'Wireless headphones',
         rating: 4.4,
+        reviewCount: 92,
         active: true,
-        brand: 'SoundForm',
+        brand: 'Sonica',
         categoryName: 'Electronics'
       },
       {
         id: 103,
-        name: 'Minimal Desk Lamp',
+        name: 'Oak & Ember Desk Lamp',
         price: 2199,
+        originalPrice: 2899,
         imageUrl: '',
+        imageLabel: 'Desk lamp',
         rating: 4.3,
+        reviewCount: 48,
         active: true,
-        brand: 'Luma Home',
-        categoryName: 'Home'
+        brand: 'Hearth Studio',
+        categoryName: 'Home',
+        badge: 'Editor Pick',
+        shortDescription: 'Warm ambient light for compact desks, reading corners, and calm evening setups.'
+      },
+      {
+        id: 104,
+        name: 'Stride Everyday Sneakers',
+        price: 4299,
+        originalPrice: 5499,
+        imageUrl: '',
+        imageLabel: 'Sneakers',
+        rating: 4.5,
+        reviewCount: 126,
+        active: true,
+        brand: 'Motive',
+        categoryName: 'Footwear',
+        shortDescription: 'Minimal low-top sneakers designed for lightweight comfort and all-day wear.'
       }
     ];
-
-    return {
-      content: products,
-      pageNumber: Number(params?.['page'] ?? 0),
-      pageSize: Number(params?.['size'] ?? products.length),
-      totalElements: products.length,
-      totalPages: 1,
-      last: true
-    };
   }
 
-  private createEmptyProductPage(params?: ApiQueryParams): PageResponse<ProductListItem> {
-    return {
-      content: [],
-      pageNumber: Number(params?.['page'] ?? 0),
-      pageSize: Number(params?.['size'] ?? 12),
-      totalElements: 0,
-      totalPages: 0,
-      last: true
-    };
-  }
-
-  private createMockProductDetail(productId: number): ProductDetail {
-    return {
-      id: productId,
-      name: 'Mock Product Detail',
-      description: 'This is a placeholder product detail response for API structure work.',
-      price: 4999,
-      imageUrl: '',
-      rating: 4.5,
-      active: true,
-      brand: 'Modern Commerce',
-      categoryName: 'Placeholder',
-      imageGallery: [],
-      specifications: [
-        {
-          key: 'Purpose',
-          value: 'Reusable API placeholder'
-        }
-      ]
-    };
+  private createMockProductDetails(): ProductDetail[] {
+    return [
+      {
+        id: 101,
+        name: 'Luma Carry Pro Backpack',
+        description: 'A polished everyday backpack with organized compartments, padded laptop storage, and a travel-friendly silhouette.',
+        price: 3299,
+        originalPrice: 4499,
+        imageUrl: '',
+        imageLabel: 'Travel backpack',
+        rating: 4.6,
+        reviewCount: 184,
+        active: true,
+        brand: 'Northline',
+        categoryName: 'Backpacks',
+        badge: 'Best Seller',
+        imageGallery: [],
+        specifications: [
+          { key: 'Material', value: 'Water-resistant woven fabric' },
+          { key: 'Capacity', value: '22 liters' },
+          { key: 'Best for', value: 'Daily commute and short travel' }
+        ]
+      },
+      {
+        id: 102,
+        name: 'Aero Noise-Lite Headphones',
+        description: 'Comfort-first wireless headphones with balanced sound, long battery life, and a clean modern finish.',
+        price: 8999,
+        originalPrice: 10999,
+        imageUrl: '',
+        imageLabel: 'Wireless headphones',
+        rating: 4.4,
+        reviewCount: 92,
+        active: true,
+        brand: 'Sonica',
+        categoryName: 'Electronics',
+        badge: 'New Arrival',
+        imageGallery: [],
+        specifications: [
+          { key: 'Battery life', value: '32 hours' },
+          { key: 'Connectivity', value: 'Bluetooth 5.3' },
+          { key: 'Best for', value: 'Work, travel, and calls' }
+        ]
+      },
+      {
+        id: 103,
+        name: 'Oak & Ember Desk Lamp',
+        description: 'A compact desk lamp with warm tones and simple controls for focused work and softer evening light.',
+        price: 2199,
+        originalPrice: 2899,
+        imageUrl: '',
+        imageLabel: 'Desk lamp',
+        rating: 4.3,
+        reviewCount: 48,
+        active: true,
+        brand: 'Hearth Studio',
+        categoryName: 'Home',
+        badge: 'Editor Pick',
+        imageGallery: [],
+        specifications: [
+          { key: 'Light tone', value: 'Warm white' },
+          { key: 'Power', value: 'USB-C powered' },
+          { key: 'Best for', value: 'Home office and bedside use' }
+        ]
+      },
+      {
+        id: 104,
+        name: 'Stride Everyday Sneakers',
+        description: 'Low-profile sneakers with breathable lining and a versatile shape that works across casual everyday outfits.',
+        price: 4299,
+        originalPrice: 5499,
+        imageUrl: '',
+        imageLabel: 'Sneakers',
+        rating: 4.5,
+        reviewCount: 126,
+        active: true,
+        brand: 'Motive',
+        categoryName: 'Footwear',
+        imageGallery: [],
+        specifications: [
+          { key: 'Upper', value: 'Breathable knit blend' },
+          { key: 'Sole', value: 'Flexible rubber outsole' },
+          { key: 'Best for', value: 'Daily wear and city walking' }
+        ]
+      }
+    ];
   }
 }

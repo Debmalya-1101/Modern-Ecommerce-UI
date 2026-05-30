@@ -65,6 +65,13 @@ export class ApiService {
     );
   }
 
+  mockFailure<T>(message: string, status = 500, options?: MockRequestOptions): Observable<T> {
+    return this.runRequest(
+      throwError(() => createMockApiError(message, status)).pipe(delay(options?.delayMs ?? 250)),
+      options?.trackLoading
+    );
+  }
+
   private createApiResponse<T>(data: T, message = 'Mock request completed successfully.'): ApiResponse<T> {
     return {
       success: true,

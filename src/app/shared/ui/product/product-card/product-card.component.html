@@ -27,13 +27,24 @@
       [originalPrice]="product.originalPrice"
     />
 
-    <button
-      mat-flat-button
-      appButtonStyle="primary"
-      type="button"
-      (click)="openQuickView()"
-    >
-      Quick view
-    </button>
+    <div class="product-card__actions">
+      <button
+        mat-flat-button
+        appButtonStyle="primary"
+        type="button"
+        [routerLink]="['/products', product.id]"
+      >
+        View details
+      </button>
+
+      <button
+        mat-stroked-button
+        appButtonStyle="secondary"
+        type="button"
+        (click)="openQuickView()"
+      >
+        Quick view
+      </button>
+    </div>
   </div>
 </mat-card>

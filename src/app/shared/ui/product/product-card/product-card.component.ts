@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { RouterLink } from '@angular/router';
 
 import { ButtonStyleDirective } from '../../../directives/button-style.directive';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
@@ -15,6 +16,7 @@ import { ProductCardViewModel } from '../product-ui.model';
   imports: [
     MatButtonModule,
     MatCardModule,
+    RouterLink,
     ButtonStyleDirective,
     ProductBadgeComponent,
     ProductCategoryChipComponent,

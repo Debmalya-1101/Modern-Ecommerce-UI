@@ -38,6 +38,12 @@
   gap: 0.8rem;
 }
 
+.product-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
 .product-card__meta {
   display: flex;
   justify-content: space-between;

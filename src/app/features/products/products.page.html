@@ -2,9 +2,9 @@
   <section class="products-hero">
     <mat-card class="products-hero__content" appearance="outlined">
       <p class="eyebrow">Products feature route</p>
-      <h2>Reusable product UI components for a real storefront foundation</h2>
+      <h2>Mock product data now flows through a real service layer</h2>
       <p class="hero-copy">
-        This page uses mock data only, but the component structure is ready for real product listings, filters, and product interactions later.
+        This page now loads products from a mock Angular service using observables, loading states, and error handling that can later connect to a real backend.
       </p>
 
       <div class="hero-actions">
@@ -20,19 +20,19 @@
     <mat-card class="products-hero__side" appearance="outlined">
       <p class="mini-label">Why this matters</p>
       <ul>
-        <li>Product UI is now reusable instead of being rebuilt per screen.</li>
-        <li>Cards, ratings, prices, badges, and grids now share one visual language.</li>
-        <li>The products route feels like a storefront instead of a placeholder page.</li>
+        <li>The route page no longer owns hardcoded product arrays.</li>
+        <li>The service layer now controls mock data and future backend replacement.</li>
+        <li>The UI shows loading, empty, and error states in one clean flow.</li>
       </ul>
     </mat-card>
   </section>
 
   <section class="products-strip">
-    @for (item of categoryHighlights; track item) {
+    @for (item of categoryHighlights(); track item) {
       <mat-card class="products-strip__item" appearance="outlined">
         <p class="mini-label">Category spotlight</p>
         <strong>{{ item }}</strong>
-        <span>Mock category highlight using the shared design system.</span>
+        <span>Category highlights are derived from service data instead of static page constants.</span>
       </mat-card>
     }
   </section>
@@ -41,30 +41,66 @@
     <div class="section-heading">
       <div>
         <p class="eyebrow">Featured products</p>
-        <h3>Reusable product grid</h3>
+        <h3>Observable-driven product grid</h3>
       </div>
       <p class="section-copy">
-        The grid, card, badge, price, image, rating, and category components are all shared and reusable.
+        The grid still uses the same shared product UI components, but the data now comes from a dedicated mock service.
       </p>
     </div>
 
-    <app-product-grid
-      [products]="featuredProducts"
-      (quickView)="showQuickView($event)"
-    />
+    @if (products().loading) {
+      <app-product-skeleton-loading [cards]="4" />
+    } @else if (products().error) {
+      <app-error-state
+        title="Could not load products"
+        [description]="products().error ?? 'Please try again in a moment.'"
+        actionLabel="Retry product load"
+        (action)="reloadProducts()"
+      />
+    } @else if (products().data?.length) {
+      <app-product-grid
+        [products]="products().data ?? []"
+        (quickView)="showQuickView($event)"
+      />
+    } @else {
+      <app-empty-state
+        title="No products are available yet"
+        description="The product grid is ready, but the mock service returned an empty collection."
+        actionLabel="Reload products"
+        (action)="reloadProducts()"
+      />
+    }
   </section>
 
   <section class="section-block">
     <div class="section-heading">
       <div>
         <p class="eyebrow">Loading state</p>
-        <h3>Product skeleton loading</h3>
+        <h3>Reusable loading and state handling</h3>
       </div>
       <p class="section-copy">
-        This skeleton component is ready for future product API loading states.
+        The same page is prepared for async success, loading, error, and empty outcomes without mixing service logic into the template.
       </p>
     </div>
 
-    <app-product-skeleton-loading [cards]="4" />
+    <mat-card class="state-summary" appearance="outlined">
+      <div class="state-summary__row">
+        <span>Status</span>
+        <strong>
+          @if (products().loading) {
+            Loading
+          } @else if (products().error) {
+            Error
+          } @else {
+            Ready
+          }
+        </strong>
+      </div>
+      <mat-divider />
+      <div class="state-summary__row">
+        <span>Products shown</span>
+        <strong>{{ products().data?.length ?? 0 }}</strong>
+      </div>
+    </mat-card>
   </section>
 </section>

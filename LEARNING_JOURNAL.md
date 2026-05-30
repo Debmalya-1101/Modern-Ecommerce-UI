@@ -1383,3 +1383,164 @@ The layers are not identical, but the separation idea is familiar:
 - dependency injection in Angular plays a similar role to Spring bean injection
 - `HttpClient` is powerful on its own, but a small wrapper makes larger apps easier to maintain
 - mock API methods are useful when building structure before turning on real backend calls
+
+## Feature Update: Mock Product Service Integration
+
+What was added:
+- a stronger reusable product model
+- a mock product service using in-memory data
+- a product listing page that now consumes service data
+- a product details placeholder page that also consumes service data
+- loading and error state handling on both product routes
+
+Why it was added:
+- the products page should learn to receive async data instead of owning hardcoded arrays
+- product route pages should stay focused on UI while the service layer owns data retrieval
+- this keeps the code ready for future backend integration without turning on real APIs yet
+
+### Observables Explained Simply
+
+An observable is a stream that gives you a value later.
+
+For product loading, that means:
+- ask the service for products now
+- receive the products after the async work finishes
+
+Small example:
+
+```ts
+this.productsApiService.getProducts().subscribe((products) => {
+  console.log(products);
+});
+```
+
+What this means:
+- the page starts a request
+- Angular waits for the observable to emit data
+- when the data arrives, the code inside `subscribe` runs
+
+Simple mental model:
+- observable = "data will arrive later"
+
+### Async Data Flow Explained
+
+The product flow in this project now looks like this:
+
+```text
+component asks service for products
+service returns an observable
+component shows loading state
+observable emits data or error
+component updates the UI
+```
+
+That is the basic frontend async pattern.
+
+Why this matters:
+- frontend pages often start empty
+- data arrives after a service call
+- the UI needs to react to loading, success, or failure
+
+### Component-Service Interaction Explained
+
+The components do not create their own product data anymore.
+
+Instead:
+- `ProductsPage` asks `ProductsApiService` for a list
+- `ProductDetailsPage` asks `ProductsApiService` for one product by id
+- the service returns observables
+- the component updates its local page state
+
+Small example:
+
+```ts
+this.productsApiService.getProductDetail(routeId).subscribe({
+  next: (productDetail) => {
+    this.productState.set({
+      data: productDetail,
+      error: null,
+      loading: false
+    });
+  }
+});
+```
+
+What this means:
+- service owns the data lookup
+- component owns the screen state
+- each layer has one clear job
+
+### Why The Mock Product Service Is Useful
+
+The mock product service uses in-memory data only.
+
+That is useful because:
+- we can practice the real data flow now
+- we do not depend on backend availability
+- the same page structure can later switch to live API calls with less rewriting
+
+In this project, the mock service now handles:
+- product list data
+- product detail data
+- "not found" errors for invalid product ids
+
+### Loading State Integration Explained
+
+The products page and product details page now both use a simple request state shape:
+- `loading`
+- `data`
+- `error`
+
+That gives each page a predictable flow:
+- loading = show spinner or skeleton
+- error = show error state
+- data = show content
+
+This is easier to read than mixing all conditions across many variables.
+
+### Error State Integration Explained
+
+Error handling is now visible in the product routes.
+
+Examples:
+- if the product list request fails later, the products page can show a retry state
+- if a product id does not exist, the details page shows a clear error message
+
+Why this is important:
+- real apps must handle failure paths, not just happy paths
+- users need feedback instead of blank screens
+
+### Product Models Explained
+
+The reusable product model now carries the fields both routes need:
+- identity
+- brand
+- category
+- price
+- rating
+- review count
+- image label
+- optional badge
+
+Why this helps:
+- the service and pages speak the same data language
+- product UI mapping stays clearer
+- future product screens can reuse the same model structure
+
+### Beginner-Friendly Takeaway
+
+The key idea is:
+
+```text
+service returns observable data
+component listens to the observable
+component decides what to render
+```
+
+That is one of the most common Angular patterns you will use.
+
+## What I Learned From This Step
+
+- observables become easier to understand when viewed as "data that arrives later"
+- component-service interaction works best when services own data retrieval and components own UI state
+- loading and error states are part of normal async UI design, not optional extras
