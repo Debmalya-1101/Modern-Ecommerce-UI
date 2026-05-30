@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -20,6 +21,7 @@ import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
@@ -42,14 +44,20 @@ export class LoginPage implements OnInit {
   protected readonly isSubmitting = computed(
     () => this.authState().isLoading && this.authState().isReady
   );
+  protected readonly signupSuccess = signal(false);
+  protected readonly recoveryHintVisible = signal(false);
   protected readonly submitted = signal(false);
 
   protected readonly loginForm = this.formBuilder.nonNullable.group({
     usernameOrEmail: ['', [Validators.required]],
-    password: ['', [Validators.required, Validators.minLength(6)]]
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    rememberMe: [true]
   });
 
   ngOnInit(): void {
+    this.authService.clearError();
+    this.signupSuccess.set(this.route.snapshot.queryParamMap.get('registered') === 'true');
+
     if (this.authService.isAuthenticated()) {
       this.navigateAfterLogin();
     }
@@ -63,11 +71,14 @@ export class LoginPage implements OnInit {
       return;
     }
 
-    this.authService.login(this.loginForm.getRawValue()).subscribe({
+    const { rememberMe, ...request } = this.loginForm.getRawValue();
+
+    this.authService.login(request, rememberMe).subscribe({
       next: () => {
         this.loginForm.reset({
           usernameOrEmail: '',
-          password: ''
+          password: '',
+          rememberMe: true
         });
         this.submitted.set(false);
         this.navigateAfterLogin();
@@ -86,10 +97,18 @@ export class LoginPage implements OnInit {
     return this.loginForm.controls.password;
   }
 
+  protected get rememberMeControl() {
+    return this.loginForm.controls.rememberMe;
+  }
+
   protected showFieldError(fieldName: 'usernameOrEmail' | 'password'): boolean {
     const control = this.loginForm.controls[fieldName];
 
     return control.invalid && (control.touched || this.submitted());
+  }
+
+  protected showRecoveryHint(): void {
+    this.recoveryHintVisible.set(true);
   }
 
   private navigateAfterLogin(): void {

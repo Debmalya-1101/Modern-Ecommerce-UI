@@ -9,11 +9,20 @@ export class TokenStorageService {
   private readonly storageKey = environment.tokenStorageKey;
 
   getToken(): string | null {
-    return this.getStorage()?.getItem(this.storageKey) ?? null;
+    return this.getLocalStorage()?.getItem(this.storageKey)
+      ?? this.getSessionStorage()?.getItem(this.storageKey)
+      ?? null;
   }
 
-  setToken(token: string): void {
-    this.getStorage()?.setItem(this.storageKey, token);
+  setToken(token: string, rememberSession = true): void {
+    this.clearToken();
+
+    if (rememberSession) {
+      this.getLocalStorage()?.setItem(this.storageKey, token);
+      return;
+    }
+
+    this.getSessionStorage()?.setItem(this.storageKey, token);
   }
 
   hasToken(): boolean {
@@ -21,14 +30,23 @@ export class TokenStorageService {
   }
 
   clearToken(): void {
-    this.getStorage()?.removeItem(this.storageKey);
+    this.getLocalStorage()?.removeItem(this.storageKey);
+    this.getSessionStorage()?.removeItem(this.storageKey);
   }
 
-  private getStorage(): Storage | null {
+  private getLocalStorage(): Storage | null {
     if (typeof localStorage === 'undefined') {
       return null;
     }
 
     return localStorage;
+  }
+
+  private getSessionStorage(): Storage | null {
+    if (typeof sessionStorage === 'undefined') {
+      return null;
+    }
+
+    return sessionStorage;
   }
 }

@@ -2112,3 +2112,174 @@ That makes the screen usable in real backend conditions such as:
 - a feature is only complete when services, routing, UI, and navigation all work together
 - reactive forms make login validation easier to manage than manual input checks
 - redirect-aware guards create a much better authentication experience than simple route blocking
+
+## Feature Update: Dedicated Authentication Experience
+
+What was added:
+- dedicated login and signup pages
+- a route-aware shell that gives `/login` and `/signup` their own cleaner layout
+- header navigation that shows login and signup when logged out, and logout when authenticated
+- remember-me session choice on login
+- stronger validation and error feedback across both auth pages
+
+Why it was added:
+- the earlier login flow worked, but it still felt like a form placed inside the normal app shell
+- real e-commerce apps usually give authentication its own focused screen experience
+- dedicated auth pages improve first impression, clarity, and mobile usability
+
+### Why The Earlier Login Experience Felt Basic
+
+The earlier implementation already had the important backend pieces:
+- auth service
+- JWT storage
+- interceptor
+- guard
+- login form
+
+But the UX still felt basic because:
+- the auth screens lived too closely inside the regular application shell
+- signup did not feel as complete as login
+- the visual hierarchy did not clearly say "this is a dedicated account experience"
+- the header and navigation did not guide unauthenticated users strongly enough
+
+The new version fixes that by separating the authentication experience from the normal shopping shell while still reusing the same auth service and guard structure.
+
+### Reactive Forms Explained Simply
+
+Reactive forms let Angular manage form values and validation in TypeScript instead of scattering checks around the template.
+
+Small example:
+
+```ts
+protected readonly loginForm = this.formBuilder.nonNullable.group({
+  usernameOrEmail: ['', [Validators.required]],
+  password: ['', [Validators.required, Validators.minLength(6)]],
+  rememberMe: [true]
+});
+```
+
+What this means:
+- the form structure is defined in one place
+- validators are attached to each field
+- Angular tracks whether each field is valid, touched, or invalid
+
+Why this is useful:
+- easier to read than manual DOM checks
+- easier to test and grow
+- works well for login, signup, checkout, and profile forms
+
+Backend comparison:
+- think of it like defining request validation rules close to a DTO or request object, but for frontend input state
+
+### Form Validation Explained Simply
+
+Form validation is how the UI checks input before sending it to the backend.
+
+In the signup page, we validate:
+- full name is required
+- email is required and must look like an email
+- password is required and must be long enough
+- confirm password must match password
+
+Small custom validator example:
+
+```ts
+function confirmPasswordValidator(control: AbstractControl): ValidationErrors | null {
+  const password = control.get('password')?.value;
+  const confirmPassword = control.get('confirmPassword')?.value;
+
+  if (!password || !confirmPassword) {
+    return null;
+  }
+
+  return password === confirmPassword ? null : { passwordMismatch: true };
+}
+```
+
+What this means:
+- Angular checks the whole form group
+- the validator compares two related fields
+- the template can show a friendly message when they do not match
+
+Why this matters:
+- users get feedback earlier
+- fewer bad requests reach the backend
+- the app feels more polished and trustworthy
+
+### Authentication Routing Explained
+
+Authentication routing means the app uses routes to guide people into login and signup flows correctly.
+
+In this project:
+- `/login` opens the sign-in page
+- `/signup` opens the registration page
+- protected routes use guards
+- unauthenticated users are redirected to login
+- after successful login, the app sends them back to the route they originally wanted
+
+Simple flow:
+
+```text
+protected page
+  -> auth guard
+  -> /login?redirectTo=/checkout
+  -> successful login
+  -> navigate back to /checkout
+```
+
+Why this feels better:
+- users do not lose context
+- protected flows such as checkout feel intentional
+- auth works like part of the app, not like a disconnected popup
+
+### Dedicated Auth Page Architecture
+
+The auth UX now has two layers:
+
+```text
+route-aware shell
+  -> chooses auth layout or normal app layout
+
+login/signup pages
+  -> own the form UI and validation
+  -> reuse AuthService for real backend communication
+```
+
+Why this is a good middle ground:
+- more professional than putting every screen inside one identical shell
+- simpler than building a large separate auth module with too much abstraction
+- still easy for a beginner to trace
+
+### Session Persistence And Remember Me
+
+The login form now includes a remember-me checkbox.
+
+Simple idea:
+- checked: store token in `localStorage`
+- unchecked: store token in `sessionStorage`
+
+Why this is useful:
+- users can choose whether the browser should remember them after it closes
+- the auth service does not need to know storage details directly
+- `TokenStorageService` stays responsible for browser storage behavior
+
+### Beginner-Friendly Takeaway
+
+The full auth experience now works like this:
+
+1. User opens `/login` or `/signup`.
+2. Angular shows a dedicated auth layout.
+3. Reactive form validation checks the input.
+4. The auth service calls the backend.
+5. On login, the JWT is stored.
+6. Guards and interceptors reuse that authenticated state.
+7. The app redirects the user into the right protected area.
+
+That is much closer to how a real production storefront handles authentication.
+
+## What I Learned From This Step
+
+- auth UX quality depends on layout and navigation, not only backend wiring
+- reactive forms make login and signup much easier to keep readable
+- validation is more maintainable when rules live in the form model instead of scattered template logic
+- authentication routing becomes easier to understand when viewed as redirects around protected routes

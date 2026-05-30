@@ -33,7 +33,7 @@ export class AuthService {
     error: this.authError()
   }));
 
-  login(request: LoginRequest): Observable<AuthResponse> {
+  login(request: LoginRequest, rememberSession = true): Observable<AuthResponse> {
     this.isLoading.set(true);
     this.authError.set(null);
 
@@ -42,7 +42,7 @@ export class AuthService {
         trackLoading: true
       })
       .pipe(
-        tap((response) => this.setSessionToken(response.token)),
+        tap((response) => this.setSessionToken(response.token, rememberSession)),
         switchMap((response) =>
           this.refreshCurrentUser().pipe(
             map(() => response)
@@ -87,9 +87,9 @@ export class AuthService {
       .pipe(
         tap((user) => this.currentUser.set(user)),
         catchError((error: AppHttpError) => {
-          if (error.status !== 401) {
-            this.currentUser.set(this.createUserFromToken(this.token()));
-            return of(this.currentUser());
+          if (error.status === 401) {
+            this.clearSessionState();
+            return of(null);
           }
 
           this.currentUser.set(this.createUserFromToken(this.token()));
@@ -162,8 +162,12 @@ export class AuthService {
     return this.getAccessToken();
   }
 
-  private setSessionToken(token: string): void {
-    this.tokenStorage.setToken(token);
+  clearError(): void {
+    this.authError.set(null);
+  }
+
+  private setSessionToken(token: string, rememberSession = true): void {
+    this.tokenStorage.setToken(token, rememberSession);
     this.token.set(token);
     this.currentUser.set(this.createUserFromToken(token));
     this.authError.set(null);

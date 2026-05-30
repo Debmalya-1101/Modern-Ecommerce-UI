@@ -1,49 +1,71 @@
 <section class="login-page">
   @if (isRestoringSession()) {
-    <mat-card class="login-panel login-panel--status" appearance="outlined">
+    <mat-card class="auth-card auth-card--status" appearance="outlined">
       <app-loading-spinner label="Restoring your session" [diameter]="52" />
     </mat-card>
   } @else {
-    <div class="login-layout">
-      <mat-card class="login-intro" appearance="outlined">
+    <div class="auth-layout auth-layout--login">
+      <mat-card class="auth-hero" appearance="outlined">
         <p class="eyebrow">Authentication</p>
-        <h2>Sign in to continue your storefront journey</h2>
-        <p class="intro-copy">
-          This login page uses the real backend authentication endpoint, restores the session after refresh, and keeps protected routes behind Angular guards.
+        <h2>Welcome back to a polished storefront workspace</h2>
+        <p class="hero-copy">
+          Sign in to continue browsing, manage orders, and move through protected checkout flows with a real backend-authenticated session.
         </p>
 
-        <div class="intro-highlights">
+        <div class="hero-highlights">
           <div>
-            <strong>JWT session</strong>
+            <strong>Trusted session flow</strong>
             <span>Stored securely in browser storage for refresh persistence.</span>
           </div>
           <div>
-            <strong>Guarded routes</strong>
+            <strong>Protected routes</strong>
             <span>Checkout, orders, and profile redirect unauthenticated users here.</span>
           </div>
           <div>
-            <strong>Interceptor flow</strong>
+            <strong>Enterprise structure</strong>
             <span>Protected API calls automatically receive the bearer token.</span>
+          </div>
+        </div>
+
+        <div class="hero-metrics">
+          <div>
+            <strong>2</strong>
+            <span>Dedicated auth pages</span>
+          </div>
+          <div>
+            <strong>3</strong>
+            <span>Protected user areas</span>
+          </div>
+          <div>
+            <strong>Real</strong>
+            <span>Backend JWT login</span>
           </div>
         </div>
       </mat-card>
 
-      <mat-card class="login-panel" appearance="outlined">
-        <div class="login-panel__header">
+      <mat-card class="auth-card" appearance="outlined">
+        <div class="auth-card__header">
           <div>
             <p class="eyebrow">Login route</p>
-            <h3>Welcome back</h3>
+            <h3>Sign in</h3>
+            <p class="auth-subtitle">Use your username or email to continue.</p>
           </div>
           <a routerLink="/" class="back-link">Back to home</a>
         </div>
 
+        @if (signupSuccess()) {
+          <div class="auth-success" role="status">
+            Account created successfully. You can sign in now.
+          </div>
+        }
+
         @if (authState().error) {
-          <div class="login-error" role="alert">
+          <div class="auth-error" role="alert">
             {{ authState().error }}
           </div>
         }
 
-        <form class="login-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+        <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
           <mat-form-field appearance="outline">
             <mat-label>Username or email</mat-label>
             <input
@@ -82,7 +104,27 @@
             }
           </mat-form-field>
 
-          <div class="login-actions">
+          <div class="auth-support-row">
+            <mat-checkbox formControlName="rememberMe">
+              Remember me
+            </mat-checkbox>
+
+            <button
+              class="text-link-button"
+              type="button"
+              (click)="showRecoveryHint()"
+            >
+              Forgot password?
+            </button>
+          </div>
+
+          @if (recoveryHintVisible()) {
+            <p class="auth-hint">
+              Password recovery can be added next as a separate feature screen. The backend login flow is already ready for it.
+            </p>
+          }
+
+          <div class="auth-actions">
             <button
               mat-flat-button
               appButtonStyle="primary"
@@ -97,6 +139,11 @@
               }
             </button>
           </div>
+
+          <p class="auth-footer-copy">
+            New here?
+            <a routerLink="/signup" class="inline-link">Create an account</a>
+          </p>
         </form>
       </mat-card>
     </div>
