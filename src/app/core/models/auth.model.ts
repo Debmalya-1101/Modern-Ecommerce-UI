@@ -32,3 +32,10 @@ export interface AuthSession {
   token: string | null;
   user: AuthUserInfo | null;
 }
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  isReady: boolean;
+  error: string | null;
+}

@@ -1544,3 +1544,170 @@ That is one of the most common Angular patterns you will use.
 - observables become easier to understand when viewed as "data that arrives later"
 - component-service interaction works best when services own data retrieval and components own UI state
 - loading and error states are part of normal async UI design, not optional extras
+
+## Feature Update: Authentication Foundation Structure
+
+What was added:
+- a clearer mock auth service flow
+- stronger token storage utility support
+- route guard integration for protected areas
+- login state handling signals
+- session restore structure on app startup
+- auth interceptor structure for bearer token injection
+
+Why it was added:
+- authentication is a cross-app concern and should not be improvised inside pages later
+- the project needs a clean mock auth flow before real backend login is enabled
+- protected routes such as checkout, orders, and profile should already have guard structure
+
+### Auth Flow Step-by-Step
+
+The auth flow in this project now works like this:
+
+1. The app starts.
+2. Auth initialization runs once during startup.
+3. `AuthService` checks local storage for a saved token.
+4. If the token is missing, the app starts unauthenticated.
+5. If the token exists and is still valid, the session is restored.
+6. When login is called, mock credentials are validated.
+7. A mock JWT token is created and stored.
+8. The current user is derived from the token.
+9. Protected routes can now pass their guard checks.
+10. The auth interceptor can attach the bearer token to protected requests later.
+
+That is the same shape a real backend auth flow would use, but with mock data for now.
+
+### Route Guards Explained Simply
+
+A route guard decides whether the user is allowed to enter a route.
+
+Simple idea:
+- user has session -> allow navigation
+- user has no session -> redirect somewhere safe
+
+Small example:
+
+```ts
+export const authGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+
+  if (authService.isAuthenticated()) {
+    return true;
+  }
+
+  return inject(Router).createUrlTree(['/']);
+};
+```
+
+What this means:
+- Angular checks the guard before opening the page
+- the guard asks the auth service if the user is logged in
+- the route is allowed or blocked
+
+Where this is used now:
+- checkout
+- orders
+- profile
+
+### Interceptors Explained Again
+
+An interceptor is a shared place that can inspect or change every HTTP request.
+
+In this project, the auth interceptor:
+- skips public requests
+- adds `Authorization: Bearer <token>` to protected ones
+
+Why this is useful:
+- page and feature services do not repeat header logic
+- auth behavior stays centralized
+
+### Spring Boot Filter Comparison
+
+If you come from Spring Boot, Angular interceptors feel very similar to filters.
+
+Simple comparison:
+- Angular interceptor wraps frontend HTTP requests
+- Spring Boot filter wraps backend HTTP requests
+
+Shared idea:
+- both run around request processing
+- both can add auth-related behavior
+- both help keep repeated logic out of controllers or services
+
+Difference:
+- Angular interceptors run in the browser client
+- Spring filters run on the server
+
+### Login State Handling Explained
+
+The auth service now tracks more than just the token.
+
+It also tracks:
+- whether auth work is loading
+- whether startup restore is complete
+- whether an auth error message exists
+
+That is helpful because:
+- the app can know when auth is still being restored
+- future login forms can show loading or error feedback
+- auth state stays centralized instead of scattered
+
+### Session Persistence Explained
+
+Session persistence means the app remembers a logged-in user after refresh.
+
+In this project:
+- the token is stored in local storage
+- app startup runs `restoreSession()`
+- expired tokens are cleared
+- valid tokens rebuild the current user from the token payload
+
+Why this matters:
+- refreshing the browser should not automatically lose the session
+- auth startup behavior becomes predictable
+
+### Token Storage Utility Explained
+
+`TokenStorageService` is intentionally small.
+
+Its job is:
+- save token
+- read token
+- clear token
+- answer whether a token exists
+
+Why keep it small:
+- storage details stay separate from auth business logic
+- `AuthService` can focus on session behavior instead of browser storage mechanics
+
+### Beginner-Friendly Auth Architecture
+
+The auth structure now looks like this:
+
+```text
+route/page
+  -> AuthService
+  -> TokenStorageService
+  -> local storage
+
+HttpClient request
+  -> auth interceptor
+  -> bearer token added when needed
+```
+
+And for protected navigation:
+
+```text
+route
+  -> auth guard
+  -> AuthService
+  -> allow or block
+```
+
+That separation keeps each piece easier to understand.
+
+## What I Learned From This Step
+
+- route guards are the frontend equivalent of navigation protection checks
+- interceptors are a clean place for shared auth request behavior
+- session persistence is mostly about restoring and validating stored auth state at startup

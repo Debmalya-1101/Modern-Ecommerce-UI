@@ -14,7 +14,7 @@ const publicPrefixes = [
 
 export const jwtInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
-  const token = authService.getToken();
+  const token = authService.getAccessToken();
 
   if (!token || isPublicRequest(request.url)) {
     return next(request);

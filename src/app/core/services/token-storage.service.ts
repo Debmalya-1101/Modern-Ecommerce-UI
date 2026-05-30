@@ -16,6 +16,10 @@ export class TokenStorageService {
     this.getStorage()?.setItem(this.storageKey, token);
   }
 
+  hasToken(): boolean {
+    return !!this.getToken();
+  }
+
   clearToken(): void {
     this.getStorage()?.removeItem(this.storageKey);
   }
