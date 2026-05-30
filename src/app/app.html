@@ -33,6 +33,50 @@
 
     <mat-divider />
 
+    <section class="sidebar-session" aria-labelledby="account-title">
+      <p id="account-title" class="section-label">Account</p>
+
+      @if (isAuthenticated()) {
+        <div class="sidebar-session__summary">
+          <strong>{{ currentUserLabel() }}</strong>
+          <span>{{ session().user?.role ?? 'ROLE_USER' }}</span>
+        </div>
+
+        <div class="sidebar-session__actions">
+          <a
+            mat-button
+            appButtonStyle="secondary"
+            routerLink="/profile"
+            (click)="closeSidebarOnMobile()"
+          >
+            Profile placeholder
+          </a>
+
+          <button
+            mat-flat-button
+            appButtonStyle="danger"
+            type="button"
+            (click)="logout()"
+          >
+            Logout
+          </button>
+        </div>
+      } @else {
+        <div class="sidebar-session__actions">
+          <a
+            mat-flat-button
+            appButtonStyle="primary"
+            routerLink="/login"
+            (click)="closeSidebarOnMobile()"
+          >
+            Login
+          </a>
+        </div>
+      }
+    </section>
+
+    <mat-divider />
+
     <section class="sidebar-planned" aria-labelledby="planned-title">
       <p id="planned-title" class="section-label">Planned areas</p>
       <ul>
@@ -71,8 +115,27 @@
         </div>
 
         <nav class="toolbar-links" aria-label="Quick links">
-          <a routerLink="/orders" class="toolbar-link">Orders</a>
-          <a routerLink="/profile" class="toolbar-link">Profile</a>
+          @if (isAuthenticated()) {
+            <a routerLink="/orders" class="toolbar-link">Orders</a>
+            <a routerLink="/profile" class="toolbar-link">Profile</a>
+            <button
+              mat-stroked-button
+              appButtonStyle="secondary"
+              type="button"
+              (click)="logout()"
+            >
+              Logout
+            </button>
+          } @else {
+            <a
+              mat-flat-button
+              appButtonStyle="primary"
+              routerLink="/login"
+              class="toolbar-login"
+            >
+              Login
+            </a>
+          }
         </nav>
       </mat-toolbar>
 

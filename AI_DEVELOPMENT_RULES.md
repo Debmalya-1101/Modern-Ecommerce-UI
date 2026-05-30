@@ -81,3 +81,20 @@ Before adding new code, ask:
 5. Can this be explained simply in the learning journal?
 
 If the answer to most of these is "no", choose the simpler approach.
+
+## Feature Implementation Rule
+
+Every feature implementation must include:
+
+1. Backend/service implementation
+2. UI implementation
+3. Routing implementation
+4. Navigation integration (if applicable)
+5. Loading states
+6. Error states
+7. Empty states (if applicable)
+8. Responsive design
+
+A feature is NOT considered complete if only services or infrastructure are implemented.
+
+Every implemented feature must be visible and testable from the browser UI.

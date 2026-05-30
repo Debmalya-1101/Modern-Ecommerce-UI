@@ -46,6 +46,30 @@
         <strong>Feature-first structure</strong>
         <span>Organized for future storefront growth without adding business screens yet.</span>
       </mat-card>
+
+      @if (backendStatus().loading) {
+        <mat-card class="status-card" appearance="outlined">
+          <p class="mini-label">Backend status</p>
+          <app-loading-spinner label="Checking backend connection" [diameter]="36" />
+        </mat-card>
+      } @else if (backendStatus().error) {
+        <app-error-state
+          title="Backend connection failed"
+          [description]="backendStatus().error ?? 'Please try again in a moment.'"
+          actionLabel="Retry check"
+          (action)="retryBackendConnection()"
+        />
+      } @else if (backendStatus().data; as status) {
+        <mat-card class="status-card status-card--connected" appearance="outlined">
+          <p class="mini-label">Backend status</p>
+          <strong>Connected</strong>
+          <span>{{ status.message }}</span>
+          <div class="status-meta">
+            <p>Endpoint: <code>{{ status.endpoint }}</code></p>
+            <p>Sample total products: {{ status.sampleProductCount }}</p>
+          </div>
+        </mat-card>
+      }
     </div>
   </section>
 

@@ -1711,3 +1711,404 @@ That separation keeps each piece easier to understand.
 - route guards are the frontend equivalent of navigation protection checks
 - interceptors are a clean place for shared auth request behavior
 - session persistence is mostly about restoring and validating stored auth state at startup
+
+## Feature Update: Backend Connectivity Verification
+
+What was added:
+- a small backend status service
+- a live backend connectivity check using a safe public GET endpoint
+- a compact dashboard card on the home page for connection status
+
+Why it was added:
+- it gives the frontend a quick way to verify whether the backend is reachable
+- it helps separate "frontend bug" from "backend unavailable" during development
+- it introduces a real `HttpClient` request flow without needing a business screen
+
+### HttpClient Flow Explained Simply
+
+`HttpClient` is Angular's built-in way to send HTTP requests.
+
+In this feature, the flow is:
+
+```text
+HomePage
+  -> BackendStatusService
+  -> ApiService
+  -> HttpWrapperService
+  -> HttpClient
+  -> backend endpoint
+```
+
+What this means:
+- the page does not call the backend directly
+- the service asks the shared API layer to make the request
+- `HttpClient` sends the GET request in the browser
+
+In this project, the connectivity check uses the public products endpoint as a safe probe.
+
+### Observable Subscription Flow Explained
+
+The page starts in a loading state, subscribes to the observable, and then updates the UI when a result arrives.
+
+Small example:
+
+```ts
+this.backendStatusService.checkConnection().subscribe({
+  next: (status) => {
+    this.backendStatus.set({
+      data: status,
+      error: null,
+      loading: false
+    });
+  },
+  error: (error) => {
+    this.backendStatus.set({
+      data: null,
+      error: error.message,
+      loading: false
+    });
+  }
+});
+```
+
+What this means:
+- `subscribe` starts listening to the request result
+- `next` runs when the backend responds successfully
+- `error` runs when the request fails
+
+That is why the card can show:
+- loading
+- connected
+- failed
+
+### Connected, Loading, Failed States Explained
+
+This feature uses the same simple page-state shape used elsewhere:
+- `loading`
+- `data`
+- `error`
+
+That makes the UI easy to reason about:
+- while loading, show the shared loading spinner
+- when connected, show the green status card
+- when failed, show the shared error state with retry
+
+### Spring Boot Comparison: RestTemplate and WebClient
+
+If you come from Spring Boot, `HttpClient` is conceptually similar to calling another service with `RestTemplate` or `WebClient`.
+
+Simple comparison:
+- Angular `HttpClient` sends requests from the browser client
+- Spring `RestTemplate` or `WebClient` sends requests from the server
+
+Mental model:
+- Angular `HttpClient` + observable flow feels closer to `WebClient`
+- both are async-friendly and stream-oriented
+
+Difference:
+- `HttpClient` runs in the frontend runtime
+- `RestTemplate` and `WebClient` run in backend code
+
+### Why The Service Layer Still Matters Here
+
+Even though this is only one small status call, the page still uses a dedicated service.
+
+Why:
+- UI stays focused on rendering
+- request details stay out of the component
+- the connectivity check can be reused later if needed
+
+## What I Learned From This Step
+
+- `HttpClient` is easier to understand when you follow the request path from component to service to backend
+- observable subscriptions power the loading, success, and failure UI flow
+- small verification features are a practical way to test real backend connectivity without building a full business page
+
+## Feature Update: Real Backend Authentication
+
+What was changed:
+- mock login was replaced with the real backend login API
+- signup now uses the real backend signup API
+- current-user refresh now uses the real `/auth/me` endpoint
+- JWT storage, auth interceptor, guards, and logout flow were kept and connected to the live backend flow
+
+Why it was changed:
+- the authentication foundation was ready, but it was still using mock data
+- the backend contract already exists for login, signup, and current-user lookup
+- moving to real auth makes the route guards and interceptor meaningful in real usage
+
+### JWT Flow Explained Simply
+
+The JWT flow in this project now works like this:
+
+1. The frontend sends `POST /auth/login` with `usernameOrEmail` and `password`.
+2. The backend responds with a token.
+3. The auth service stores that token in local storage.
+4. The auth service keeps the token in Angular state too.
+5. Protected requests automatically receive `Authorization: Bearer <token>`.
+6. On refresh, the app reads the saved token and restores the session.
+7. The app calls `/auth/me` to refresh current user information.
+8. If the backend rejects the token with `401`, the app logs out.
+
+That is the basic end-to-end JWT lifecycle on the frontend.
+
+### Interceptor Execution Flow Explained
+
+Interceptor flow means every outgoing request passes through shared request handlers before it leaves the app.
+
+In this project, the request path is:
+
+```text
+component or service
+  -> HttpClient
+  -> JWT interceptor
+  -> error interceptor
+  -> backend
+```
+
+And the response path comes back through the interceptors too.
+
+What the JWT interceptor does:
+- checks whether the request is public
+- checks whether a token exists
+- adds the bearer token header for protected requests
+
+What the error interceptor does:
+- watches for backend errors
+- normalizes them into a cleaner app error shape
+- logs the user out on `401`
+
+### Spring Security Filter Chain Comparison
+
+If you come from Spring Boot, Angular interceptors are very similar in purpose to the Spring Security filter chain.
+
+Simple comparison:
+- Angular interceptor runs in the browser before the request reaches the backend
+- Spring Security filter runs on the server before the request reaches the controller
+
+Shared idea:
+- both can inspect requests
+- both can add or validate auth behavior
+- both keep repeated auth logic out of normal business code
+
+Difference:
+- Angular interceptor adds the token to the outgoing request
+- Spring Security filters validate the token after it arrives on the backend
+
+### Real Login Flow Explained
+
+The login method now does real backend work instead of returning a mock response.
+
+Simple idea:
+- call `/auth/login`
+- store the returned token
+- call `/auth/me`
+- update the current user
+
+Why that second call matters:
+- the login response only contains token information
+- `/auth/me` gives the frontend the actual current user data such as username, email, and role
+
+### Session Restoration On Refresh
+
+Session restoration now works with the real backend structure too.
+
+The app startup flow is:
+- read token from storage
+- check whether it looks expired
+- restore token into app state
+- call `/auth/me` to refresh the current user
+
+Why this helps:
+- refresh does not immediately lose auth state
+- user data stays closer to backend truth
+
+### Loading and Error Handling In Auth
+
+The auth service already had loading and error state signals, and they now wrap real backend calls.
+
+That means:
+- login can show loading state
+- signup can show loading state
+- backend auth failures can surface readable error messages
+
+This is important because real auth APIs fail for real reasons:
+- bad credentials
+- duplicate signup values
+- expired tokens
+- backend unavailable
+
+### Beginner-Friendly Takeaway
+
+The main pattern is:
+
+```text
+auth service calls backend
+backend returns token
+token is stored
+interceptor reuses token
+guards use auth state
+```
+
+That is the core frontend authentication loop.
+
+## What I Learned From This Step
+
+- JWT auth becomes easier to follow when broken into login, storage, interceptor, guard, and restore steps
+- Angular interceptors play a role similar to Spring Security filters, but on the client side
+- real backend auth mainly changes the data source, while the surrounding auth architecture can stay mostly the same
+
+## Feature Update: Complete Authentication Feature
+
+What was added:
+- a real login page at `/login`
+- reactive form validation for username/email and password
+- redirect-aware route guard behavior
+- login and logout navigation entry points
+- loading and error handling in the login UI
+- profile/logout menu visibility based on session state
+
+Why it was added:
+- the auth infrastructure was not complete until users could actually reach and test it in the browser
+- protected routes need a visible login path and a clear return flow after authentication
+- enterprise-style frontend auth is not only services and interceptors; it also includes usable navigation and screen feedback
+
+### Authentication Flow Step-by-Step
+
+The full authentication flow now works like this:
+
+1. A logged-out user clicks the login menu item or gets redirected from a protected route.
+2. Angular opens `/login`.
+3. The login page shows a reactive form with validation.
+4. The user submits `usernameOrEmail` and `password`.
+5. `AuthService.login()` calls the real backend login API.
+6. The backend returns a JWT token.
+7. The token is stored in local storage and also kept in Angular auth state.
+8. The auth service calls `/auth/me` to load the current user.
+9. The user is redirected to the protected page they originally wanted, or to `/profile`.
+10. Future protected API requests receive the token from the interceptor.
+11. On refresh, the app restores the saved session.
+12. On logout, the token and current user state are cleared.
+
+That is now a complete end-to-end frontend authentication loop.
+
+### Reactive Forms Explained Simply
+
+Reactive forms are Angular's structured way to manage form values and validation in TypeScript.
+
+Small example:
+
+```ts
+protected readonly loginForm = this.formBuilder.nonNullable.group({
+  usernameOrEmail: ['', [Validators.required]],
+  password: ['', [Validators.required, Validators.minLength(6)]]
+});
+```
+
+What this means:
+- the form shape is defined in code
+- validation rules live in the component
+- Angular tracks whether fields are valid, touched, or invalid
+
+Why this is useful:
+- login validation stays predictable
+- templates stay cleaner
+- it scales better than manually checking input values
+
+### Route Guards Explained Again
+
+The route guard now does two important jobs:
+- block unauthenticated access
+- remember the route the user originally wanted
+
+Small idea:
+
+```ts
+return router.createUrlTree(['/login'], {
+  queryParams: { redirectTo: state.url }
+});
+```
+
+What this means:
+- if the user tries to open `/checkout`
+- the app redirects to `/login?redirectTo=/checkout`
+- after successful login, the app can send them back
+
+This creates a more complete user experience than redirecting everyone to the home page.
+
+### Interceptors Explained Again
+
+The auth interceptor runs before protected HTTP requests leave the frontend.
+
+Its job:
+- look for a saved token
+- skip public requests like login and product listing
+- add `Authorization: Bearer <token>` to protected ones
+
+The error interceptor runs on the way back and handles shared backend error behavior.
+
+This is why services like cart, orders, or profile do not need to manually add auth headers.
+
+### Spring Boot Filter Comparison
+
+The Angular interceptor pattern is very close to Spring Boot filters in purpose.
+
+Simple comparison:
+- Angular interceptor: runs in the browser before requests leave the frontend
+- Spring Security filter: runs on the backend before the request reaches the controller
+
+Shared idea:
+- both apply cross-cutting request logic
+- both keep auth-related code out of normal feature handlers
+
+Difference:
+- Angular adds the token
+- Spring Security validates the token
+
+### Login UI Architecture Explained
+
+The login feature now follows the same layered structure as the rest of the app:
+
+```text
+login page
+  -> AuthService
+  -> ApiService / HttpClient
+  -> backend
+```
+
+And for navigation:
+
+```text
+protected route
+  -> auth guard
+  -> /login redirect
+  -> successful login
+  -> redirect back
+```
+
+Why this matters:
+- the UI stays focused on rendering and form state
+- the service stays focused on auth communication and session state
+- the shell stays focused on navigation visibility
+
+### Loading and Error States In The Login Screen
+
+The login page now handles two important states:
+
+- loading:
+  - disable the submit button
+  - show a progress spinner
+- error:
+  - show the backend error message
+  - keep the form on screen for correction
+
+That makes the screen usable in real backend conditions such as:
+- wrong password
+- bad username/email
+- backend not reachable
+
+## What I Learned From This Step
+
+- a feature is only complete when services, routing, UI, and navigation all work together
+- reactive forms make login validation easier to manage than manual input checks
+- redirect-aware guards create a much better authentication experience than simple route blocking

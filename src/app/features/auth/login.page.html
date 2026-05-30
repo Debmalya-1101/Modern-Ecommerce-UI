@@ -1,0 +1,104 @@
+<section class="login-page">
+  @if (isRestoringSession()) {
+    <mat-card class="login-panel login-panel--status" appearance="outlined">
+      <app-loading-spinner label="Restoring your session" [diameter]="52" />
+    </mat-card>
+  } @else {
+    <div class="login-layout">
+      <mat-card class="login-intro" appearance="outlined">
+        <p class="eyebrow">Authentication</p>
+        <h2>Sign in to continue your storefront journey</h2>
+        <p class="intro-copy">
+          This login page uses the real backend authentication endpoint, restores the session after refresh, and keeps protected routes behind Angular guards.
+        </p>
+
+        <div class="intro-highlights">
+          <div>
+            <strong>JWT session</strong>
+            <span>Stored securely in browser storage for refresh persistence.</span>
+          </div>
+          <div>
+            <strong>Guarded routes</strong>
+            <span>Checkout, orders, and profile redirect unauthenticated users here.</span>
+          </div>
+          <div>
+            <strong>Interceptor flow</strong>
+            <span>Protected API calls automatically receive the bearer token.</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="login-panel" appearance="outlined">
+        <div class="login-panel__header">
+          <div>
+            <p class="eyebrow">Login route</p>
+            <h3>Welcome back</h3>
+          </div>
+          <a routerLink="/" class="back-link">Back to home</a>
+        </div>
+
+        @if (authState().error) {
+          <div class="login-error" role="alert">
+            {{ authState().error }}
+          </div>
+        }
+
+        <form class="login-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+          <mat-form-field appearance="outline">
+            <mat-label>Username or email</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="usernameOrEmail"
+              autocomplete="username"
+              placeholder="Enter your username or email"
+            />
+
+            @if (showFieldError('usernameOrEmail')) {
+              <mat-error>
+                Username or email is required.
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              type="password"
+              formControlName="password"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+            />
+
+            @if (showFieldError('password')) {
+              <mat-error>
+                @if (passwordControl.hasError('required')) {
+                  Password is required.
+                } @else if (passwordControl.hasError('minlength')) {
+                  Password must be at least 6 characters.
+                }
+              </mat-error>
+            }
+          </mat-form-field>
+
+          <div class="login-actions">
+            <button
+              mat-flat-button
+              appButtonStyle="primary"
+              type="submit"
+              [disabled]="isSubmitting()"
+            >
+              @if (isSubmitting()) {
+                <mat-progress-spinner mode="indeterminate" [diameter]="18" />
+                <span>Signing in...</span>
+              } @else {
+                <span>Sign in</span>
+              }
+            </button>
+          </div>
+        </form>
+      </mat-card>
+    </div>
+  }
+</section>

@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, catchError, finalize, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, map, of, switchMap, tap, throwError } from 'rxjs';
 
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import { AppHttpError } from '../models/api.model';
@@ -37,10 +37,17 @@ export class AuthService {
     this.isLoading.set(true);
     this.authError.set(null);
 
-    return this.createMockLoginRequest(request)
+    return this.apiService
+      .post<AuthResponse, LoginRequest>(API_ENDPOINTS.auth.login, request, {
+        trackLoading: true
+      })
       .pipe(
         tap((response) => this.setSessionToken(response.token)),
-        tap(() => this.refreshCurrentUser().subscribe()),
+        switchMap((response) =>
+          this.refreshCurrentUser().pipe(
+            map(() => response)
+          )
+        ),
         tap(() => this.isReady.set(true)),
         catchError((error: AppHttpError) => {
           this.authError.set(error.message);
@@ -55,9 +62,7 @@ export class AuthService {
     this.authError.set(null);
 
     return this.apiService
-      .mockData<string>(`Mock signup completed for ${request.userName}.`, {
-        delayMs: 300,
-        message: `Mock POST ${API_ENDPOINTS.auth.signup}`,
+      .post<string, SignupRequest>(API_ENDPOINTS.auth.signup, request, {
         trackLoading: true
       })
       .pipe(
@@ -76,14 +81,17 @@ export class AuthService {
     }
 
     return this.apiService
-      .mockData<AuthUserInfo>(this.createMockCurrentUser(), {
-        delayMs: 200,
-        message: `Mock GET ${API_ENDPOINTS.auth.me}`,
+      .get<AuthUserInfo>(API_ENDPOINTS.auth.me, undefined, {
         trackLoading: false
       })
       .pipe(
         tap((user) => this.currentUser.set(user)),
-        catchError(() => {
+        catchError((error: AppHttpError) => {
+          if (error.status !== 401) {
+            this.currentUser.set(this.createUserFromToken(this.token()));
+            return of(this.currentUser());
+          }
+
           this.currentUser.set(this.createUserFromToken(this.token()));
           return of(this.currentUser());
         })
@@ -113,13 +121,28 @@ export class AuthService {
 
     this.token.set(storedToken);
     this.currentUser.set(this.createUserFromToken(storedToken));
-    this.isReady.set(true);
-    this.isLoading.set(false);
+
+    this.refreshCurrentUser()
+      .pipe(
+        finalize(() => {
+          this.isReady.set(true);
+          this.isLoading.set(false);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.authError.set(null);
+        },
+        error: () => {
+          this.currentUser.set(this.createUserFromToken(this.token()));
+        }
+      });
   }
 
   logout(): void {
     this.tokenStorage.clearToken();
     this.clearSessionState();
+    this.authError.set(null);
     this.isReady.set(true);
   }
 
@@ -139,66 +162,11 @@ export class AuthService {
     return this.getAccessToken();
   }
 
-  private createMockLoginRequest(request: LoginRequest): Observable<AuthResponse> {
-    if (!request.usernameOrEmail.trim() || !request.password.trim()) {
-      return this.apiService.mockFailure<AuthResponse>(
-        'Username/email and password are required for mock login.',
-        400,
-        {
-          delayMs: 250,
-          trackLoading: true
-        }
-      );
-    }
-
-    return this.apiService.mockData<AuthResponse>(this.createMockAuthResponse(request), {
-      delayMs: 300,
-      message: `Mock POST ${API_ENDPOINTS.auth.login}`,
-      trackLoading: true
-    });
-  }
-
   private setSessionToken(token: string): void {
     this.tokenStorage.setToken(token);
     this.token.set(token);
     this.currentUser.set(this.createUserFromToken(token));
     this.authError.set(null);
-  }
-
-  private createMockAuthResponse(request: LoginRequest): AuthResponse {
-    const username = request.usernameOrEmail.includes('@')
-      ? request.usernameOrEmail.split('@')[0]
-      : request.usernameOrEmail;
-    const role: UserRole = username.toLowerCase().includes('admin') ? 'ROLE_ADMIN' : 'ROLE_USER';
-
-    const payload = {
-      sub: username,
-      role,
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24
-    };
-
-    return {
-      token: this.createMockJwtToken(payload),
-      tokenType: 'Bearer'
-    };
-  }
-
-  private createMockCurrentUser(): AuthUserInfo {
-    return this.createUserFromToken(this.token()) ?? {
-      username: 'demo-user',
-      emailId: 'demo@modern-commerce.dev',
-      role: 'ROLE_USER'
-    };
-  }
-
-  private createMockJwtToken(payload: JwtTokenPayload): string {
-    const header = { alg: 'none', typ: 'JWT' };
-
-    return [
-      btoa(JSON.stringify(header)),
-      btoa(JSON.stringify(payload)),
-      'mock-signature'
-    ].join('.');
   }
 
   private createUserFromToken(token: string | null): AuthUserInfo | null {

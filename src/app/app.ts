@@ -1,13 +1,14 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { AuthService } from './core/services/auth.service';
 import { ButtonStyleDirective } from './shared/directives/button-style.directive';
 
 interface NavigationItem {
@@ -36,12 +37,20 @@ interface NavigationItem {
 export class App {
   private readonly breakpointObserver = inject(BreakpointObserver);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
   private readonly mobileBreakpoint = '(max-width: 768px)';
   private readonly startsOnMobile = this.breakpointObserver.isMatched(this.mobileBreakpoint);
 
   protected readonly title = 'Modern Commerce';
   protected readonly isMobile = signal(this.startsOnMobile);
   protected readonly isSidebarOpen = signal(!this.startsOnMobile);
+  protected readonly authState = this.authService.state;
+  protected readonly session = this.authService.session;
+  protected readonly isAuthenticated = this.authService.isAuthenticated;
+  protected readonly currentUserLabel = computed(
+    () => this.session().user?.username ?? 'Guest'
+  );
   protected readonly navigationItems: NavigationItem[] = [
     {
       label: 'Home',
@@ -98,5 +107,11 @@ export class App {
     if (this.isMobile()) {
       this.isSidebarOpen.set(false);
     }
+  }
+
+  protected logout(): void {
+    this.authService.logout();
+    this.closeSidebarOnMobile();
+    this.router.navigateByUrl('/login');
   }
 }
