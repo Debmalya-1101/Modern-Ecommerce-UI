@@ -1,23 +1,65 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 
-import { RoutePlaceholderComponent } from '../../shared/ui/route-placeholder/route-placeholder.component';
+import { CartService } from '../../core/services/cart.service';
+import { CartItemComponent } from './components/cart-item/cart-item.component';
+import { CartSummaryComponent } from './components/cart-summary/cart-summary.component';
+import { CartRecommendationsCarouselComponent } from './components/cart-recommendations-carousel/cart-recommendations-carousel.component';
+import { SaveForLaterListComponent } from './components/save-for-later-list/save-for-later-list.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
+import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
+import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading-spinner.component';
+import { ButtonStyleDirective } from '../../shared/directives/button-style.directive';
 
 @Component({
   selector: 'app-cart-page',
-  imports: [RoutePlaceholderComponent],
-  template: `
-    <app-route-placeholder
-      eyebrow="Cart feature route"
-      title="Cart placeholder"
-      description="This route will later show cart items, totals, quantity updates, and remove actions."
-      [highlights]="highlights"
-    />
-  `
+  imports: [
+    RouterLink,
+    MatButtonModule,
+    CartItemComponent,
+    CartSummaryComponent,
+    CartRecommendationsCarouselComponent,
+    SaveForLaterListComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
+    LoadingSpinnerComponent,
+    ButtonStyleDirective
+  ],
+  templateUrl: './cart.page.html',
+  styleUrl: './cart.page.scss'
 })
 export class CartPage {
-  protected readonly highlights = [
-    'Protected route shape is already planned by the backend API reference',
-    'Ready for cart item list, cart total, and quantity controls',
-    'Can later reuse shared loading, empty, and error state components'
-  ];
+  private readonly cartService = inject(CartService);
+
+  public readonly cartItems = this.cartService.items;
+  public readonly isEmpty = this.cartService.isEmpty;
+  public readonly loading = this.cartService.loading;
+  public readonly error = this.cartService.error;
+
+  protected handleIncreaseQuantity(itemId: number): void {
+    const item = this.cartItems().find((i) => i.itemId === itemId);
+    if (item) {
+      this.cartService.updateQuantity(itemId, item.quantity + 1);
+    }
+  }
+
+  protected handleDecreaseQuantity(itemId: number): void {
+    const item = this.cartItems().find((i) => i.itemId === itemId);
+    if (item) {
+      this.cartService.updateQuantity(itemId, item.quantity - 1);
+    }
+  }
+
+  protected handleRemoveItem(itemId: number): void {
+    this.cartService.removeFromCart(itemId);
+  }
+
+  protected handleSaveForLater(itemId: number): void {
+    this.cartService.saveForLater(itemId);
+  }
+
+  protected reloadCart(): void {
+    this.cartService.loadCart();
+  }
 }

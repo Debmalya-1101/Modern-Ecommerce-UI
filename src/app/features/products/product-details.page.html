@@ -111,12 +111,33 @@
         </div>
 
         <div class="detail-actions">
+          <div class="detail-quantity" [class.disabled]="productDetail.stockStatus === 'out-of-stock'">
+            <button
+              mat-icon-button
+              type="button"
+              aria-label="Decrease quantity"
+              [disabled]="productDetail.stockStatus === 'out-of-stock' || selectedQuantity() <= 1"
+              (click)="updateQuantity(-1)"
+            >
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="detail-quantity__value">{{ selectedQuantity() }}</span>
+            <button
+              mat-icon-button
+              type="button"
+              aria-label="Increase quantity"
+              [disabled]="productDetail.stockStatus === 'out-of-stock'"
+              (click)="updateQuantity(1)"
+            >
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
           <button
             mat-flat-button
             appButtonStyle="primary"
             type="button"
             [disabled]="productDetail.stockStatus === 'out-of-stock'"
-            (click)="addToCart(productDetail.name)"
+            (click)="addToCart(productDetail)"
           >
             Add To Cart
           </button>

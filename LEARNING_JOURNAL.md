@@ -2900,3 +2900,577 @@ This runs silently in the background (`trackLoading: false`), meaning the main p
 ### What is Next
 
 - **Shopping Cart Implementation:** Building the client-side cart logic and connecting it to the backend `POST /api/cart/add`.
+
+---
+
+## Feature Design: Shopping Cart Architecture
+
+**Date:** 2026-06-06
+**Feature:** Design Client-Side Cart State Management, Components, and Routing
+**Status:** 📋 Design Phase Complete
+
+### What Was Done
+
+Before writing any code, we mapped out the complete architecture for the Shopping Cart feature. In a modern Angular application, we avoid mixing server communication with UI logic and avoid wrapping state in heavy external frameworks. Instead, we use Angular Signals as lightweight, reactive data containers inside a shared Service.
+
+---
+
+### Concept 1: Writable Signals vs. Read-Only Signals
+
+In backend systems, we protect internal state by making class fields `private` and exposing public getters. In Angular, we do the exact same thing with Signals.
+
+- **Writable Signal (`signal`)**: Allows any code to change its value using `.set()` or `.update()`. We keep this `private` inside our service so components cannot randomly mutate the cart data.
+- **Read-Only Signal (`asReadonly()`)**: Allows components to *read* values and react to changes, but prevents them from changing the values directly.
+
+```ts
+@Injectable({ providedIn: 'root' })
+export class CartService {
+  // Only the service can write to this
+  private readonly _cart = signal<Cart>({ items: [], cartTotal: 0 });
+
+  // Components can inject the service and read this
+  public readonly cart = this._cart.asReadonly();
+}
+```
+
+By separating read/write access, debugging state changes is trivial: you only have to look at the service methods (`addToCart`, `removeFromCart`), not every button or page template in the project.
+
+---
+
+### Concept 2: Computed Signals for Derived State
+
+In database design, you don't store fields like `item_count` or `order_subtotal` if you can calculate them dynamically from the line items. Storing them invites desynchronization bugs.
+
+In Angular, **Computed Signals** are the equivalent of database views or derived fields. They automatically calculate a value from other signals and **cache** the result. They only recalculate when their dependent signals change.
+
+```ts
+// Calculate total item count for the header badge
+public readonly itemCount = computed(() => 
+  this.cart().items.reduce((sum, item) => sum + item.quantity, 0)
+);
+
+// Calculate if the cart is empty for conditional UI display
+public readonly isEmpty = computed(() => this.cart().items.length === 0);
+```
+
+If the cart items don't change, calling `itemCount()` returns the cached number instantly without running the `.reduce()` loop again.
+
+---
+
+### Concept 3: Immediate Updates & Optimistic UI
+
+When a user clicks "+" to increase an item quantity, they expect the number to change *immediately*. Waiting for a backend API call (which might take 200–500ms) makes the app feel sluggish.
+
+**Optimistic UI** means updating the local UI state *before* the server confirms the change, assuming the server operation will succeed.
+
+If the operation fails, we rollback the UI state to what it was before and display a toast/snackbar warning.
+
+```ts
+public updateQuantity(itemId: number, quantity: number): void {
+  // 1. Keep copy of previous state
+  const previousCart = this._cart();
+
+  // 2. Optimistically update local signal state immediately
+  this._cart.update(current => {
+    const updated = current.items.map(item => 
+      item.itemId === itemId ? { ...item, quantity, total: item.price * quantity } : item
+    );
+    return { items: updated, cartTotal: updated.reduce((s, i) => s + i.total, 0) };
+  });
+
+  // 3. Make HTTP request in the background
+  this.cartApi.updateItemQuantity(itemId, quantity).subscribe({
+    next: (confirmedCart) => {
+      this._cart.set(confirmedCart); // Sync with final server-side calculations
+    },
+    error: () => {
+      this._cart.set(previousCart); // Rollback on failure!
+      this.snackbar.error('Failed to update quantity.');
+    }
+  });
+}
+```
+
+This ensures the user experience remains fast, while retaining transaction safety via rollback.
+
+---
+
+### Concept 4: Lazy Loading Routes
+
+If we load all page components at startup, the initial download size of the application becomes bloated. **Lazy Loading** means loading a feature's code only when the user navigates to its URL.
+
+In modern Angular, we register lazy-loaded feature routes directly in `app.routes.ts` by pointing to the feature routes file:
+
+```ts
+// In app.routes.ts
+{
+  path: 'cart',
+  loadChildren: () => import('./features/cart/cart.routes').then(m => m.CART_ROUTES)
+}
+```
+
+And in `features/cart/cart.routes.ts`, we register the sub-routes:
+
+```ts
+// In cart.routes.ts
+export const CART_ROUTES: Routes = [
+  {
+    path: '',
+    loadComponent: () => import('./cart.page').then(m => m.CartPage)
+  }
+];
+```
+
+The browser only downloads the JavaScript files for the Cart screen when the user actually navigates to `/cart`.
+
+---
+
+### What I Learned From This Design
+
+- Centralizing state in a shared service with readonly Signals creates a unidirectional data flow that is simple to trace and inspect.
+- Computed signals prevent boilerplate calculation code in templates and keep page rendering fast.
+- Optimistic state updates provide instant user feedback while retaining backend database consistency through error rollback handlers.
+
+## Feature Update: Shopping Cart Implementation
+
+What was added:
+- Integrated real backend endpoints into `CartApiService`.
+- Implemented `CartService` using Angular Signals to manage cart items and optimistic updates.
+- Added a reactive cart badge to the `App` shell header that dynamically updates based on the items in the cart.
+- Built a modern, responsive Cart Page featuring an empty state, loading state, item list, and order summary.
+
+Why it was added:
+- Enables the core e-commerce flow of selecting and purchasing items.
+- Upgrades the placeholder mock data to a fully functional and reactive state system.
+
+### `effect()` API Explained Simply
+
+We utilized the `effect()` API in our `CartService` to react automatically when the user's authentication state changes. 
+
+Small example:
+
+```ts
+constructor() {
+  effect(() => {
+    const isAuthenticated = this.authService.isAuthenticated();
+    if (isAuthenticated) {
+      this.loadCart();
+    } else {
+      this._cart.set({ items: [], cartTotal: 0 });
+    }
+  });
+}
+```
+
+What this means:
+- `effect()` automatically tracks any signals it reads inside its callback function.
+    <!-- Product Grid here -->
+  </mat-drawer-content>
+</mat-drawer-container>
+```
+
+Why this works well:
+- It provides a wider layout for the actual products.
+- The same component structure works for desktop and mobile without needing two separate filter blocks.
+- It feels modern and interactive.
+
+### Extracting Dynamic Options (Brands)
+
+The backend doesn't always have dedicated `/brands` endpoints. Sometimes you have to derive available options from the catalog itself.
+
+```ts
+  getCatalogBrands(): Observable<string[]> {
+    return this.apiService.get(..., { page: 0, size: 100 }, { trackLoading: false })
+      .pipe(
+        map((response) => {
+          const allBrands = response.content.map(p => p.brand).filter(b => !!b);
+          return [...new Set(allBrands)].sort();
+        })
+      );
+  }
+```
+
+This runs silently in the background (`trackLoading: false`), meaning the main product grid doesn't wait for this to finish, keeping the perceived performance high.
+
+### What is Next
+
+- **Shopping Cart Implementation:** Building the client-side cart logic and connecting it to the backend `POST /api/cart/add`.
+
+---
+
+## Feature Design: Shopping Cart Architecture
+
+**Date:** 2026-06-06
+**Feature:** Design Client-Side Cart State Management, Components, and Routing
+**Status:** 📋 Design Phase Complete
+
+### What Was Done
+
+Before writing any code, we mapped out the complete architecture for the Shopping Cart feature. In a modern Angular application, we avoid mixing server communication with UI logic and avoid wrapping state in heavy external frameworks. Instead, we use Angular Signals as lightweight, reactive data containers inside a shared Service.
+
+---
+
+### Concept 1: Writable Signals vs. Read-Only Signals
+
+In backend systems, we protect internal state by making class fields `private` and exposing public getters. In Angular, we do the exact same thing with Signals.
+
+- **Writable Signal (`signal`)**: Allows any code to change its value using `.set()` or `.update()`. We keep this `private` inside our service so components cannot randomly mutate the cart data.
+- **Read-Only Signal (`asReadonly()`)**: Allows components to *read* values and react to changes, but prevents them from changing the values directly.
+
+```ts
+@Injectable({ providedIn: 'root' })
+export class CartService {
+  // Only the service can write to this
+  private readonly _cart = signal<Cart>({ items: [], cartTotal: 0 });
+
+  // Components can inject the service and read this
+  public readonly cart = this._cart.asReadonly();
+}
+```
+
+By separating read/write access, debugging state changes is trivial: you only have to look at the service methods (`addToCart`, `removeFromCart`), not every button or page template in the project.
+
+---
+
+### Concept 2: Computed Signals for Derived State
+
+In database design, you don't store fields like `item_count` or `order_subtotal` if you can calculate them dynamically from the line items. Storing them invites desynchronization bugs.
+
+In Angular, **Computed Signals** are the equivalent of database views or derived fields. They automatically calculate a value from other signals and **cache** the result. They only recalculate when their dependent signals change.
+
+```ts
+// Calculate total item count for the header badge
+public readonly itemCount = computed(() => 
+  this.cart().items.reduce((sum, item) => sum + item.quantity, 0)
+);
+
+// Calculate if the cart is empty for conditional UI display
+public readonly isEmpty = computed(() => this.cart().items.length === 0);
+```
+
+If the cart items don't change, calling `itemCount()` returns the cached number instantly without running the `.reduce()` loop again.
+
+---
+
+### Concept 3: Immediate Updates & Optimistic UI
+
+When a user clicks "+" to increase an item quantity, they expect the number to change *immediately*. Waiting for a backend API call (which might take 200–500ms) makes the app feel sluggish.
+
+**Optimistic UI** means updating the local UI state *before* the server confirms the change, assuming the server operation will succeed.
+
+If the operation fails, we rollback the UI state to what it was before and display a toast/snackbar warning.
+
+```ts
+public updateQuantity(itemId: number, quantity: number): void {
+  // 1. Keep copy of previous state
+  const previousCart = this._cart();
+
+  // 2. Optimistically update local signal state immediately
+  this._cart.update(current => {
+    const updated = current.items.map(item => 
+      item.itemId === itemId ? { ...item, quantity, total: item.price * quantity } : item
+    );
+    return { items: updated, cartTotal: updated.reduce((s, i) => s + i.total, 0) };
+  });
+
+  // 3. Make HTTP request in the background
+  this.cartApi.updateItemQuantity(itemId, quantity).subscribe({
+    next: (confirmedCart) => {
+      this._cart.set(confirmedCart); // Sync with final server-side calculations
+    },
+    error: () => {
+      this._cart.set(previousCart); // Rollback on failure!
+      this.snackbar.error('Failed to update quantity.');
+    }
+  });
+}
+```
+
+This ensures the user experience remains fast, while retaining transaction safety via rollback.
+
+---
+
+### Concept 4: Lazy Loading Routes
+
+If we load all page components at startup, the initial download size of the application becomes bloated. **Lazy Loading** means loading a feature's code only when the user navigates to its URL.
+
+In modern Angular, we register lazy-loaded feature routes directly in `app.routes.ts` by pointing to the feature routes file:
+
+```ts
+// In app.routes.ts
+{
+  path: 'cart',
+  loadChildren: () => import('./features/cart/cart.routes').then(m => m.CART_ROUTES)
+}
+```
+
+And in `features/cart/cart.routes.ts`, we register the sub-routes:
+
+```ts
+// In cart.routes.ts
+export const CART_ROUTES: Routes = [
+  {
+    path: '',
+    loadComponent: () => import('./cart.page').then(m => m.CartPage)
+  }
+];
+```
+
+The browser only downloads the JavaScript files for the Cart screen when the user actually navigates to `/cart`.
+
+---
+
+### What I Learned From This Design
+
+- Centralizing state in a shared service with readonly Signals creates a unidirectional data flow that is simple to trace and inspect.
+- Computed signals prevent boilerplate calculation code in templates and keep page rendering fast.
+- Optimistic state updates provide instant user feedback while retaining backend database consistency through error rollback handlers.
+
+## Feature Update: Shopping Cart Implementation
+
+What was added:
+- Integrated real backend endpoints into `CartApiService`.
+- Implemented `CartService` using Angular Signals to manage cart items and optimistic updates.
+- Added a reactive cart badge to the `App` shell header that dynamically updates based on the items in the cart.
+- Built a modern, responsive Cart Page featuring an empty state, loading state, item list, and order summary.
+
+Why it was added:
+- Enables the core e-commerce flow of selecting and purchasing items.
+- Upgrades the placeholder mock data to a fully functional and reactive state system.
+
+### `effect()` API Explained Simply
+
+We utilized the `effect()` API in our `CartService` to react automatically when the user's authentication state changes. 
+
+Small example:
+
+```ts
+constructor() {
+  effect(() => {
+    const isAuthenticated = this.authService.isAuthenticated();
+    if (isAuthenticated) {
+      this.loadCart();
+    } else {
+      this._cart.set({ items: [], cartTotal: 0 });
+    }
+  });
+}
+```
+
+What this means:
+- `effect()` automatically tracks any signals it reads inside its callback function.
+- Whenever `isAuthenticated()` (which is a computed signal) changes, Angular automatically re-runs this effect function.
+- If the user logs in, we fetch their cart from the backend. If they log out, we clear the local cart data.
+
+Why this is useful:
+- We don't need to manually subscribe to an observable or manage an explicit event listener for login/logout actions.
+- The logic declaratively states: "Whenever authentication status changes, adjust the cart accordingly."
+- It integrates perfectly with Angular's reactive Signals model.
+
+## Feature Update: Complex Signal State & Debouncing
+
+What was added:
+- a debounced API request queue (`CartRequestQueueService`)
+- tracking item-level loading states in signals (`updatingItemIds`)
+- local client-side persistence for "Save for Later"
+
+Why it was added:
+- rapid clicks on quantity pickers would cause race conditions on the backend API
+- users need immediate UI feedback (optimistic UI), but if multiple requests stack up, the backend might fail or return stale state
+- saving items for later is a common e-commerce feature, and using local signal state avoids creating a full backend API if one isn't ready
+
+### Optimistic UI Explained Simply
+
+Optimistic UI means the frontend updates the screen *before* the backend confirms the change.
+
+Simple idea:
+1. User clicks "+"
+2. The UI instantly shows quantity + 1
+3. A background request is sent to the server
+4. If the server fails, the UI rolls back to the old value
+
+Why this matters:
+- the app feels extremely fast
+- network latency doesn't block the user's workflow
+
+### Debouncing Explained Simply
+
+Debouncing means waiting a short time after the user *stops* interacting before taking an action.
+
+Small RxJS example:
+```ts
+this.updateSubject.pipe(
+  groupBy(req => req.itemId),
+  mergeMap(group$ => group$.pipe(
+    debounceTime(400),
+    switchMap(req => this.api.updateQuantity(req))
+  ))
+).subscribe();
+```
+
+What this means:
+- If a user clicks "+" 5 times quickly, we don't send 5 API requests
+- The stream groups clicks by item ID, waits 400ms after the last click, and sends *only* the final quantity to the backend
+
+Backend analogy:
+- Similar to request batching or rate limiting
+
+### Complex Signal State
+
+Previously, the cart used one main `cart` signal. Now we use a set of item IDs to track which items are currently saving:
+
+```ts
+private readonly _updatingItemIds = signal<Set<number>>(new Set());
+
+// Mark item as updating
+this._updatingItemIds.update(set => new Set(set).add(itemId));
+```
+
+Why this is useful:
+- We can disable specific buttons (like "Remove" or "Checkout") only for the item being processed, without freezing the entire page.
+
+## What I Learned From This Step
+
+- RxJS `switchMap` and `debounceTime` are powerful for controlling rapid user interactions
+- Optimistic UI requires careful error handling to rollback state if the server fails
+- Angular Signals make it very easy to track localized loading states (like `Set<number>`) and reactively disable buttons across the UI
+
+## Aligning PUT Cart Item API to Backend Specifications
+
+### Request Parameters vs. Request Body in Angular HTTP PUT
+
+Backend-heavy developers are familiar with controllers matching query parameters (`@RequestParam`) or JSON bodies (`@RequestBody`). In our Angular client, we had originally mapped the cart item quantity update:
+`PUT /api/cart/item/{itemId}`
+to expect a JSON request body `UpdateCartItemRequest { quantity }`.
+However, the backend API expects a request parameter (query parameter) `?quantity={n}` instead of a request body.
+
+In Angular, we updated this using our centralized `ApiService.put` wrapper. Because `put` expects a request body as its second parameter, we pass `null` as the body and pass `quantity` as a query parameter inside the `params` options object.
+
+Example configuration in `CartApiService`:
+```ts
+updateItemQuantity(itemId: number, quantity: number): Observable<Cart> {
+  const params = { quantity };
+  // Pass null for request body, and query parameters in the params argument
+  return this.apiService.put<Cart, null>(
+    API_ENDPOINTS.cart.item(itemId),
+    null,
+    params,
+    { trackLoading: false }
+  );
+}
+```
+
+This properly formats the request as:
+`PUT /api/cart/item/1?quantity=5`
+with no payload body, matching the backend controller signature.
+
+## Layout and Currency Spacing Refactoring in Cart Feature
+
+### Why `:host { display: block; }` is Critical in Angular Layouts
+
+For developers coming from backend frameworks, custom Angular elements (like `<app-cart-item>`) can seem like simple wrappers. However, by default, the browser treats custom HTML tags as `display: inline`. 
+
+When elements are `display: inline`, they do not respect block height/width styles, padding, or flexbox alignments in the same way as standard block elements. This often leads to severe display issues, such as:
+1. **Vertical Stretching**: Inline custom components placed inside a flex layout (like our product lists or sidebar) can stretch in unexpected ways because their block-level children are not correctly sized, causing massive white space gaps.
+2. **Ignored Dimensions**: Children styling such as `height: 100%` will fail to resolve because the custom host parent has no block height.
+
+By explicitly adding `:host { display: block; }` to our component stylesheets, we ensure that:
+- The component acts as a block-level container in the DOM.
+- The parent flex/grid containers can accurately calculate height and spacing.
+- Inner elements configured with `height: 100%` resolve their size correctly relative to the parent.
+
+### Overriding Default Component Dimensions
+
+In our product cards, we use a shared `<app-product-image-placeholder>` component that defaults to a `minHeight` of `14rem` (224px). In the smaller layout of a cart list, this default height stretched the parent and pushed surrounding content away.
+
+By passing `minHeight="100%"` to the placeholder component and styling it to take up the full container space, we force the image to fit precisely within the `100px`/`120px` square container using CSS `object-fit: cover`:
+
+```html
+<app-product-image-placeholder
+  [src]="item.imageUrl"
+  [label]="item.productName"
+  minHeight="100%"
+/>
+```
+
+```scss
+app-product-image-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+```
+
+This consistently restricts the image to a square aspect ratio and resolves awkward sizing.
+
+### Overriding Default Component Dimensions
+
+In our product cards, we use a shared `<app-product-image-placeholder>` component that defaults to a `minHeight` of `14rem` (224px). In the smaller layout of a cart list, this default height stretched the parent and pushed surrounding content away.
+
+Instead of percentage height bindings (like `minHeight="100%"` which can trigger relative layout calculation bugs in some flex items), we pass `minHeight="0"` to the placeholder. This completely unbinds the `14rem` (224px) constraint. Combined with `height: 100%` on both the host and the image frame, it allows the component to fit exactly inside the `100px`/`120px` square container:
+
+```html
+<app-product-image-placeholder
+  [src]="item.imageUrl"
+  [label]="item.productName"
+  minHeight="0"
+/>
+```
+
+```scss
+app-product-image-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+```
+
+This consistently restricts the image to a square aspect ratio and resolves awkward sizing.
+
+### Isolating Lists using Block Flow (`display: block`)
+
+In modern e-commerce layouts, wrapping lists of items inside flex containers (`display: flex; flex-direction: column;`) can occasionally trigger vertical stretching issues in browsers if parent nodes are constrained or act as flex containers themselves. 
+
+By changing `.cart-list` and `.cart-drawer__items` to use standard block layout (`display: block`) and spacing components with top/bottom padding or margins (like `margin-bottom: 1.5rem`), we ensure:
+- Children (`app-cart-item` components) only occupy their natural height.
+- Any vertical stretching by parent flex configurations is entirely avoided.
+- Clear, tight, and reliable spacing between cart items.
+
+### Consistent Application Currency
+
+We aligned the Cart layout's currency formatters with the central application configuration (`APP_CONSTANTS.currencyCode`), reverting hardcoded `USD` displays back to `INR` (`₹`) and removing template divisions by 100 which incorrectly assumed price inputs were in cents.
+
+## Sass Import Duplication Gotcha in Scoped Component Styles
+
+### The Danger of `@use` or `@import` of Selector-Heavy Stylesheets
+
+In Angular components, style encapsulation scopes all SCSS selectors inside a component's stylesheet to that component (using attributes like `[_nghost-ng-xxx]`). 
+
+If you use `@use 'app.scss'` or `@import 'app.scss'` inside a component stylesheet, Sass will import **every single CSS selector** defined in `app.scss` and compile it directly into that component's stylesheet. 
+Because the component styles are encapsulated, Angular will scope all of those compiled classes to the component's host!
+For example, if `app.scss` defines:
+```scss
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+```
+And `cart-item.component.scss` imports `app.scss`, the output CSS compiled for `app-cart-item` will contain:
+```css
+[_nghost-ng-cartitem] {
+  display: block;
+  min-height: 100dvh;
+}
+```
+This forces **every single cart item** to have a minimum height of `100dvh` (100% of the viewport height), creating massive empty gaps and breaking the layouts entirely! It also bloated our stylesheet file sizes, causing budget exceed warnings during the build.
+
+### The Fix
+
+Only import files that contain **Sass variables, mixins, or functions** (Sass partials that do NOT output CSS rules, typically prefixed with an underscore like `_variables.scss`).
+Never `@use` or `@import` a layout/selector-heavy stylesheet (like `app.scss` or `styles.scss`) inside scoped component styles. CSS Custom Properties (variables) are globally available at runtime anyway, so Sass imports aren't needed to access them.
+
+Removing the `@use '../../app.scss'` line instantly dropped stylesheet sizes, cleared the build warnings, and resolved the vertical spacing issue since `app-cart-item` and `app-cart-summary` heights now resolve to `auto` naturally.
+
+
+
+

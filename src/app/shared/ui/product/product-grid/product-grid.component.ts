@@ -12,8 +12,13 @@ import { ProductCardViewModel } from '../product-ui.model';
 export class ProductGridComponent {
   @Input() products: ProductCardViewModel[] = [];
   @Output() quickView = new EventEmitter<number>();
+  @Output() addToCart = new EventEmitter<number>();
 
   protected handleQuickView(productId: number): void {
     this.quickView.emit(productId);
+  }
+
+  protected handleAddToCart(productId: number): void {
+    this.addToCart.emit(productId);
   }
 }

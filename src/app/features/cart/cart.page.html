@@ -1,0 +1,58 @@
+<div class="cart-page">
+  <div class="cart-page__header">
+    <h1>Your Shopping Cart</h1>
+  </div>
+
+  <div class="cart-page__content">
+    @if (error()) {
+      <app-error-state
+        title="Could not load your cart"
+        [description]="error() ?? 'Please try again in a moment.'"
+        actionLabel="Retry"
+        (action)="reloadCart()"
+      />
+    } @else if (loading() && isEmpty()) {
+      <div class="cart-page__loading">
+        <app-loading-spinner />
+        <p>Loading your cart...</p>
+      </div>
+    } @else if (isEmpty()) {
+      <app-empty-state
+        title="Your cart is empty"
+        description="Looks like you haven't added anything yet."
+        actionLabel="Browse Catalog"
+        (action)="reloadCart()"
+      >
+        <div ngProjectAs="[action]">
+          <a mat-flat-button appButtonStyle="primary" routerLink="/products">
+            Browse Catalog
+          </a>
+        </div>
+      </app-empty-state>
+    } @else {
+      <div class="cart-layout">
+        <div class="cart-layout__main">
+          <div class="cart-list">
+            @for (item of cartItems(); track item.itemId) {
+              <app-cart-item
+                [item]="item"
+                [disabled]="loading()"
+                (increaseQuantity)="handleIncreaseQuantity($event)"
+                (decreaseQuantity)="handleDecreaseQuantity($event)"
+                (removeItem)="handleRemoveItem($event)"
+                (saveForLater)="handleSaveForLater($event)"
+              />
+            }
+          </div>
+
+          <app-save-for-later-list />
+          <app-cart-recommendations-carousel />
+        </div>
+
+        <div class="cart-layout__sidebar">
+          <app-cart-summary />
+        </div>
+      </div>
+    }
+  </div>
+</div>

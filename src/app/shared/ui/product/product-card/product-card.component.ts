@@ -30,8 +30,14 @@ import { ProductCardViewModel } from '../product-ui.model';
 export class ProductCardComponent {
   @Input({ required: true }) product!: ProductCardViewModel;
   @Output() quickView = new EventEmitter<number>();
+  @Output() addToCart = new EventEmitter<number>();
 
   protected openQuickView(): void {
     this.quickView.emit(this.product.id);
+  }
+
+  protected onAddToCart(event: Event): void {
+    event.stopPropagation();
+    this.addToCart.emit(this.product.id);
   }
 }

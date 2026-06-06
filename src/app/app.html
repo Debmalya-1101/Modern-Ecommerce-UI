@@ -150,6 +150,17 @@
 
     </mat-drawer>
 
+    <!-- Mini-Cart Drawer -->
+    <mat-drawer
+      class="cart-drawer-shell"
+      position="end"
+      mode="over"
+      [opened]="isCartDrawerOpen()"
+      (closedStart)="closeCartDrawer()"
+    >
+      <app-cart-drawer />
+    </mat-drawer>
+
     <mat-drawer-content class="shell-content">
       <header class="shell-header">
         <mat-toolbar class="shell-toolbar">
@@ -179,6 +190,21 @@
 
           <nav class="toolbar-links" aria-label="Quick links">
             @if (isAuthenticated()) {
+              <a 
+                [routerLink]="isMobile() ? '/cart' : null" 
+                (click)="toggleCartDrawer($event)"
+                class="toolbar-link cart-badge-link" 
+                aria-label="Shopping Cart"
+                [style.cursor]="'pointer'"
+              >
+                <mat-icon
+                  [matBadge]="cartItemCount()"
+                  matBadgeColor="accent"
+                  [matBadgeHidden]="cartItemCount() === 0"
+                >
+                  shopping_cart
+                </mat-icon>
+              </a>
               <a routerLink="/orders" class="toolbar-link">Orders</a>
               <a routerLink="/profile" class="toolbar-link">Profile</a>
               <button

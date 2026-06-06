@@ -14,7 +14,7 @@
 }
 
 .shell-container {
-  min-height: 100dvh;
+  height: 100dvh;
   background:
     radial-gradient(circle at top left, rgba(255, 222, 196, 0.7), transparent 28%),
     linear-gradient(180deg, #fbf6f0 0%, #f3ede6 100%);
@@ -132,8 +132,9 @@
 
 .shell-content {
   display: flex;
-  min-height: 100dvh;
+  height: 100%;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .shell-header {

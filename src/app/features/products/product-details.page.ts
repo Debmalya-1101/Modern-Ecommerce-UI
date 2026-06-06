@@ -3,12 +3,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AppHttpError, createInitialRequestState } from '../../core/models/api.model';
 import { ProductDetail } from '../../core/models/product.model';
 import { ProductsApiService } from '../../core/services/products-api.service';
+import { CartService } from '../../core/services/cart.service';
 import { ButtonStyleDirective } from '../../shared/directives/button-style.directive';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
@@ -33,6 +35,7 @@ interface GalleryItem {
     MatButtonModule,
     MatCardModule,
     MatDividerModule,
+    MatIconModule,
     RouterLink,
     ButtonStyleDirective,
     ErrorStateComponent,
@@ -52,6 +55,7 @@ export class ProductDetailsPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly productsApiService = inject(ProductsApiService);
   private readonly snackbarService = inject(SnackbarService);
+  private readonly cartService = inject(CartService);
 
   private readonly productState = signal(createInitialRequestState<ProductDetail>());
   protected readonly productId = signal<number | null>(null);
@@ -59,6 +63,9 @@ export class ProductDetailsPage implements OnInit {
 
   // The URL of the currently-selected gallery image shown in the main viewer
   protected readonly selectedImageUrl = signal('');
+
+  // The quantity the user wishes to add to the cart
+  protected readonly selectedQuantity = signal(1);
 
   /**
    * Gallery items derived from the product's imageGallery array.
@@ -107,8 +114,13 @@ export class ProductDetailsPage implements OnInit {
     this.selectedImageUrl.set(url);
   }
 
-  protected addToCart(productName: string): void {
-    this.snackbarService.success(`${productName} added to cart.`);
+  protected addToCart(productDetail: ProductDetail): void {
+    this.cartService.addToCart(productDetail.id, this.selectedQuantity());
+    this.selectedQuantity.set(1); // Reset after adding
+  }
+
+  protected updateQuantity(delta: number): void {
+    this.selectedQuantity.update((q) => Math.max(1, q + delta));
   }
 
   protected buyNow(productName: string): void {

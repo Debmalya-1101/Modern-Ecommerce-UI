@@ -8,9 +8,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatIconModule } from '@angular/material/icon';
 import { filter } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
+import { CartService } from './core/services/cart.service';
 import { ButtonStyleDirective } from './shared/directives/button-style.directive';
+import { CartDrawerComponent } from './features/cart/components/cart-drawer/cart-drawer.component';
 
 interface NavigationItem {
   label: string;
@@ -30,7 +34,10 @@ interface NavigationItem {
     MatListModule,
     MatSidenavModule,
     MatToolbarModule,
-    ButtonStyleDirective
+    MatBadgeModule,
+    MatIconModule,
+    ButtonStyleDirective,
+    CartDrawerComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
@@ -40,6 +47,7 @@ export class App {
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly cartService = inject(CartService);
   private readonly mobileBreakpoint = '(max-width: 768px)';
   private readonly startsOnMobile = this.breakpointObserver.isMatched(this.mobileBreakpoint);
   private readonly currentUrl = signal(this.router.url);
@@ -63,6 +71,8 @@ export class App {
   protected readonly currentUserLabel = computed(
     () => this.session().user?.username ?? 'Guest'
   );
+  protected readonly cartItemCount = this.cartService.itemCount;
+  protected readonly isCartDrawerOpen = this.cartService.isDrawerOpen;
   protected readonly navigationItems: NavigationItem[] = [
     {
       label: 'Home',
@@ -123,6 +133,17 @@ export class App {
     if (this.isMobile()) {
       this.isSidebarOpen.set(false);
     }
+  }
+
+  protected toggleCartDrawer(event: Event): void {
+    if (!this.isMobile()) {
+      event.preventDefault();
+      this.cartService.toggleDrawer();
+    }
+  }
+
+  protected closeCartDrawer(): void {
+    this.cartService.closeDrawer();
   }
 
   protected logout(): void {

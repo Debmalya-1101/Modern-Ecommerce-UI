@@ -1,0 +1,18 @@
+<div class="recommendations">
+  <div class="recommendations__header">
+    <h3>You might also like</h3>
+  </div>
+
+  @if (loading()) {
+    <app-product-skeleton-loading [cards]="4" />
+  } @else if (recommendations().length > 0) {
+    <div class="recommendations__grid">
+      @for (product of recommendations(); track product.id) {
+        <app-product-card
+          [product]="product"
+          (addToCart)="handleAddToCart($event)"
+        />
+      }
+    </div>
+  }
+</div>

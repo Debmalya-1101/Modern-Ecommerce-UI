@@ -9,6 +9,7 @@ import { finalize } from 'rxjs';
 
 import { AppHttpError, createInitialRequestState } from '../../core/models/api.model';
 import { ProductCatalogQuery, ProductsApiService } from '../../core/services/products-api.service';
+import { CartService } from '../../core/services/cart.service';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
 import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
@@ -54,6 +55,7 @@ export class ProductsPage implements OnInit {
   private readonly router = inject(Router);
   private readonly productsApiService = inject(ProductsApiService);
   private readonly snackbarService = inject(SnackbarService);
+  private readonly cartService = inject(CartService);
 
   // Holds the current product list state: loading flag, error message, or data
   private readonly productState = signal(createInitialRequestState<ProductCardViewModel[]>([]));
@@ -142,6 +144,10 @@ export class ProductsPage implements OnInit {
 
   protected showQuickView(productId: number): void {
     this.snackbarService.info(`Quick view for product #${productId} is coming soon.`);
+  }
+
+  protected addToCart(productId: number): void {
+    this.cartService.addToCart(productId, 1);
   }
 
   protected reloadProducts(): void {

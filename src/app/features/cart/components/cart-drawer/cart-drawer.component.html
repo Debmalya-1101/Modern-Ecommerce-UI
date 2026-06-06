@@ -1,0 +1,55 @@
+<div class="cart-drawer">
+  <div class="cart-drawer__header">
+    <h2>Shopping Cart</h2>
+    <button mat-icon-button (click)="closeDrawer()" aria-label="Close cart">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-divider />
+
+  <div class="cart-drawer__content">
+    @if (isEmpty()) {
+      <div class="cart-drawer__empty">
+        <app-empty-state
+          title="Your cart is empty"
+          description="Looks like you haven't added anything yet."
+        >
+          <div ngProjectAs="[action]">
+            <button mat-flat-button appButtonStyle="primary" (click)="closeDrawer()" routerLink="/products">
+              Browse Catalog
+            </button>
+          </div>
+        </app-empty-state>
+      </div>
+    } @else {
+      <div class="cart-drawer__items">
+        @for (item of cartItems(); track item.itemId) {
+          <app-cart-item
+            [item]="item"
+            (increaseQuantity)="handleIncreaseQuantity($event)"
+            (decreaseQuantity)="handleDecreaseQuantity($event)"
+            (removeItem)="handleRemoveItem($event)"
+          />
+        }
+      </div>
+
+      <div class="cart-drawer__footer">
+        <mat-divider style="margin: 1.5rem 0; display: block;" />
+        <div class="cart-drawer__subtotal">
+          <span>Subtotal</span>
+          <strong>{{ total() | currency:currencyCode:'symbol':'1.0-0' }}</strong>
+        </div>
+        <p class="cart-drawer__taxes">Shipping, taxes, and discounts calculated at checkout.</p>
+        <div class="cart-drawer__actions">
+          <button mat-stroked-button appButtonStyle="secondary" (click)="closeDrawer()" routerLink="/cart">
+            View Cart
+          </button>
+          <button mat-flat-button appButtonStyle="primary" (click)="closeDrawer()" routerLink="/checkout">
+            Checkout
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,61 @@
+:host {
+  display: block;
+}
+
+.cart-page {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  &__header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+    }
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    gap: 1rem;
+    color: var(--text-secondary);
+  }
+}
+
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  @media (min-width: 992px) {
+    grid-template-columns: 1fr 380px;
+    align-items: start;
+  }
+
+  &__main {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 0 1.5rem;
+    border: 1px solid var(--border-color);
+  }
+
+  &__sidebar {
+    position: relative;
+  }
+}
+
+.cart-list {
+  display: block;
+  
+  // Remove bottom border from the last item
+  ::ng-deep app-cart-item:last-child .cart-item {
+    border-bottom: none;
+  }
+}

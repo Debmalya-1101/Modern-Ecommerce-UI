@@ -194,6 +194,25 @@ h3,
   background: rgba(245, 236, 227, 0.86);
 }
 
+.detail-quantity {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(87, 61, 44, 0.12);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.75);
+  
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  
+  &__value {
+    min-width: 2.5rem;
+    text-align: center;
+    font-weight: 600;
+  }
+}
+
 .detail-actions {
   display: flex;
   flex-wrap: wrap;

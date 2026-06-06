@@ -1,0 +1,38 @@
+@if (savedItems().length > 0) {
+  <div class="save-for-later">
+    <div class="save-for-later__header">
+      <h3>Saved for later ({{ savedItems().length }} items)</h3>
+    </div>
+
+    <div class="save-for-later__list">
+      @for (item of savedItems(); track item.itemId) {
+        <div class="saved-item">
+          <div class="saved-item__media" [routerLink]="['/products', item.productId]">
+            <app-product-image-placeholder
+              [src]="item.imageUrl"
+              [label]="item.productName"
+              minHeight="0"
+            />
+          </div>
+
+          <div class="saved-item__content">
+            <h4 class="saved-item__title" [routerLink]="['/products', item.productId]">
+              {{ item.productName }}
+            </h4>
+            <div class="saved-item__price">
+              {{ item.price | currency:currencyCode:'symbol':'1.0-0' }}
+            </div>
+            <div class="saved-item__actions">
+              <button mat-stroked-button appButtonStyle="secondary" (click)="moveToCart(item.itemId)">
+                Move to Cart
+              </button>
+              <button mat-button color="warn" (click)="removeItem(item.itemId)">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

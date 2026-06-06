@@ -141,6 +141,7 @@
       <app-product-grid
         [products]="products().data ?? []"
         (quickView)="showQuickView($event)"
+        (addToCart)="addToCart($event)"
       />
 
       <!-- Paginator -->

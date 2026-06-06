@@ -1,0 +1,59 @@
+<mat-card class="cart-summary" appearance="outlined">
+  <div class="cart-summary__header">
+    <h2>Order Summary</h2>
+  </div>
+
+  <mat-divider />
+
+  <div class="cart-summary__body">
+    <div class="summary-row">
+      <span class="summary-label">Subtotal</span>
+      <span class="summary-value">{{ subtotal() | currency:currencyCode:'symbol':'1.0-0' }}</span>
+    </div>
+
+    <div class="summary-row">
+      <span class="summary-label">Estimated Shipping</span>
+      <span class="summary-value">
+        @if (shippingCost() === 0) {
+          <span class="text-success">Free</span>
+        } @else {
+          {{ shippingCost() | currency:currencyCode:'symbol':'1.0-0' }}
+        }
+      </span>
+    </div>
+
+    <div class="summary-row">
+      <span class="summary-label">Estimated Tax</span>
+      <span class="summary-value">{{ taxCost() | currency:currencyCode:'symbol':'1.0-0' }}</span>
+    </div>
+  </div>
+
+  <mat-divider />
+
+  <div class="cart-summary__footer">
+    <div class="summary-row summary-row--total">
+      <span class="summary-label">Estimated Total</span>
+      <span class="summary-value">{{ grandTotal() | currency:currencyCode:'symbol':'1.0-0' }}</span>
+    </div>
+
+    <button
+      mat-flat-button
+      appButtonStyle="primary"
+      class="checkout-btn"
+      routerLink="/checkout"
+      [disabled]="isEmpty() || loading()"
+    >
+      Proceed to Checkout
+    </button>
+
+    <button
+      mat-stroked-button
+      appButtonStyle="secondary"
+      class="checkout-btn"
+      routerLink="/products"
+      style="margin-top: 0.75rem;"
+    >
+      Continue Shopping
+    </button>
+  </div>
+</mat-card>

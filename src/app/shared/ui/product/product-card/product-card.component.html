@@ -39,18 +39,18 @@
         mat-flat-button
         appButtonStyle="primary"
         type="button"
-        [routerLink]="['/products', product.id]"
+        (click)="onAddToCart($event)"
       >
-        View details
+        Quick Add
       </button>
 
       <button
         mat-stroked-button
         appButtonStyle="secondary"
         type="button"
-        (click)="openQuickView()"
+        [routerLink]="['/products', product.id]"
       >
-        Quick view
+        Details
       </button>
     </div>
   </div>

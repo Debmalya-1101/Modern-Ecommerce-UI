@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.recommendations {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(87, 61, 44, 0.12);
+
+  &__header {
+    margin-bottom: 1.5rem;
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #2d241f;
+      margin: 0;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .recommendations {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+
+    &__grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+  }
+}
