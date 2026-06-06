@@ -2806,3 +2806,97 @@ The key rule: **critical UI blocking operations** use `trackLoading: true`. **No
 - **Sort + price filter** — backend supports `?sortBy=price&order=asc&minPrice=1000`. UI controls for these come next.
 - **Cart integration** — the "Add to Cart" button currently shows a snackbar. Next session wires it to `POST /api/cart/add`.
 
+---
+
+## Feature Update: Search, Filtering, and Pagination
+
+What was added:
+- Support for complex backend query parameters (`brand`, `minPrice`, `maxPrice`, `sortBy`, `order`, `page`, `size`)
+- A slide-out filter drawer using Angular Material (`MatSidenavModule`) for mobile-friendly catalog browsing
+- A paginator component using Angular Material (`MatPaginatorModule`)
+- Syncing of complex filter state with the URL query parameters
+- An aggregated response model (`PaginatedProducts`) mapping backend pagination metadata to the frontend
+
+Why it was added:
+- As the catalog grows, users need ways to find products efficiently
+- A "products-first" visual layout demands filters be tucked away but easily accessible
+- Real-world e-commerce requires stateful URLs (bookmarkable searches and filter states)
+
+### URL as the Source of Truth
+
+The most robust way to manage complex filtering in Angular is to make the URL the **single source of truth**.
+
+Instead of:
+`User clicks filter -> Component fetches data -> Component updates URL`
+
+We do:
+`User clicks filter -> Component updates URL -> Router detects URL change -> Component fetches data`
+
+```ts
+  private updateCatalogFilters(changes: Partial<CatalogFilters>): void {
+    const nextFilters = { ...this.filters(), ...changes };
+    
+    // Reset page to 0 if any filter besides page/size changes
+    if (changes.page === undefined && changes.size === undefined) {
+      nextFilters.page = 0;
+    }
+
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        q: nextFilters.searchTerm || null,
+        brand: nextFilters.brand !== 'all' ? nextFilters.brand : null,
+        page: nextFilters.page > 0 ? nextFilters.page : null,
+        // ...
+      },
+    });
+  }
+```
+
+Why this is important:
+- **Refresh-safe:** The user can refresh the page, and the filters are perfectly restored.
+- **Bookmarkable:** The user can copy the URL and send a specific search result to a friend.
+- **Browser History:** The back button works naturally.
+
+### Slide-Out Drawer for Filters
+
+Real estate on an e-commerce page is valuable. Instead of permanently occupying the left 20% of the screen with filters, we used a `mat-drawer` (slide-out panel).
+
+```html
+<mat-drawer-container class="catalog-drawer-container" [hasBackdrop]="true">
+  <mat-drawer position="end" [opened]="showFilterDrawer()" mode="over">
+    <!-- Filter UI here -->
+  </mat-drawer>
+  
+  <mat-drawer-content>
+    <!-- Product Grid here -->
+  </mat-drawer-content>
+</mat-drawer-container>
+```
+
+Why this works well:
+- It provides a wider layout for the actual products.
+- The same component structure works for desktop and mobile without needing two separate filter blocks.
+- It feels modern and interactive.
+
+### Extracting Dynamic Options (Brands)
+
+The backend doesn't always have dedicated `/brands` endpoints. Sometimes you have to derive available options from the catalog itself.
+
+```ts
+  getCatalogBrands(): Observable<string[]> {
+    return this.apiService.get(..., { page: 0, size: 100 }, { trackLoading: false })
+      .pipe(
+        map((response) => {
+          const allBrands = response.content.map(p => p.brand).filter(b => !!b);
+          return [...new Set(allBrands)].sort();
+        })
+      );
+  }
+```
+
+This runs silently in the background (`trackLoading: false`), meaning the main product grid doesn't wait for this to finish, keeping the perceived performance high.
+
+### What is Next
+
+- **Shopping Cart Implementation:** Building the client-side cart logic and connecting it to the backend `POST /api/cart/add`.

@@ -224,6 +224,227 @@
   // No extra wrapper padding needed — the grid handles its own spacing
 }
 
+// ── Drawer & Layout ───────────────────────────────────────────────────
+.catalog-drawer-container {
+  height: 100%;
+  background: transparent;
+}
+
+.filter-drawer {
+  width: 320px;
+  max-width: 85vw;
+  background: #fffcf7;
+  border-left: 1px solid rgba(87, 61, 44, 0.1);
+  padding: 1.5rem;
+  box-sizing: border-box;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin: 0;
+      color: #2d241f;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  &__footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(87, 61, 44, 0.1);
+  }
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: #9e7059;
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+
+  &:hover {
+    color: #b55f34;
+  }
+}
+
+// ── Filter Sections ───────────────────────────────────────────────────
+.filter-section {
+  h4 {
+    margin: 0 0 0.8rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6e5d52;
+  }
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+
+  input {
+    flex: 1;
+    width: 0;
+    padding: 0.5rem;
+    border: 1px solid rgba(87, 61, 44, 0.2);
+    border-radius: 0.4rem;
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: #2d241f;
+
+    &:focus {
+      outline: none;
+      border-color: #b55f34;
+    }
+  }
+
+  span {
+    color: #9e7059;
+  }
+}
+
+.apply-btn {
+  width: 100%;
+  padding: 0.6rem;
+  background: rgba(181, 95, 52, 0.1);
+  color: #b55f34;
+  border: none;
+  border-radius: 0.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms;
+
+  &:hover {
+    background: rgba(181, 95, 52, 0.2);
+  }
+}
+
+.brand-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.brand-chip {
+  text-align: left;
+  padding: 0.5rem 0.8rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  color: #4a3b32;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  &:hover {
+    background: rgba(87, 61, 44, 0.04);
+  }
+
+  &--active {
+    background: rgba(181, 95, 52, 0.1);
+    color: #b55f34;
+    font-weight: 600;
+    border-color: rgba(181, 95, 52, 0.2);
+  }
+}
+
+.clear-btn {
+  width: 100%;
+  padding: 0.6rem;
+  background: transparent;
+  border: 1px solid #9e7059;
+  color: #9e7059;
+  border-radius: 0.4rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(158, 112, 89, 0.05);
+  }
+}
+
+// ── Meta Actions (Sort & Toggle) ──────────────────────────────────────
+.meta-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+.sort-select {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid rgba(87, 61, 44, 0.2);
+  border-radius: 0.4rem;
+  background: #fff;
+  color: #3b2f28;
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+
+  &:focus {
+    border-color: #b55f34;
+  }
+}
+
+.filter-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.8rem;
+  background: #fff;
+  border: 1px solid rgba(87, 61, 44, 0.2);
+  border-radius: 0.4rem;
+  color: #3b2f28;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+    color: #9e7059;
+  }
+
+  &:hover {
+    border-color: #b55f34;
+    background: rgba(181, 95, 52, 0.03);
+  }
+}
+
+// ── Paginator ─────────────────────────────────────────────────────────
+.catalog-paginator-container {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+::ng-deep .catalog-paginator {
+  background: transparent !important;
+  color: #2d241f !important;
+
+  .mat-mdc-paginator-container {
+    padding: 0 !important;
+    min-height: 48px;
+  }
+}
+
 // ── Responsive ────────────────────────────────────────────────────────
 @media (max-width: 640px) {
   .catalog-bar {
@@ -233,10 +454,15 @@
 
   .catalog-bar__meta {
     width: 100%;
-    order: -1; // move count above search on very small screens
+    order: -1; // move meta row above search on very small screens
+    justify-content: space-between;
+  }
+
+  .meta-actions {
+    margin-left: auto;
   }
 
   .meta-filter {
-    max-width: 8rem;
+    display: none; // hide active filter text on mobile to save space
   }
 }

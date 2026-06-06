@@ -1,4 +1,56 @@
-<div class="catalog-page">
+<mat-drawer-container class="catalog-drawer-container" [hasBackdrop]="true">
+  
+  <!-- ── Filter Drawer (Slide-out panel) ──────────────────────────── -->
+  <mat-drawer position="end" [opened]="showFilterDrawer()" (openedChange)="showFilterDrawer.set($event)" mode="over" class="filter-drawer">
+    <div class="filter-drawer__header">
+      <h3>Filters</h3>
+      <button class="icon-btn" (click)="toggleFilterDrawer()" aria-label="Close filters">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    
+    <div class="filter-drawer__body">
+      <!-- Price Range -->
+      <div class="filter-section">
+        <h4>Price Range</h4>
+        <div class="price-inputs">
+          <input type="number" #minPrice [value]="filters().minPrice || ''" placeholder="Min $">
+          <span>-</span>
+          <input type="number" #maxPrice [value]="filters().maxPrice || ''" placeholder="Max $">
+        </div>
+        <button class="apply-btn" (click)="updatePriceFilter(minPrice.value, maxPrice.value)">Apply Price</button>
+      </div>
+
+      <!-- Brands -->
+      <div class="filter-section">
+        <h4>Brands</h4>
+        <div class="brand-list">
+          <button
+            class="brand-chip"
+            [class.brand-chip--active]="filters().brand === 'all'"
+            (click)="changeBrand('all')">
+            All Brands
+          </button>
+          @for (brand of brandOptions(); track brand) {
+            <button
+              class="brand-chip"
+              [class.brand-chip--active]="filters().brand === brand"
+              (click)="changeBrand(brand)">
+              {{ brand }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+    
+    <div class="filter-drawer__footer">
+      <button class="clear-btn" (click)="clearFilters()">Clear All Filters</button>
+    </div>
+  </mat-drawer>
+
+  <!-- ── Main Content ─────────────────────────────────────────────── -->
+  <mat-drawer-content>
+    <div class="catalog-page">
 
   <!-- ── Slim filter bar ──────────────────────────────────────────── -->
   <div class="catalog-bar">
@@ -25,13 +77,26 @@
     <!-- Result meta -->
     <div class="catalog-bar__meta">
       <span class="meta-count">{{ productCountLabel() }}</span>
-      @if (filters().searchTerm || filters().category !== 'all') {
+      @if (filters().searchTerm || filters().category !== 'all' || filters().brand !== 'all' || filters().minPrice !== null || filters().maxPrice !== null) {
         <span class="meta-sep">·</span>
         <span class="meta-filter">{{ activeFilterSummary() }}</span>
         <button class="meta-clear" type="button" (click)="clearFilters()">
           <mat-icon>close</mat-icon> Clear
         </button>
       }
+      
+      <div class="meta-actions">
+        <select class="sort-select" [value]="filters().sortBy + '-' + filters().order" (change)="changeSort($event)" aria-label="Sort products">
+          <option value="createdAt-desc">Newest</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating-desc">Top Rated</option>
+          <option value="name-asc">Name: A to Z</option>
+        </select>
+        <button class="filter-toggle-btn" (click)="toggleFilterDrawer()">
+          <mat-icon>tune</mat-icon> Filters
+        </button>
+      </div>
     </div>
 
   </div>
@@ -77,6 +142,19 @@
         [products]="products().data ?? []"
         (quickView)="showQuickView($event)"
       />
+
+      <!-- Paginator -->
+      <div class="catalog-paginator-container">
+        <mat-paginator
+          class="catalog-paginator"
+          [length]="totalElements()"
+          [pageIndex]="filters().page"
+          [pageSize]="filters().size"
+          [pageSizeOptions]="[12, 24, 48]"
+          (page)="onPageChange($event)"
+          aria-label="Select page">
+        </mat-paginator>
+      </div>
     } @else {
       <app-empty-state
         title="No products matched your search"
@@ -86,6 +164,7 @@
       />
     }
 
+    </div>
   </div>
-
-</div>
+  </mat-drawer-content>
+</mat-drawer-container>

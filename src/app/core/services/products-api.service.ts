@@ -19,6 +19,22 @@ import {
 export interface ProductCatalogQuery {
   searchTerm?: string;
   category?: string;
+  brand?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: string;
+  order?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface PaginatedProducts {
+  products: ProductListItem[];
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
 }
 
 /**
@@ -37,32 +53,48 @@ export class ProductsApiService {
   private readonly apiService = inject(ApiService);
 
   /**
-   * Fetches the first page of products from the backend.
-   *
-   * The backend returns a PageResponse<ProductListDTO> (paginated wrapper).
-   * We unwrap .content here so callers get a plain array.
+   * Fetches a page of products from the backend based on filter criteria.
    *
    * Query params supported by the backend:
    *   search    — free-text search on name / brand / description
    *   category  — filter by exact category name
+   *   brand     — filter by exact brand name
+   *   minPrice  — minimum price filter
+   *   maxPrice  — maximum price filter
+   *   sortBy    — field to sort by (createdAt, price, rating, name)
+   *   order     — sort direction (asc, desc)
    *   page      — 0-indexed page number (default: 0)
-   *   size      — items per page (default: 12, we request 24)
+   *   size      — items per page (default: 12)
    *
-   * @param query  Optional search and category filter values
+   * @param query  Optional filter, sort, and pagination values
    */
-  getProducts(query?: ProductCatalogQuery): Observable<ProductListItem[]> {
+  getProducts(query?: ProductCatalogQuery): Observable<PaginatedProducts> {
     // Build query params — only include non-empty values
     const params: Record<string, string | number> = {
-      page: 0,
-      size: 24,
+      page: query?.page ?? 0,
+      size: query?.size ?? 12,
     };
 
     if (query?.searchTerm?.trim()) {
       params['search'] = query.searchTerm.trim();
     }
-
     if (query?.category?.trim()) {
       params['category'] = query.category.trim();
+    }
+    if (query?.brand?.trim()) {
+      params['brand'] = query.brand.trim();
+    }
+    if (query?.minPrice !== undefined && query?.minPrice !== null) {
+      params['minPrice'] = query.minPrice;
+    }
+    if (query?.maxPrice !== undefined && query?.maxPrice !== null) {
+      params['maxPrice'] = query.maxPrice;
+    }
+    if (query?.sortBy?.trim()) {
+      params['sortBy'] = query.sortBy.trim();
+    }
+    if (query?.order?.trim()) {
+      params['order'] = query.order.trim();
     }
 
     return this.apiService
@@ -70,8 +102,14 @@ export class ProductsApiService {
         trackLoading: true
       })
       .pipe(
-        // The backend wraps results in PageResponse — unwrap the content array
-        map((response) => response.content.map((dto) => this.mapToProductListItem(dto)))
+        map((response) => ({
+          products: response.content.map((dto) => this.mapToProductListItem(dto)),
+          pageNumber: response.pageNumber,
+          pageSize: response.pageSize,
+          totalElements: response.totalElements,
+          totalPages: response.totalPages,
+          last: response.last
+        }))
       );
   }
 
@@ -115,6 +153,34 @@ export class ProductsApiService {
           const allCategories = response.content.map((product) => product.categoryName);
           const uniqueCategories = [...new Set(allCategories)];
           return uniqueCategories.sort((a, b) => a.localeCompare(b));
+        })
+      );
+  }
+
+  /**
+   * Fetches a list of distinct brand names available in the catalog.
+   *
+   * The backend has no dedicated /brands endpoint, so we load a broad
+   * sample of products and extract the unique brand names from them.
+   *
+   * trackLoading is false here so this background call does not trigger
+   * the global loading spinner used by the product grid.
+   */
+  getCatalogBrands(): Observable<string[]> {
+    return this.apiService
+      .get<PageResponse<ProductListDTO>>(
+        API_ENDPOINTS.products.list,
+        { page: 0, size: 100 },
+        { trackLoading: false }
+      )
+      .pipe(
+        map((response) => {
+          // Extract brand names and deduplicate, ignoring empty brands
+          const allBrands = response.content
+            .map((product) => product.brand)
+            .filter((brand) => !!brand);
+          const uniqueBrands = [...new Set(allBrands)];
+          return uniqueBrands.sort((a, b) => a.localeCompare(b));
         })
       );
   }

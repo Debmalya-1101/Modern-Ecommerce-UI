@@ -1,6 +1,9 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -20,12 +23,22 @@ import { ProductCardViewModel } from '../../shared/ui/product/product-ui.model';
 interface CatalogFilters {
   searchTerm: string;
   category: string;
+  brand: string;
+  minPrice: number | null;
+  maxPrice: number | null;
+  sortBy: string;
+  order: string;
+  page: number;
+  size: number;
 }
 
 @Component({
   selector: 'app-products-page',
   imports: [
+    FormsModule,
     MatIconModule,
+    MatPaginatorModule,
+    MatSidenavModule,
     EmptyStateComponent,
     ErrorStateComponent,
     ProductGridComponent,
@@ -48,6 +61,13 @@ export class ProductsPage implements OnInit {
   private readonly defaultFilters: CatalogFilters = {
     searchTerm: '',
     category: 'all',
+    brand: 'all',
+    minPrice: null,
+    maxPrice: null,
+    sortBy: 'createdAt',
+    order: 'desc',
+    page: 0,
+    size: 12,
   };
 
   // --- Public signals and computed values read by the template ---
@@ -57,15 +77,22 @@ export class ProductsPage implements OnInit {
   // Tracks what is typed in the search box before the user presses Search
   protected readonly searchDraft = signal('');
 
-  // Category chips — starts empty, populated from the backend on init
+  // Category and brand chips — starts empty, populated from the backend on init
   protected readonly categoryOptions = signal<string[]>([]);
+  protected readonly brandOptions = signal<string[]>([]);
+
+  // UI state for filter drawer
+  protected readonly showFilterDrawer = signal(false);
+
+  // Total elements from paginated response
+  protected readonly totalElements = signal(0);
 
   // Exposes product state as read-only to the template
   protected readonly products = this.productState.asReadonly();
 
   // Shows "1 product" or "12 products" in the hero stat card
   protected readonly productCountLabel = computed(() => {
-    const count = this.products().data?.length ?? 0;
+    const count = this.totalElements();
     return count === 1 ? '1 product' : `${count} products`;
   });
 
@@ -78,6 +105,14 @@ export class ProductsPage implements OnInit {
       summary.push(filters.category);
     }
 
+    if (filters.brand !== 'all') {
+      summary.push(filters.brand);
+    }
+
+    if (filters.minPrice !== null || filters.maxPrice !== null) {
+      summary.push('Price filtered');
+    }
+
     if (filters.searchTerm) {
       summary.push(`"${filters.searchTerm}"`);
     }
@@ -86,18 +121,16 @@ export class ProductsPage implements OnInit {
   });
 
   ngOnInit(): void {
-    // Load category chips once on page load — runs silently in the background
+    // Load options once on page load — runs silently in the background
     this.loadCategories();
+    this.loadBrands();
 
     // React to URL query param changes so browser back/forward and
     // refresh all work correctly (the URL is the source of truth for filters)
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
-        const filters = this.mapQueryParamsToFilters({
-          searchTerm: params.get('q') ?? '',
-          category: params.get('category') ?? 'all',
-        });
+        const filters = this.mapQueryParamsToFilters(params);
 
         this.filters.set(filters);
         this.searchDraft.set(filters.searchTerm);
@@ -133,6 +166,30 @@ export class ProductsPage implements OnInit {
     this.updateCatalogFilters(this.defaultFilters);
   }
 
+  protected toggleFilterDrawer(): void {
+    this.showFilterDrawer.update(v => !v);
+  }
+
+  protected changeSort(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const [sortBy, order] = target.value.split('-');
+    this.updateCatalogFilters({ sortBy, order });
+  }
+
+  protected changeBrand(brand: string): void {
+    this.updateCatalogFilters({ brand });
+  }
+
+  protected updatePriceFilter(minPrice: string, maxPrice: string): void {
+    const min = minPrice ? Number(minPrice) : null;
+    const max = maxPrice ? Number(maxPrice) : null;
+    this.updateCatalogFilters({ minPrice: min, maxPrice: max });
+  }
+
+  protected onPageChange(event: PageEvent): void {
+    this.updateCatalogFilters({ page: event.pageIndex, size: event.pageSize });
+  }
+
   // --- Private helpers ---
 
   /**
@@ -150,6 +207,13 @@ export class ProductsPage implements OnInit {
     const query: ProductCatalogQuery = {
       searchTerm: filters.searchTerm || undefined,
       category: filters.category !== 'all' ? filters.category : undefined,
+      brand: filters.brand !== 'all' ? filters.brand : undefined,
+      minPrice: filters.minPrice ?? undefined,
+      maxPrice: filters.maxPrice ?? undefined,
+      sortBy: filters.sortBy,
+      order: filters.order,
+      page: filters.page,
+      size: filters.size,
     };
 
     this.productsApiService
@@ -162,11 +226,12 @@ export class ProductsPage implements OnInit {
         })
       )
       .subscribe({
-        next: (products) => {
+        next: (paginatedResponse) => {
+          this.totalElements.set(paginatedResponse.totalElements);
           // Map backend ProductListItem → ProductCardViewModel for the grid component.
           // Fields not provided by the backend (reviewCount, imageLabel) use safe defaults.
           this.productState.set({
-            data: products.map((product) => ({
+            data: paginatedResponse.products.map((product) => ({
               id: product.id,
               name: product.name,
               brand: product.brand,
@@ -212,18 +277,45 @@ export class ProductsPage implements OnInit {
   }
 
   /**
+   * Fetches available brands from the backend.
+   */
+  private loadBrands(): void {
+    this.productsApiService
+      .getCatalogBrands()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (brands) => this.brandOptions.set(brands),
+        error: () => {
+          // Silent fail
+        },
+      });
+  }
+
+  /**
    * Updates the URL query params to reflect the new filter values.
    * Angular Router will re-trigger the queryParamMap subscription, which
    * in turn calls loadProducts() — keeping the URL as the single source of truth.
    */
   private updateCatalogFilters(changes: Partial<CatalogFilters>): void {
     const nextFilters = { ...this.filters(), ...changes };
+    
+    // Reset page to 0 if any filter besides page/size changes
+    if (changes.page === undefined && changes.size === undefined) {
+      nextFilters.page = 0;
+    }
 
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
         q: nextFilters.searchTerm || null,
         category: nextFilters.category !== 'all' ? nextFilters.category : null,
+        brand: nextFilters.brand !== 'all' ? nextFilters.brand : null,
+        minPrice: nextFilters.minPrice,
+        maxPrice: nextFilters.maxPrice,
+        sortBy: nextFilters.sortBy !== 'createdAt' ? nextFilters.sortBy : null,
+        order: nextFilters.order !== 'desc' ? nextFilters.order : null,
+        page: nextFilters.page > 0 ? nextFilters.page : null,
+        size: nextFilters.size !== 12 ? nextFilters.size : null,
       },
     });
   }
@@ -232,13 +324,17 @@ export class ProductsPage implements OnInit {
    * Converts raw URL query param strings into a typed CatalogFilters object.
    * Handles missing or invalid values by applying safe defaults.
    */
-  private mapQueryParamsToFilters(queryParams: {
-    searchTerm: string;
-    category: string;
-  }): CatalogFilters {
+  private mapQueryParamsToFilters(params: any): CatalogFilters {
     return {
-      searchTerm: queryParams.searchTerm.trim(),
-      category: queryParams.category.trim() || 'all',
+      searchTerm: params.get('q') ?? '',
+      category: params.get('category') ?? 'all',
+      brand: params.get('brand') ?? 'all',
+      minPrice: params.has('minPrice') ? Number(params.get('minPrice')) : null,
+      maxPrice: params.has('maxPrice') ? Number(params.get('maxPrice')) : null,
+      sortBy: params.get('sortBy') ?? 'createdAt',
+      order: params.get('order') ?? 'desc',
+      page: params.has('page') ? Number(params.get('page')) : 0,
+      size: params.has('size') ? Number(params.get('size')) : 12,
     };
   }
 }
