@@ -1,0 +1,112 @@
+<div class="checkout-container">
+  <h1>Checkout</h1>
+
+  @if (cartIsEmpty()) {
+    <div class="empty-cart-state">
+      <mat-icon>shopping_cart</mat-icon>
+      <h2>Your cart is empty</h2>
+      <p>Add some items to your cart before checking out.</p>
+      <button mat-flat-button color="primary" routerLink="/products">
+        Continue Shopping
+      </button>
+    </div>
+  } @else {
+    <div class="checkout-grid">
+      <!-- Left Column: Form -->
+      <div class="checkout-form-section">
+        <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+          <h2>Customer Information</h2>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Full Name</mat-label>
+              <input matInput formControlName="name" placeholder="John Doe">
+              @if (checkoutForm.get('name')?.hasError('required') && checkoutForm.get('name')?.touched) {
+                <mat-error>Name is required</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email Address</mat-label>
+              <input matInput type="email" formControlName="email" placeholder="john@example.com">
+              @if (checkoutForm.get('email')?.hasError('required') && checkoutForm.get('email')?.touched) {
+                <mat-error>Email is required</mat-error>
+              } @else if (checkoutForm.get('email')?.hasError('email') && checkoutForm.get('email')?.touched) {
+                <mat-error>Please enter a valid email address</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Phone Number</mat-label>
+            <input matInput type="tel" formControlName="phoneNo" placeholder="9876543210">
+            @if (checkoutForm.get('phoneNo')?.hasError('required') && checkoutForm.get('phoneNo')?.touched) {
+              <mat-error>Phone number is required</mat-error>
+            } @else if (checkoutForm.get('phoneNo')?.hasError('pattern') && checkoutForm.get('phoneNo')?.touched) {
+              <mat-error>Please enter a valid 10-digit phone number</mat-error>
+            }
+          </mat-form-field>
+
+          <h2 class="mt-6">Shipping Address</h2>
+          
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Address</mat-label>
+            <textarea matInput formControlName="address" rows="3" placeholder="123 Main St, City, State, ZIP"></textarea>
+            @if (checkoutForm.get('address')?.hasError('required') && checkoutForm.get('address')?.touched) {
+              <mat-error>Address is required</mat-error>
+            } @else if (checkoutForm.get('address')?.hasError('minlength') && checkoutForm.get('address')?.touched) {
+              <mat-error>Address must be at least 10 characters long</mat-error>
+            }
+          </mat-form-field>
+
+        </form>
+      </div>
+
+      <!-- Right Column: Order Summary -->
+      <div class="checkout-summary-section">
+        <h2>Order Summary</h2>
+        
+        <div class="order-items">
+          @for (item of cartItems(); track item.itemId) {
+            <div class="order-item">
+              <img [src]="item.imageUrl || 'assets/images/placeholder.png'" [alt]="item.productName" class="item-image">
+              <div class="item-details">
+                <h3>{{ item.productName }}</h3>
+                <p class="item-meta">Qty: {{ item.quantity }}</p>
+              </div>
+              <div class="item-price">{{ item.total | currency:currencyCode:'symbol':'1.0-0' }}</div>
+            </div>
+          }
+        </div>
+
+        <div class="order-totals">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <span>{{ cartTotal() | currency:currencyCode:'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="total-row">
+            <span>Shipping</span>
+            <span>Free</span>
+          </div>
+          <div class="total-row final-total">
+            <span>Total</span>
+            <span>{{ cartTotal() | currency:currencyCode:'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <div class="checkout-action">
+          <button mat-flat-button class="shared-button shared-button--primary submit-btn" 
+                  [disabled]="checkoutForm.invalid || isSubmitting()"
+                  (click)="onSubmit()">
+            @if (isSubmitting()) {
+              <mat-spinner diameter="24" color="accent" class="inline-block"></mat-spinner>
+              <span class="ml-2">Processing...</span>
+            } @else {
+              Place Order
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

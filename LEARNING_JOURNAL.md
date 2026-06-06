@@ -3471,6 +3471,91 @@ Never `@use` or `@import` a layout/selector-heavy stylesheet (like `app.scss` or
 
 Removing the `@use '../../app.scss'` line instantly dropped stylesheet sizes, cleared the build warnings, and resolved the vertical spacing issue since `app-cart-item` and `app-cart-summary` heights now resolve to `auto` naturally.
 
+## Feature Update: Checkout Integration
 
+What was added:
+- Integrated a checkout page using Angular Reactive Forms.
+- Added client-side validation for Name, Email, Phone Number, and Address.
+- Linked the frontend checkout to the backend API via `OrdersApiService.checkout`.
+- Handled state (loading spinners) and routing (redirect to `/order-success` on success).
 
+Why it was added:
+- Completes the core shopping loop: Cart -> Checkout -> Success.
+- Provides a real-world example of handling moderately complex form validation.
+
+### Reactive Forms Explained Simply
+
+Reactive Forms in Angular provide a model-driven approach to handling form inputs.
+
+Instead of writing validation rules strictly in the HTML template (Template-driven forms), we define the form structure and its rules in the component class (`checkout.page.ts`).
+
+Small example:
+```ts
+this.checkoutForm = this.fb.group({
+  name: ['', [Validators.required]],
+  email: ['', [Validators.required, Validators.email]]
+});
+```
+
+What this means:
+- `fb.group` creates a collection of form controls.
+- Each control gets an initial value (e.g. `''` for empty string).
+- We can easily attach synchronous validators (like `Validators.required` and `Validators.email`).
+- In the template, we bind this logic using `[formGroup]="checkoutForm"` and `formControlName="name"`.
+
+Why this is useful:
+- Easier to unit test because the form model is in the component class.
+- Allows complex cross-field validation if necessary.
+- Synchronizes with Angular Material inputs to seamlessly display error states (`<mat-error>`).
+
+### What I Learned From This Step
+- Form building is very declarative and structured using `FormBuilder`.
+- Combining `ReactiveFormsModule` with Angular Material makes displaying errors clean and accessible.
+- A checkout flow needs optimistic/pessimistic UI handling—showing a loading spinner inside the submit button while the backend API (`post`) does its job prevents duplicate submissions.
+
+## Feature Update: Checkout UI & Currency Enhancements
+
+What was added:
+- Dynamic currency formatting using centralized configuration (`APP_CONSTANTS.currencyCode`).
+- Responsive styling that stretches Angular Material inputs to `100%` container width.
+- Refined CSS grid distribution (`1.4fr 1fr` columns) on desktop to eliminate blank space.
+- Theme integration mapping: using `--shell-surface`, `--shell-border`, and `--shell-accent` for consistent form focus states.
+
+Why it was added:
+- The app operates in INR (₹) whereas checkout prices were hardcoded to USD ($).
+- Forms look flat and basic by default because Angular Material form fields default to a fixed inline width; stretching them to the full width of cards gives a modern, premium e-commerce look.
+- Distributing whitespace more evenly creates a balanced visual layout that does not feel sparse.
+
+### Localized Price Pipes in Templates
+
+Using Angular's default `currency` pipe is straightforward, but hardcoding `'USD'` is problematic for localized applications. By using variables injected into component classes, we can support multi-currency or localized currency dynamically.
+
+Example:
+```ts
+// In typescript component
+protected readonly currencyCode = APP_CONSTANTS.currencyCode; // 'INR'
+```
+
+```html
+<!-- In HTML template -->
+<span>{{ price | currency:currencyCode:'symbol':'1.0-0' }}</span>
+```
+
+### Full-Width Material Inputs
+
+Angular Material's `mat-form-field` has a default display behavior that limits its width. To stretch it across a grid column:
+1. Target the component itself: `mat-form-field { width: 100%; }`.
+2. Target the inner wrapper classes to add premium styling like custom hover backgrounds and custom focus colors using CSS variables.
+
+Example:
+```scss
+mat-form-field {
+  width: 100%;
+  
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.6) !important;
+  }
+}
+```
 

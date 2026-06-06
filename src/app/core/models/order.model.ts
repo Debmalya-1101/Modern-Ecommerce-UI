@@ -14,3 +14,10 @@ export interface OrderResponse {
   createdAt: string;
   items: OrderItem[];
 }
+
+export interface CheckoutRequest {
+  name: string;
+  phoneNo: string;
+  email: string;
+  address: string;
+}

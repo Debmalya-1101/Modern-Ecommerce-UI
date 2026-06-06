@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
-import { OrderResponse } from '../models/order.model';
+import { CheckoutRequest, OrderResponse } from '../models/order.model';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -29,6 +29,14 @@ export class OrdersApiService {
         trackLoading: true
       })
       .pipe(map((response) => response.data ?? this.createMockOrder(orderId)));
+  }
+
+  checkout(request: CheckoutRequest): Observable<OrderResponse> {
+    return this.apiService.post<OrderResponse, CheckoutRequest>(
+      API_ENDPOINTS.orders.checkout,
+      request,
+      { trackLoading: true }
+    );
   }
 
   private createMockOrders(): OrderResponse[] {
