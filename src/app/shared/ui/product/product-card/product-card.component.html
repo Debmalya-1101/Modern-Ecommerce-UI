@@ -1,6 +1,9 @@
 <mat-card class="product-card" appearance="outlined">
   <div class="product-card__media">
-    <app-product-image-placeholder [label]="product.imageLabel" />
+    <app-product-image-placeholder
+      [src]="product.imageUrl"
+      [label]="product.imageLabel"
+    />
 
     @if (product.badge) {
       <div class="product-card__badge">

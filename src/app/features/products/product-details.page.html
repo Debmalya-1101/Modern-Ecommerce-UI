@@ -1,10 +1,11 @@
 <section class="product-details-page">
   <section class="page-header">
     <div>
-      <p class="eyebrow">Product details route</p>
-      <h2>Placeholder product details powered by mock service data</h2>
+      <p class="eyebrow">Product details</p>
+      <h2>Full product view from the backend API</h2>
       <p class="page-copy">
-        This route uses the product id from the URL, asks the mock product service for data, and renders loading or error feedback when needed.
+        This page reads the product ID from the URL, loads the matching product from the backend,
+        and stays refresh-safe because the route is the source of truth.
       </p>
     </div>
 
@@ -32,15 +33,48 @@
   } @else if (product().data; as productDetail) {
     <section class="detail-layout">
       <mat-card class="detail-media" appearance="outlined">
-        <app-product-image-placeholder [label]="productDetail.imageLabel" />
+        <div class="detail-media__frame">
+          <app-product-image-placeholder
+            [src]="selectedImageUrl() || productDetail.imageUrl"
+            [label]="productDetail.name"
+            minHeight="25rem"
+          />
+        </div>
+
+        <div class="detail-media__thumbs">
+          @for (item of galleryItems(); track item.url) {
+            <button
+              type="button"
+              class="detail-thumb"
+              [class.detail-thumb--active]="selectedImageUrl() === item.url"
+              (click)="selectImage(item.url)"
+            >
+              <img
+                [src]="item.url"
+                [alt]="item.label"
+                class="detail-thumb__image"
+              />
+              <span class="detail-thumb__label">{{ item.label }}</span>
+            </button>
+          }
+        </div>
       </mat-card>
 
       <mat-card class="detail-summary" appearance="outlined">
         <div class="detail-summary__top">
-          <app-product-category-chip [label]="productDetail.categoryName" />
+          <div class="detail-summary__chips">
+            <app-product-category-chip [label]="productDetail.categoryName" />
 
-          @if (productDetail.badge) {
-            <app-product-badge [label]="productDetail.badge" />
+            @if (productDetail.badge) {
+              <app-product-badge [label]="productDetail.badge" />
+            }
+          </div>
+
+          @if (productDetail.stockStatus) {
+            <app-product-stock-indicator
+              [status]="productDetail.stockStatus"
+              [label]="productDetail.stockLabel ?? 'Check availability'"
+            />
           }
         </div>
 
@@ -52,7 +86,7 @@
 
           <app-product-rating-display
             [rating]="productDetail.rating"
-            [reviewCount]="productDetail.reviewCount"
+            [reviewCount]="productDetail.reviewCount ?? 0"
           />
         </div>
 
@@ -63,12 +97,37 @@
 
         <p class="detail-description">{{ productDetail.description }}</p>
 
+        <mat-divider />
+
+        <div class="detail-purchase">
+          <div class="detail-purchase__meta">
+            <span>Product ID</span>
+            <strong>#{{ productDetail.id }}</strong>
+          </div>
+          <div class="detail-purchase__meta">
+            <span>Brand</span>
+            <strong>{{ productDetail.brand }}</strong>
+          </div>
+        </div>
+
         <div class="detail-actions">
-          <button mat-flat-button appButtonStyle="primary" type="button">
-            Add to cart later
+          <button
+            mat-flat-button
+            appButtonStyle="primary"
+            type="button"
+            [disabled]="productDetail.stockStatus === 'out-of-stock'"
+            (click)="addToCart(productDetail.name)"
+          >
+            Add To Cart
           </button>
-          <button mat-stroked-button appButtonStyle="secondary" type="button">
-            Save for later
+          <button
+            mat-stroked-button
+            appButtonStyle="secondary"
+            type="button"
+            [disabled]="productDetail.stockStatus === 'out-of-stock'"
+            (click)="buyNow(productDetail.name)"
+          >
+            Buy Now
           </button>
         </div>
       </mat-card>
@@ -77,24 +136,28 @@
     <mat-card class="detail-specifications" appearance="outlined">
       <div class="detail-specifications__header">
         <div>
-          <p class="eyebrow">Placeholder product content</p>
-          <h3>Product specifications</h3>
+          <p class="eyebrow">Product breakdown</p>
+          <h3>Specifications</h3>
         </div>
         <p class="detail-specifications__copy">
-          These values come from the same mock service layer and keep the detail route ready for real backend data later.
+          Structured specification rows sourced directly from the backend API.
         </p>
       </div>
 
       <mat-divider />
 
-      <div class="spec-grid">
-        @for (specification of productDetail.specifications; track specification.key) {
-          <div class="spec-grid__item">
-            <span>{{ specification.key }}</span>
-            <strong>{{ specification.value }}</strong>
-          </div>
-        }
-      </div>
+      @if (productDetail.specifications.length) {
+        <div class="spec-grid">
+          @for (specification of productDetail.specifications; track specification.key) {
+            <div class="spec-grid__item">
+              <span>{{ specification.key }}</span>
+              <strong>{{ specification.value }}</strong>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="detail-specifications__copy">No specifications available for this product.</p>
+      }
     </mat-card>
   }
 </section>

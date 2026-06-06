@@ -9,5 +9,7 @@ export interface ProductCardViewModel {
   rating: number;
   reviewCount: number;
   badge?: string;
-  imageLabel: string;
+  imageUrl: string;   // Real image URL from the backend
+  imageLabel: string; // Alt text / fallback label
 }
+

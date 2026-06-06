@@ -2426,3 +2426,383 @@ That is a strong real-world Angular pattern:
 - a feature feels complete only when routing, UI, async states, and navigation all meet in one browser-visible flow
 - query params are a practical way to keep catalog filters in sync with the URL
 - signals work well for page state even when the data source still comes from observables
+
+## Feature Update: Product Details Feature
+
+What was added:
+- a real `/products/:id` product details page
+- large product media area with mock gallery selections
+- product title, category, description, rating, price, and stock indicator
+- add to cart and buy now actions
+- loading and error handling for route-driven product fetches
+
+Why it was added:
+- the product catalog was incomplete without a destination page for each card
+- product details pages are a core e-commerce route
+- this step connects route parameters, service loading, and responsive UI in one feature
+
+### Route Parameters Explained Simply
+
+A route parameter is a dynamic value inside the URL path.
+
+Example:
+
+```text
+/products/101
+```
+
+What this means:
+- `/products` is the fixed route part
+- `101` is the route parameter value
+- Angular reads that value and uses it to load product `101`
+
+In this feature, the parameter name is `id`.
+
+Small example:
+
+```ts
+this.route.paramMap.subscribe((params) => {
+  const routeId = Number(params.get('id'));
+});
+```
+
+What this does:
+- Angular watches the current route
+- it reads the `id` from the URL
+- the page uses that id to request the matching product details
+
+Backend comparison:
+- this is similar to a Spring Boot path variable like `@GetMapping("/products/{id}")`
+- Angular is reading the path in the browser instead of on the server
+
+### Why Route Parameters Matter Here
+
+Using `/products/:id` is useful because:
+- every product gets its own URL
+- browser refresh still knows which product to show
+- users can bookmark or share the product page
+- the details page can load the correct product directly from the URL
+
+That is why the route itself becomes the source of truth for which product is open.
+
+### Observable Loading Plus Local State
+
+The details page uses the route id to trigger the mock service call.
+
+Simple flow:
+
+```text
+URL changes
+  -> route parameter changes
+  -> page reads id
+  -> service loads product details
+  -> UI shows loading, success, or error
+```
+
+Why this is useful:
+- the component stays in sync with the URL
+- the UI reacts correctly on refresh and direct navigation
+- the same pattern can later connect to a real backend endpoint
+
+### Shared Product UI Reuse
+
+The details page reuses shared product display pieces instead of rebuilding them:
+- product category chip
+- product badge
+- product rating display
+- product price display
+- product image placeholder
+
+It also adds a reusable stock indicator component, which is a good pattern when the same stock messaging may appear in product cards, wishlist screens, or cart summaries later.
+
+## What I Learned From This Step
+
+- route parameters are the cleanest way to make one details page serve many products
+- a page that depends on the URL should react to route changes, not only read the route once
+- refresh-safe product details work because the URL already contains the product identity
+
+---
+
+## Feature Update: Real Product API Integration
+
+**Date:** 2026-06-06
+**Feature:** Replace all mock product data with real Spring Boot backend calls
+**Status:** ✅ Complete
+
+### What Was Done
+
+The product catalog and product details pages were previously powered entirely by hardcoded mock data baked inside `ProductsApiService`. This session replaces all of that with real HTTP calls to the backend and cleans up the development-only controls that only worked with mock data.
+
+---
+
+### Concept 1: DTOs vs View Models
+
+A common backend-developer question when learning frontend is: "Why do I need two separate interfaces for the same data?"
+
+The answer is that **what the backend sends** and **what the UI needs** are often different shapes.
+
+**DTO (Data Transfer Object)** — what the backend actually returns:
+
+```ts
+// ProductListDTO — exact shape from GET /api/products
+export interface ProductListDTO {
+  id: number;
+  name: string;
+  price: number;
+  imageUrl: string;
+  rating: number;
+  active: boolean;
+  brand: string;
+  categoryName: string;
+}
+```
+
+**View Model** — what the Angular product card component expects to render:
+
+```ts
+// ProductCardViewModel — what the product grid needs
+export interface ProductCardViewModel {
+  id: number;
+  name: string;
+  brand: string;
+  category: string;
+  price: number;
+  rating: number;
+  reviewCount: number;   // ← backend doesn't send this
+  imageLabel: string;    // ← backend doesn't send this
+}
+```
+
+The service maps DTO → View Model. The component never sees the raw DTO.
+
+```ts
+// In the service — private mapper
+private mapToProductListItem(dto: ProductListDTO): ProductListItem {
+  return {
+    id: dto.id,
+    name: dto.name,
+    price: dto.price,
+    imageUrl: dto.imageUrl,
+    rating: dto.rating,
+    active: dto.active,
+    brand: dto.brand,
+    categoryName: dto.categoryName,
+    // Fields not in backend are omitted — they are optional in the model
+  };
+}
+```
+
+And in the page component — another layer of mapping from `ProductListItem` → `ProductCardViewModel`:
+
+```ts
+data: products.map((product) => ({
+  id: product.id,
+  name: product.name,
+  brand: product.brand,
+  category: product.categoryName,
+  price: product.price,
+  rating: product.rating,
+  reviewCount: 0,            // Safe default — not in backend
+  imageLabel: product.name,  // Derived from product name
+})),
+```
+
+Each layer has one responsibility: the service knows about HTTP and DTOs, the page knows about the ViewModel the UI component expects.
+
+---
+
+### Concept 2: PageResponse — How Paginated APIs Work
+
+The product list endpoint doesn't return a plain array. It returns a **paginated wrapper**:
+
+```json
+// What GET /api/products actually returns
+{
+  "content": [
+    { "id": 1, "name": "Running Shoes", "price": 2499, ... },
+    { "id": 2, "name": "Desk Lamp", "price": 1899, ... }
+  ],
+  "pageNumber": 0,
+  "pageSize": 24,
+  "totalElements": 58,
+  "totalPages": 3,
+  "last": false
+}
+```
+
+This pattern is standard in backend APIs because returning thousands of records at once is too slow and too expensive.
+
+In Angular, the service unwraps `.content` before returning data to the page:
+
+```ts
+getProducts(query?: ProductCatalogQuery): Observable<ProductListItem[]> {
+  return this.apiService
+    .get<PageResponse<ProductListDTO>>(API_ENDPOINTS.products.list, params, { trackLoading: true })
+    .pipe(
+      map((response) => response.content.map((dto) => this.mapToProductListItem(dto)))
+      //              ↑ unwrap the array    ↑ convert each DTO to frontend model
+    );
+}
+```
+
+The `PageResponse<T>` interface is generic — the same wrapper shape is used for products, orders, admin tables, etc. The `T` just changes.
+
+`totalElements` and `totalPages` are not used yet, but they will be needed when pagination controls (page 1, page 2...) are added later.
+
+---
+
+### Concept 3: Optional Fields and the `?` Operator
+
+The backend public product API does not return several fields that the mock data invented:
+- `reviewCount` — not in list or detail DTOs
+- `badge` — no concept of badge in the backend
+- `stockStatus` / `stockLabel` — only in admin DTOs
+- `originalPrice` — no discount concept yet
+
+The solution is to mark these fields as **optional** in TypeScript using `?`:
+
+```ts
+export interface ProductDetail {
+  id: number;
+  name: string;
+  // ...required fields always present...
+  stockStatus?: ProductStockStatus;  // ← optional, backend doesn't send this
+  stockLabel?: string;               // ← optional, backend doesn't send this
+  reviewCount?: number;              // ← optional, backend doesn't send this
+}
+```
+
+Then in the template, guard the optional field before rendering it:
+
+```html
+<!-- Only show stock indicator if the backend sent stockStatus -->
+@if (productDetail.stockStatus) {
+  <app-product-stock-indicator
+    [status]="productDetail.stockStatus"
+    [label]="productDetail.stockLabel ?? 'Check availability'"
+  />
+}
+```
+
+The `??` operator (nullish coalescing) provides a fallback when the value is `null` or `undefined`:
+
+```ts
+productDetail.reviewCount ?? 0
+// Returns: reviewCount if it exists, otherwise 0
+```
+
+This is safer than using `||` because `||` also replaces `0` and `false`, which might be valid values.
+
+---
+
+### Concept 4: URL as Source of Truth for Filter State
+
+A filter like "show Electronics in category, sorted by price" could be stored two ways:
+
+1. In a component signal only → **lost on browser refresh**
+2. In the URL (`/products?category=Electronics`) → **survives refresh**
+
+This project stores filters in the URL. The flow works like this:
+
+```text
+User changes a filter
+  → updateCatalogFilters() updates URL query params via Router.navigate()
+  → Angular Router emits a new queryParamMap
+  → ngOnInit subscription reads the params and calls loadProducts()
+  → Products load with the correct filter
+```
+
+```ts
+// Reading filter state FROM the URL
+ngOnInit(): void {
+  this.route.queryParamMap
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe((params) => {
+      const filters = {
+        searchTerm: params.get('q') ?? '',
+        category: params.get('category') ?? 'all',
+      };
+      this.loadProducts(filters);
+    });
+}
+
+// Writing filter state TO the URL
+private updateCatalogFilters(changes: Partial<CatalogFilters>): void {
+  void this.router.navigate([], {
+    relativeTo: this.route,
+    queryParams: {
+      q: nextFilters.searchTerm || null,
+      category: nextFilters.category !== 'all' ? nextFilters.category : null,
+    },
+  });
+}
+```
+
+Setting a query param to `null` removes it from the URL cleanly. So `/products?category=all` becomes `/products`.
+
+Browser back and forward also work because Angular Router manages URL history — clicking back restores the previous query params and re-triggers the subscription.
+
+---
+
+### Concept 5: Silent Background Calls with `trackLoading: false`
+
+The product catalog needs to load two things on init:
+1. The product grid (should show a skeleton while loading)
+2. The category filter chips (should load quietly without disrupting the grid)
+
+The `ApiLoadingService.track()` method is what triggers the loading skeleton. `trackLoading: false` bypasses it:
+
+```ts
+// Loads products — shows the skeleton spinner
+getProducts(): Observable<ProductListItem[]> {
+  return this.apiService.get(..., { trackLoading: true });
+}
+
+// Loads categories — runs silently in the background
+getCatalogCategories(): Observable<string[]> {
+  return this.apiService.get(..., { trackLoading: false }); // ← no spinner
+}
+```
+
+In the page:
+
+```ts
+ngOnInit(): void {
+  this.loadCategories(); // ← silent, background call
+  this.route.queryParamMap.subscribe(...); // ← triggers product grid load
+}
+
+private loadCategories(): void {
+  this.productsApiService.getCatalogCategories()
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
+      next: (categories) => this.categoryOptions.set(categories),
+      error: () => {
+        // Fail silently — categories missing is acceptable, products missing is not
+      },
+    });
+}
+```
+
+The key rule: **critical UI blocking operations** use `trackLoading: true`. **Non-critical background fetches** use `trackLoading: false`.
+
+---
+
+### Files Changed This Session
+
+| File | Summary |
+|---|---|
+| `core/models/product.model.ts` | Added `ProductListDTO` + `ProductDetailDTO` matching the backend. Made UI-only fields optional. |
+| `core/services/products-api.service.ts` | Full rewrite — 300 lines of mock data removed, replaced with real HTTP calls. |
+| `features/products/products.page.ts` | Removed `previewState` (mock-only). Async category loading. Cleaner filter handling. |
+| `features/products/products.page.html` | Removed dev-only Preview State dropdown and Badge chips. Updated copy. |
+| `features/products/product-details.page.ts` | Updated `galleryLabels` fallback to use `product.name`. |
+| `features/products/product-details.page.html` | Guarded optional `stockStatus`, `reviewCount`. Updated copy. |
+
+### What is Next
+
+- **Pagination** — `totalPages` and `totalElements` are returned by the backend. A paginator component will let users browse beyond the first 24 results.
+- **Real images** — `imageUrl` is returned from the backend. The image placeholder can be replaced with a real `<img>` tag.
+- **Sort + price filter** — backend supports `?sortBy=price&order=asc&minPrice=1000`. UI controls for these come next.
+- **Cart integration** — the "Add to Cart" button currently shows a snackbar. Next session wires it to `POST /api/cart/add`.
+

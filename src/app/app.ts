@@ -67,38 +67,33 @@ export class App {
     {
       label: 'Home',
       path: '/',
-      description: 'Feature routing overview'
+      description: 'Back to the storefront home'
     },
     {
       label: 'Products',
       path: '/products',
-      description: 'Product listing placeholder'
+      description: 'Browse the product catalog'
     },
     {
       label: 'Cart',
       path: '/cart',
-      description: 'Cart route placeholder'
+      description: 'View your shopping cart'
     },
     {
       label: 'Checkout',
       path: '/checkout',
-      description: 'Checkout route placeholder'
+      description: 'Complete your order'
     },
     {
       label: 'Orders',
       path: '/orders',
-      description: 'Orders route placeholder'
+      description: 'Your order history'
     },
     {
       label: 'Profile',
       path: '/profile',
-      description: 'Profile route placeholder'
+      description: 'Manage your account'
     }
-  ];
-  protected readonly plannedAreas = [
-    'Product details route',
-    'Protected order history',
-    'Future admin area'
   ];
 
   constructor() {

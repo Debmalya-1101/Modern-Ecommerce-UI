@@ -72,11 +72,8 @@
       [opened]="isSidebarOpen()"
     >
       <div class="sidebar-brand">
-        <p class="sidebar-eyebrow">Angular storefront shell</p>
         <h2>{{ title }}</h2>
-        <p class="sidebar-copy">
-          A clean starting point for a responsive e-commerce experience.
-        </p>
+        <p class="sidebar-copy">Your modern shopping destination.</p>
       </div>
 
       <mat-divider />
@@ -116,7 +113,7 @@
               routerLink="/profile"
               (click)="closeSidebarOnMobile()"
             >
-              Profile placeholder
+              My Profile
             </a>
 
             <button
@@ -151,16 +148,6 @@
         }
       </section>
 
-      <mat-divider />
-
-      <section class="sidebar-planned" aria-labelledby="planned-title">
-        <p id="planned-title" class="section-label">Planned areas</p>
-        <ul>
-          @for (area of plannedAreas; track area) {
-            <li>{{ area }}</li>
-          }
-        </ul>
-      </section>
     </mat-drawer>
 
     <mat-drawer-content class="shell-content">
@@ -248,8 +235,7 @@
       </main>
 
       <footer class="shell-footer">
-        <p>Built with standalone Angular components, SCSS, and Angular Material.</p>
-        <p>Current scope: application shell only.</p>
+        <p>Built with Angular, Angular Material, and SCSS.</p>
       </footer>
     </mat-drawer-content>
   </mat-drawer-container>

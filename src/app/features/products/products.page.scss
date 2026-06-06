@@ -2,219 +2,241 @@
   display: block;
 }
 
-.products-page {
+// ── Page wrapper ──────────────────────────────────────────────────────
+.catalog-page {
   display: grid;
-  gap: 1.5rem;
+  gap: 0.75rem;
 }
 
-.catalog-hero {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: minmax(0, 1.6fr) minmax(19rem, 0.95fr);
-}
-
-.catalog-hero__copy {
-  display: grid;
-  gap: 1rem;
-  padding: 2rem;
-  border-radius: 1.75rem;
-  background:
-    radial-gradient(circle at top left, rgba(255, 219, 186, 0.95), transparent 40%),
-    linear-gradient(135deg, #fff8f1 0%, #fffdf8 55%, #fff4ea 100%);
-  border: 1px solid rgba(181, 95, 52, 0.14);
-  box-shadow: 0 20px 44px rgba(80, 54, 36, 0.09);
-}
-
-.catalog-hero__stats {
-  display: grid;
-  gap: 1rem;
-}
-
-.hero-stat-card,
-.catalog-toolbar {
-  border-color: rgba(87, 61, 44, 0.14);
-  background: rgba(255, 252, 247, 0.96);
-  box-shadow: 0 14px 32px rgba(80, 54, 36, 0.07);
-}
-
-.hero-stat-card {
-  display: grid;
-  gap: 0.5rem;
-  padding: 1.15rem 1.2rem;
-}
-
-.eyebrow,
-.mini-label {
-  margin: 0;
-  color: #b55f34;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-h2,
-h3,
-strong,
-span,
-p {
-  margin: 0;
-}
-
-h2,
-h3 {
-  color: #2d241f;
-}
-
-.hero-copy,
-.section-copy,
-.hero-stat-card span,
-.category-filter small {
-  color: #6e5d52;
-  line-height: 1.7;
-}
-
-.section-block {
-  display: grid;
-  gap: 1rem;
-}
-
-.catalog-toolbar {
-  display: grid;
-  gap: 1.25rem;
-  padding: 1.1rem;
-}
-
-.catalog-toolbar__search {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-}
-
-.search-field {
-  width: 100%;
-}
-
-.catalog-toolbar__search-actions,
-.catalog-toolbar__controls {
+// ── Slim filter bar ───────────────────────────────────────────────────
+// One thin row at the top — search + result count side by side.
+// Inspired by Amazon/Flipkart: immediate, functional, no wasted space.
+.catalog-bar {
   display: flex;
-  gap: 1rem;
   align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 1rem;
+  background: rgba(255, 252, 247, 0.98);
+  border: 1px solid rgba(87, 61, 44, 0.13);
+  box-shadow: 0 4px 14px rgba(80, 54, 36, 0.06);
   flex-wrap: wrap;
 }
 
-.catalog-toolbar__search-actions {
-  justify-content: flex-end;
-}
-
-.catalog-toolbar__controls {
-  justify-content: space-between;
-}
-
-.catalog-toolbar__badge-group {
-  display: grid;
-  gap: 0.45rem;
-}
-
-.category-filter-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.category-filter {
-  display: grid;
-  gap: 0.35rem;
-  justify-items: start;
-  padding: 1rem 1.1rem;
-  min-height: 6.5rem;
-  border-radius: 1.1rem;
-  border-color: rgba(87, 61, 44, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 249, 241, 0.96) 100%);
-  color: #2d241f;
-  text-align: left;
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.category-filter:hover {
-  transform: translateY(-2px);
-  border-color: rgba(181, 95, 52, 0.22);
-  box-shadow: 0 14px 26px rgba(80, 54, 36, 0.08);
-}
-
-.category-filter--active {
-  border-color: rgba(181, 95, 52, 0.42);
-  box-shadow: 0 16px 30px rgba(181, 95, 52, 0.12);
-}
-
-.category-filter span {
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.section-heading {
+// ── Search box ────────────────────────────────────────────────────────
+.catalog-bar__search {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  align-items: end;
-}
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.65rem;
+  background: #fff;
+  border: 1.5px solid rgba(87, 61, 44, 0.15);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 
-.section-copy {
-  max-width: 28rem;
-  text-align: right;
-}
-
-@media (max-width: 1100px) {
-  .catalog-hero,
-  .category-filter-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .catalog-toolbar__search {
-    grid-template-columns: 1fr;
-  }
-
-  .catalog-toolbar__search-actions {
-    justify-content: start;
+  &:focus-within {
+    border-color: rgba(181, 95, 52, 0.5);
+    box-shadow: 0 0 0 3px rgba(181, 95, 52, 0.1);
   }
 }
 
-@media (max-width: 900px) {
-  .section-heading {
-    align-items: start;
-    flex-direction: column;
-  }
+.search-icon {
+  font-size: 1.15rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  color: #9e7059;
+  flex-shrink: 0;
+}
 
-  .section-copy {
-    max-width: none;
-    text-align: left;
-  }
+.search-input {
+  flex: 1 1 auto;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.92rem;
+  color: #2d241f;
+  min-width: 0;
 
-  .catalog-toolbar__controls {
-    align-items: start;
-    flex-direction: column;
+  &::placeholder {
+    color: #b09a8d;
   }
 }
 
-@media (max-width: 600px) {
-  .catalog-hero__copy {
-    padding: 1.4rem;
+.search-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #9e7059;
+  flex-shrink: 0;
+
+  mat-icon {
+    font-size: 1.1rem;
+    width: 1.1rem;
+    height: 1.1rem;
   }
 
-  .catalog-toolbar {
-    padding: 1rem;
+  &:hover {
+    color: #b55f34;
+  }
+}
+
+.search-submit-btn {
+  flex-shrink: 0;
+  padding: 0.3rem 0.9rem;
+  border: none;
+  border-radius: 0.45rem;
+  background: #b55f34;
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, transform 100ms ease;
+
+  &:hover {
+    background: #9e4f28;
+    transform: translateY(-1px);
   }
 
-  .catalog-toolbar__search-actions {
+  &:active {
+    transform: none;
+  }
+}
+
+// ── Result meta (count + active filter + clear) ───────────────────────
+.catalog-bar__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.meta-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2d241f;
+}
+
+.meta-sep {
+  color: #b09a8d;
+  font-size: 0.85rem;
+}
+
+.meta-filter {
+  font-size: 0.85rem;
+  color: #6e5d52;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.18rem 0.55rem;
+  border: 1px solid rgba(181, 95, 52, 0.3);
+  border-radius: 2rem;
+  background: transparent;
+  color: #b55f34;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease;
+
+  mat-icon {
+    font-size: 0.95rem;
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  &:hover {
+    background: rgba(181, 95, 52, 0.08);
+  }
+}
+
+// ── Category chip row ─────────────────────────────────────────────────
+// Horizontal scroll, never wraps — looks like Flipkart's category strip
+.category-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem; // space for scrollbar on Windows
+  scrollbar-width: thin;
+  scrollbar-color: rgba(181, 95, 52, 0.2) transparent;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background: rgba(181, 95, 52, 0.2);
+  }
+}
+
+.cat-chip {
+  flex-shrink: 0;
+  padding: 0.35rem 1rem;
+  border: 1.5px solid rgba(87, 61, 44, 0.16);
+  border-radius: 2rem;
+  background: rgba(255, 252, 247, 0.96);
+  color: #3b2f28;
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 120ms ease;
+
+  &:hover {
+    background: rgba(181, 95, 52, 0.07);
+    border-color: rgba(181, 95, 52, 0.3);
+    transform: translateY(-1px);
+  }
+}
+
+.cat-chip--active {
+  background: #b55f34;
+  border-color: #b55f34;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(181, 95, 52, 0.25);
+
+  &:hover {
+    background: #9e4f28;
+    border-color: #9e4f28;
+  }
+}
+
+// ── Product content area ──────────────────────────────────────────────
+.catalog-content {
+  // No extra wrapper padding needed — the grid handles its own spacing
+}
+
+// ── Responsive ────────────────────────────────────────────────────────
+@media (max-width: 640px) {
+  .catalog-bar {
+    gap: 0.75rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .catalog-bar__meta {
     width: 100%;
+    order: -1; // move count above search on very small screens
   }
 
-  .catalog-toolbar__search-actions button {
-    flex: 1 1 0;
+  .meta-filter {
+    max-width: 8rem;
   }
 }

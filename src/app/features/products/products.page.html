@@ -1,145 +1,75 @@
-<section class="products-page">
-  <section class="catalog-hero">
-    <div class="catalog-hero__copy">
-      <p class="eyebrow">Curated catalog</p>
-      <h2>Everyday essentials with a polished storefront feel</h2>
-      <p class="hero-copy">
-        Browse mock products with reusable product cards, responsive layout, and built-in loading, error, and empty states.
-      </p>
-    </div>
+<div class="catalog-page">
 
-    <div class="catalog-hero__stats">
-      <mat-card class="hero-stat-card" appearance="outlined">
-        <span class="mini-label">Showing</span>
-        <strong>{{ productCountLabel() }}</strong>
-        <span>{{ activeFilterSummary() }}</span>
-      </mat-card>
+  <!-- ── Slim filter bar ──────────────────────────────────────────── -->
+  <div class="catalog-bar">
 
-      <mat-card class="hero-stat-card" appearance="outlined">
-        <span class="mini-label">Preview state</span>
-        <strong>{{ filters().previewState | titlecase }}</strong>
-        <span>Switch to empty or error to verify UI states from the browser.</span>
-      </mat-card>
-    </div>
-  </section>
-
-  <mat-card class="catalog-toolbar" appearance="outlined">
-    <div class="catalog-toolbar__search">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-label>Search products, brands, or categories</mat-label>
-        <input
-          matInput
-          [ngModel]="searchDraft()"
-          (ngModelChange)="searchDraft.set($event)"
-          (keyup.enter)="applySearch()"
-        />
-        <button
-          mat-icon-button
-          matSuffix
-          type="button"
-          aria-label="Apply search"
-          (click)="applySearch()"
-        >
-          <mat-icon>search</mat-icon>
+    <!-- Search input -->
+    <div class="catalog-bar__search">
+      <mat-icon class="search-icon">search</mat-icon>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search products, brands or categories..."
+        [value]="searchDraft()"
+        (input)="searchDraft.set($any($event.target).value)"
+        (keyup.enter)="applySearch()"
+      />
+      @if (searchDraft()) {
+        <button class="search-clear-btn" type="button" (click)="clearSearch()" aria-label="Clear search">
+          <mat-icon>close</mat-icon>
         </button>
-      </mat-form-field>
-
-      <div class="catalog-toolbar__search-actions">
-        <button mat-flat-button appButtonStyle="primary" type="button" (click)="applySearch()">
-          Search
-        </button>
-        <button mat-stroked-button appButtonStyle="secondary" type="button" (click)="clearSearch()">
-          Clear
-        </button>
-      </div>
+      }
+      <button class="search-submit-btn" type="button" (click)="applySearch()">Search</button>
     </div>
 
-    <div class="catalog-toolbar__controls">
-      <mat-form-field appearance="outline">
-        <mat-label>Preview state</mat-label>
-        <mat-select
-          [ngModel]="filters().previewState"
-          (ngModelChange)="changePreviewState($event)"
-        >
-          @for (state of previewStateOptions; track state) {
-            <mat-option [value]="state">{{ state | titlecase }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
-      <div class="catalog-toolbar__badge-group">
-        <p class="mini-label">Badges</p>
-        <mat-chip-listbox
-          [value]="filters().badge"
-          (change)="changeBadge($event.value)"
-          aria-label="Product badge filter"
-        >
-          @for (badge of badgeOptions; track badge) {
-            <mat-chip-option [value]="badge">
-              {{ badge === 'all' ? 'All' : (badge | titlecase) }}
-            </mat-chip-option>
-          }
-        </mat-chip-listbox>
-      </div>
-    </div>
-  </mat-card>
-
-  <section class="section-block">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">Browse by category</p>
-        <h3>Quick filters for the catalog</h3>
-      </div>
-      <button mat-stroked-button appButtonStyle="secondary" type="button" (click)="clearFilters()">
-        Reset filters
-      </button>
-    </div>
-
-    <div class="category-filter-grid">
-      <button
-        mat-stroked-button
-        type="button"
-        class="category-filter"
-        [class.category-filter--active]="filters().category === 'all'"
-        (click)="changeCategory('all')"
-      >
-        <span>All products</span>
-        <small>See the full curated catalog</small>
-      </button>
-
-      @for (category of categoryOptions(); track category) {
-        <button
-          mat-stroked-button
-          type="button"
-          class="category-filter"
-          [class.category-filter--active]="filters().category === category"
-          (click)="changeCategory(category)"
-        >
-          <span>{{ category }}</span>
-          <small>Filter the catalog by {{ category.toLowerCase() }}</small>
+    <!-- Result meta -->
+    <div class="catalog-bar__meta">
+      <span class="meta-count">{{ productCountLabel() }}</span>
+      @if (filters().searchTerm || filters().category !== 'all') {
+        <span class="meta-sep">·</span>
+        <span class="meta-filter">{{ activeFilterSummary() }}</span>
+        <button class="meta-clear" type="button" (click)="clearFilters()">
+          <mat-icon>close</mat-icon> Clear
         </button>
       }
     </div>
-  </section>
 
-  <section class="section-block">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">Featured picks</p>
-        <h3>Modern product grid</h3>
-      </div>
-      <p class="section-copy">
-        Responsive cards reuse the shared badge, rating, price, and image placeholder components.
-      </p>
+  </div>
+
+  <!-- ── Category chip row ─────────────────────────────────────────── -->
+  @if (categoryOptions().length) {
+    <div class="category-row" role="navigation" aria-label="Filter by category">
+      <button
+        class="cat-chip"
+        [class.cat-chip--active]="filters().category === 'all'"
+        type="button"
+        (click)="changeCategory('all')"
+      >
+        All
+      </button>
+      @for (category of categoryOptions(); track category) {
+        <button
+          class="cat-chip"
+          [class.cat-chip--active]="filters().category === category"
+          type="button"
+          (click)="changeCategory(category)"
+        >
+          {{ category }}
+        </button>
+      }
     </div>
+  }
+
+  <!-- ── Product content ───────────────────────────────────────────── -->
+  <div class="catalog-content">
 
     @if (products().loading) {
-      <app-product-skeleton-loading [cards]="6" />
+      <app-product-skeleton-loading [cards]="12" />
     } @else if (products().error) {
       <app-error-state
         title="Could not load the catalog"
         [description]="products().error ?? 'Please try again in a moment.'"
-        actionLabel="Retry catalog load"
+        actionLabel="Retry"
         (action)="reloadProducts()"
       />
     } @else if (products().data?.length) {
@@ -149,11 +79,13 @@
       />
     } @else {
       <app-empty-state
-        title="No products matched this view"
-        description="Try clearing the search or preview state to bring products back into the grid."
-        actionLabel="Reset catalog filters"
+        title="No products matched your search"
+        description="Try clearing the search term or choosing a different category."
+        actionLabel="Reset filters"
         (action)="clearFilters()"
       />
     }
-  </section>
-</section>
+
+  </div>
+
+</div>

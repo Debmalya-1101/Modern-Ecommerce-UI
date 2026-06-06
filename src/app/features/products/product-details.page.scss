@@ -13,7 +13,7 @@
 .detail-summary,
 .detail-specifications {
   border-color: rgba(87, 61, 44, 0.14);
-  background: rgba(255, 252, 247, 0.94);
+  background: rgba(255, 252, 247, 0.96);
   box-shadow: 0 14px 32px rgba(80, 54, 36, 0.07);
 }
 
@@ -51,7 +51,9 @@ h3,
 .page-copy,
 .detail-description,
 .detail-specifications__copy,
-.spec-grid__item span {
+.spec-grid__item span,
+.detail-thumb__label,
+.detail-purchase__meta span {
   color: #6e5d52;
   line-height: 1.7;
 }
@@ -63,13 +65,82 @@ h3,
 .detail-layout {
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
 }
 
 .detail-media,
 .detail-summary,
 .detail-specifications {
   padding: 1.4rem;
+}
+
+.detail-media {
+  display: grid;
+  gap: 1rem;
+}
+
+.detail-media__frame {
+  padding: 0.55rem;
+  border-radius: 1.7rem;
+  background:
+    radial-gradient(circle at top left, rgba(255, 227, 205, 0.95), transparent 40%),
+    linear-gradient(180deg, rgba(255, 249, 241, 0.98) 0%, rgba(249, 238, 227, 0.98) 100%);
+}
+
+.detail-media__frame app-product-image-placeholder {
+  min-height: 25rem;
+}
+
+.detail-media__thumbs {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.detail-thumb {
+  display: grid;
+  gap: 0;
+  padding: 0.5rem;
+  border: 2px solid rgba(87, 61, 44, 0.12);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+  overflow: hidden;
+}
+
+.detail-thumb:hover {
+  transform: translateY(-2px);
+  border-color: rgba(181, 95, 52, 0.3);
+  box-shadow: 0 8px 20px rgba(80, 54, 36, 0.1);
+}
+
+.detail-thumb--active {
+  border-color: #b55f34;
+  box-shadow: 0 0 0 2px rgba(181, 95, 52, 0.2), 0 8px 20px rgba(181, 95, 52, 0.1);
+}
+
+.detail-thumb__image {
+  width: 100%;
+  height: 5.5rem;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 0.55rem;
+  display: block;
+}
+
+.detail-thumb__label {
+  padding: 0.35rem 0.25rem 0.1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #2d241f;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .detail-summary {
@@ -84,20 +155,43 @@ h3,
   gap: 0.9rem;
 }
 
-.detail-summary__top,
-.detail-summary__heading,
-.detail-actions,
-.spec-grid__item {
+.detail-summary__top {
+  align-items: start;
+}
+
+.detail-summary__chips {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
   align-items: center;
 }
 
 .detail-summary__heading {
+  align-items: end;
   flex-wrap: wrap;
 }
 
 .detail-brand {
   font-size: 0.88rem;
   font-weight: 600;
+}
+
+.detail-description {
+  font-size: 0.98rem;
+}
+
+.detail-purchase {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detail-purchase__meta {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  background: rgba(245, 236, 227, 0.86);
 }
 
 .detail-actions {
@@ -131,6 +225,7 @@ h3,
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  align-items: center;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid rgba(87, 61, 44, 0.12);
 }
@@ -140,26 +235,50 @@ h3,
   border-bottom: 0;
 }
 
-@media (max-width: 960px) {
-  .page-header,
-  .detail-layout,
-  .detail-specifications__header,
-  .spec-grid__item {
+@media (max-width: 1080px) {
+  .detail-layout {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 960px) {
   .page-header,
   .detail-specifications__header,
   .spec-grid__item {
     display: grid;
+    grid-template-columns: 1fr;
   }
 
-  .detail-layout {
+  .detail-media__thumbs,
+  .detail-purchase {
     grid-template-columns: 1fr;
   }
 
   .detail-specifications__copy {
     max-width: none;
     text-align: left;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-header,
+  .detail-media,
+  .detail-summary,
+  .detail-specifications {
+    padding: 1.1rem;
+  }
+
+  .detail-summary__top,
+  .detail-summary__heading {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .detail-actions {
+    flex-direction: column;
+  }
+
+  .detail-actions button {
+    width: 100%;
   }
 }

@@ -1,0 +1,4 @@
+<div class="stock-indicator" [class.stock-indicator--limited]="status === 'limited'" [class.stock-indicator--out]="status === 'out-of-stock'">
+  <span class="stock-indicator__dot" aria-hidden="true"></span>
+  <span class="stock-indicator__label">{{ label }}</span>
+</div>

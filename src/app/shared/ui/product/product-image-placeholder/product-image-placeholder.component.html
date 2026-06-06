@@ -1,7 +1,18 @@
-<div class="image-placeholder" aria-label="Product image placeholder">
-  <div class="image-placeholder__orb"></div>
-  <div class="image-placeholder__copy">
-    <span class="image-placeholder__eyebrow">Preview</span>
-    <strong>{{ label }}</strong>
+@if (showImage) {
+  <div class="image-frame" [style.minHeight]="minHeight">
+    <img
+      [src]="src"
+      [alt]="label"
+      class="product-image"
+      (error)="onImageError()"
+    />
   </div>
-</div>
+} @else {
+  <div class="image-placeholder" [style.minHeight]="minHeight" [attr.aria-label]="label">
+    <div class="image-placeholder__orb"></div>
+    <div class="image-placeholder__copy">
+      <span class="image-placeholder__eyebrow">No image</span>
+      <strong>{{ label }}</strong>
+    </div>
+  </div>
+}
