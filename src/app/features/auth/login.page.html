@@ -1,4 +1,4 @@
-<section class="login-page">
+<section class="login-page auth-page">
   @if (isRestoringSession()) {
     <mat-card class="auth-card auth-card--status" appearance="outlined">
       <app-loading-spinner label="Restoring your session" [diameter]="52" />
@@ -6,11 +6,28 @@
   } @else {
     <div class="auth-layout auth-layout--login">
       <mat-card class="auth-hero" appearance="outlined">
-        <p class="eyebrow">Authentication</p>
-        <h2>Welcome back to a polished storefront workspace</h2>
-        <p class="hero-copy">
-          Sign in to continue browsing, manage orders, and move through protected checkout flows with a real backend-authenticated session.
-        </p>
+        <div class="auth-hero__intro">
+          <p class="eyebrow">Authentication</p>
+          <h2>Welcome back to your curated storefront workspace</h2>
+          <p class="hero-copy">
+            Sign in to continue browsing, manage orders, and move through protected checkout flows with a real backend-authenticated session.
+          </p>
+        </div>
+
+        <div class="auth-hero__visual" aria-hidden="true">
+          <div class="auth-hero__surface">
+            <span class="auth-hero__surface-pill">Trusted login</span>
+            <span class="auth-hero__surface-title">Account access</span>
+            <span class="auth-hero__surface-line"></span>
+            <span class="auth-hero__surface-line auth-hero__surface-line--short"></span>
+          </div>
+
+          <div class="auth-hero__surface auth-hero__surface--accent">
+            <span class="auth-hero__surface-title">Protected checkout</span>
+            <span class="auth-hero__surface-line"></span>
+            <span class="auth-hero__surface-line auth-hero__surface-line--short"></span>
+          </div>
+        </div>
 
         <div class="hero-highlights">
           <div>
@@ -54,13 +71,13 @@
         </div>
 
         @if (signupSuccess()) {
-          <div class="auth-success" role="status">
+          <div class="auth-success" role="status" aria-live="polite">
             Account created successfully. You can sign in now.
           </div>
         }
 
         @if (authState().error) {
-          <div class="auth-error" role="alert">
+          <div class="auth-error" role="alert" aria-live="assertive">
             {{ authState().error }}
           </div>
         }
@@ -112,17 +129,15 @@
             <button
               class="text-link-button"
               type="button"
-              (click)="showRecoveryHint()"
+              routerLink="/forgot-password"
             >
               Forgot password?
             </button>
           </div>
 
-          @if (recoveryHintVisible()) {
-            <p class="auth-hint">
-              Password recovery can be added next as a separate feature screen. The backend login flow is already ready for it.
-            </p>
-          }
+          <p class="auth-hint">
+            Keep this checked on personal devices. Use the password recovery flow if you cannot access your account.
+          </p>
 
           <div class="auth-actions">
             <button

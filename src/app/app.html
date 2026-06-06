@@ -31,6 +31,14 @@
           >
             Create account
           </a>
+        } @else if (isSignupRoute()) {
+          <a
+            mat-stroked-button
+            appButtonStyle="secondary"
+            routerLink="/login"
+          >
+            Sign in
+          </a>
         } @else {
           <a
             mat-stroked-button
@@ -38,6 +46,13 @@
             routerLink="/login"
           >
             Sign in
+          </a>
+          <a
+            mat-flat-button
+            appButtonStyle="primary"
+            routerLink="/signup"
+          >
+            Create account
           </a>
         }
       </nav>

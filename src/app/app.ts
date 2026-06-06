@@ -53,9 +53,13 @@ export class App {
   protected readonly isAuthRoute = computed(() => {
     const url = this.currentUrl();
 
-    return url.startsWith('/login') || url.startsWith('/signup');
+    return url.startsWith('/login')
+      || url.startsWith('/signup')
+      || url.startsWith('/forgot-password')
+      || url.startsWith('/reset-password');
   });
   protected readonly isLoginRoute = computed(() => this.currentUrl().startsWith('/login'));
+  protected readonly isSignupRoute = computed(() => this.currentUrl().startsWith('/signup'));
   protected readonly currentUserLabel = computed(
     () => this.session().user?.username ?? 'Guest'
   );

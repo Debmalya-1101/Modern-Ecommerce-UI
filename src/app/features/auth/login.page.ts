@@ -45,7 +45,6 @@ export class LoginPage implements OnInit {
     () => this.authState().isLoading && this.authState().isReady
   );
   protected readonly signupSuccess = signal(false);
-  protected readonly recoveryHintVisible = signal(false);
   protected readonly submitted = signal(false);
 
   protected readonly loginForm = this.formBuilder.nonNullable.group({
@@ -97,18 +96,10 @@ export class LoginPage implements OnInit {
     return this.loginForm.controls.password;
   }
 
-  protected get rememberMeControl() {
-    return this.loginForm.controls.rememberMe;
-  }
-
   protected showFieldError(fieldName: 'usernameOrEmail' | 'password'): boolean {
     const control = this.loginForm.controls[fieldName];
 
     return control.invalid && (control.touched || this.submitted());
-  }
-
-  protected showRecoveryHint(): void {
-    this.recoveryHintVisible.set(true);
   }
 
   private navigateAfterLogin(): void {

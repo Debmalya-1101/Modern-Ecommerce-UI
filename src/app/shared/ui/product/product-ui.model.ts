@@ -3,6 +3,7 @@ export interface ProductCardViewModel {
   name: string;
   brand: string;
   category: string;
+  shortDescription?: string;
   price: number;
   originalPrice?: number | null;
   rating: number;

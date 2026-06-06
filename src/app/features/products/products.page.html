@@ -1,60 +1,145 @@
 <section class="products-page">
-  <section class="products-hero">
-    <mat-card class="products-hero__content" appearance="outlined">
-      <p class="eyebrow">Products feature route</p>
-      <h2>Mock product data now flows through a real service layer</h2>
+  <section class="catalog-hero">
+    <div class="catalog-hero__copy">
+      <p class="eyebrow">Curated catalog</p>
+      <h2>Everyday essentials with a polished storefront feel</h2>
       <p class="hero-copy">
-        This page now loads products from a mock Angular service using observables, loading states, and error handling that can later connect to a real backend.
+        Browse mock products with reusable product cards, responsive layout, and built-in loading, error, and empty states.
       </p>
+    </div>
 
-      <div class="hero-actions">
-        <button mat-flat-button appButtonStyle="primary" type="button">
-          Browse collections
-        </button>
-        <button mat-stroked-button appButtonStyle="secondary" type="button">
-          View category layout
-        </button>
-      </div>
-    </mat-card>
+    <div class="catalog-hero__stats">
+      <mat-card class="hero-stat-card" appearance="outlined">
+        <span class="mini-label">Showing</span>
+        <strong>{{ productCountLabel() }}</strong>
+        <span>{{ activeFilterSummary() }}</span>
+      </mat-card>
 
-    <mat-card class="products-hero__side" appearance="outlined">
-      <p class="mini-label">Why this matters</p>
-      <ul>
-        <li>The route page no longer owns hardcoded product arrays.</li>
-        <li>The service layer now controls mock data and future backend replacement.</li>
-        <li>The UI shows loading, empty, and error states in one clean flow.</li>
-      </ul>
-    </mat-card>
+      <mat-card class="hero-stat-card" appearance="outlined">
+        <span class="mini-label">Preview state</span>
+        <strong>{{ filters().previewState | titlecase }}</strong>
+        <span>Switch to empty or error to verify UI states from the browser.</span>
+      </mat-card>
+    </div>
   </section>
 
-  <section class="products-strip">
-    @for (item of categoryHighlights(); track item) {
-      <mat-card class="products-strip__item" appearance="outlined">
-        <p class="mini-label">Category spotlight</p>
-        <strong>{{ item }}</strong>
-        <span>Category highlights are derived from service data instead of static page constants.</span>
-      </mat-card>
-    }
+  <mat-card class="catalog-toolbar" appearance="outlined">
+    <div class="catalog-toolbar__search">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search products, brands, or categories</mat-label>
+        <input
+          matInput
+          [ngModel]="searchDraft()"
+          (ngModelChange)="searchDraft.set($event)"
+          (keyup.enter)="applySearch()"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          aria-label="Apply search"
+          (click)="applySearch()"
+        >
+          <mat-icon>search</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <div class="catalog-toolbar__search-actions">
+        <button mat-flat-button appButtonStyle="primary" type="button" (click)="applySearch()">
+          Search
+        </button>
+        <button mat-stroked-button appButtonStyle="secondary" type="button" (click)="clearSearch()">
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <div class="catalog-toolbar__controls">
+      <mat-form-field appearance="outline">
+        <mat-label>Preview state</mat-label>
+        <mat-select
+          [ngModel]="filters().previewState"
+          (ngModelChange)="changePreviewState($event)"
+        >
+          @for (state of previewStateOptions; track state) {
+            <mat-option [value]="state">{{ state | titlecase }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="catalog-toolbar__badge-group">
+        <p class="mini-label">Badges</p>
+        <mat-chip-listbox
+          [value]="filters().badge"
+          (change)="changeBadge($event.value)"
+          aria-label="Product badge filter"
+        >
+          @for (badge of badgeOptions; track badge) {
+            <mat-chip-option [value]="badge">
+              {{ badge === 'all' ? 'All' : (badge | titlecase) }}
+            </mat-chip-option>
+          }
+        </mat-chip-listbox>
+      </div>
+    </div>
+  </mat-card>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">Browse by category</p>
+        <h3>Quick filters for the catalog</h3>
+      </div>
+      <button mat-stroked-button appButtonStyle="secondary" type="button" (click)="clearFilters()">
+        Reset filters
+      </button>
+    </div>
+
+    <div class="category-filter-grid">
+      <button
+        mat-stroked-button
+        type="button"
+        class="category-filter"
+        [class.category-filter--active]="filters().category === 'all'"
+        (click)="changeCategory('all')"
+      >
+        <span>All products</span>
+        <small>See the full curated catalog</small>
+      </button>
+
+      @for (category of categoryOptions(); track category) {
+        <button
+          mat-stroked-button
+          type="button"
+          class="category-filter"
+          [class.category-filter--active]="filters().category === category"
+          (click)="changeCategory(category)"
+        >
+          <span>{{ category }}</span>
+          <small>Filter the catalog by {{ category.toLowerCase() }}</small>
+        </button>
+      }
+    </div>
   </section>
 
   <section class="section-block">
     <div class="section-heading">
       <div>
-        <p class="eyebrow">Featured products</p>
-        <h3>Observable-driven product grid</h3>
+        <p class="eyebrow">Featured picks</p>
+        <h3>Modern product grid</h3>
       </div>
       <p class="section-copy">
-        The grid still uses the same shared product UI components, but the data now comes from a dedicated mock service.
+        Responsive cards reuse the shared badge, rating, price, and image placeholder components.
       </p>
     </div>
 
     @if (products().loading) {
-      <app-product-skeleton-loading [cards]="4" />
+      <app-product-skeleton-loading [cards]="6" />
     } @else if (products().error) {
       <app-error-state
-        title="Could not load products"
+        title="Could not load the catalog"
         [description]="products().error ?? 'Please try again in a moment.'"
-        actionLabel="Retry product load"
+        actionLabel="Retry catalog load"
         (action)="reloadProducts()"
       />
     } @else if (products().data?.length) {
@@ -64,43 +149,11 @@
       />
     } @else {
       <app-empty-state
-        title="No products are available yet"
-        description="The product grid is ready, but the mock service returned an empty collection."
-        actionLabel="Reload products"
-        (action)="reloadProducts()"
+        title="No products matched this view"
+        description="Try clearing the search or preview state to bring products back into the grid."
+        actionLabel="Reset catalog filters"
+        (action)="clearFilters()"
       />
     }
-  </section>
-
-  <section class="section-block">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">Loading state</p>
-        <h3>Reusable loading and state handling</h3>
-      </div>
-      <p class="section-copy">
-        The same page is prepared for async success, loading, error, and empty outcomes without mixing service logic into the template.
-      </p>
-    </div>
-
-    <mat-card class="state-summary" appearance="outlined">
-      <div class="state-summary__row">
-        <span>Status</span>
-        <strong>
-          @if (products().loading) {
-            Loading
-          } @else if (products().error) {
-            Error
-          } @else {
-            Ready
-          }
-        </strong>
-      </div>
-      <mat-divider />
-      <div class="state-summary__row">
-        <span>Products shown</span>
-        <strong>{{ products().data?.length ?? 0 }}</strong>
-      </div>
-    </mat-card>
   </section>
 </section>

@@ -17,6 +17,10 @@
 
     <h3>{{ product.name }}</h3>
 
+    @if (product.shortDescription) {
+      <p class="product-card__description">{{ product.shortDescription }}</p>
+    }
+
     <app-product-rating-display
       [rating]="product.rating"
       [reviewCount]="product.reviewCount"

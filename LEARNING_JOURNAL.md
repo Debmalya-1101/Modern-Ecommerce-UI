@@ -2283,3 +2283,146 @@ That is much closer to how a real production storefront handles authentication.
 - reactive forms make login and signup much easier to keep readable
 - validation is more maintainable when rules live in the form model instead of scattered template logic
 - authentication routing becomes easier to understand when viewed as redirects around protected routes
+
+## Feature Update: Product Catalog UI
+
+What was added:
+- a real `/products` catalog page instead of a placeholder learning screen
+- responsive product grid and reusable product cards
+- search, category filtering, and badge filtering using mock data
+- browser-visible loading, empty, and error states
+- query-param-driven catalog state so the page can be refreshed and shared
+
+Why it was added:
+- the products feature was not complete until it behaved like a browsable storefront page
+- the project requirements call for a modern e-commerce listing experience
+- this step connects service data, component state, routing, and shared UI in one practical feature
+
+### Container Page And Presentational Components
+
+The catalog page acts as the container component.
+
+Simple idea:
+- the page loads data
+- the page tracks filter state
+- shared UI components display the products
+
+In this feature:
+- `ProductsPage` is the container
+- `ProductGridComponent` lays out the cards
+- `ProductCardComponent` renders each product
+- smaller shared components render badge, rating, price, and image placeholder
+
+That separation is useful because:
+- the page owns behavior
+- the shared components stay reusable
+- the templates stay easier to read
+
+### Query Params Explained Simply
+
+Query params are the values after `?` in a URL.
+
+Example:
+
+```text
+/products?q=watch&badge=new
+```
+
+What this means:
+- `q=watch` stores the search text
+- `badge=new` stores the selected badge filter
+
+Why this is useful:
+- refreshing the page keeps the current catalog view
+- copying the URL preserves the current filters
+- browser back and forward navigation work more naturally
+
+Backend comparison:
+- similar to request query parameters in a Spring controller
+- but here Angular reads them on the frontend and updates the screen
+
+### Signals Plus Observable Loading
+
+This feature uses both signals and observables together.
+
+Simple idea:
+- the HTTP-style mock request is still an observable
+- the local UI state is stored in signals
+
+Small example:
+
+```ts
+private readonly productState = signal(createInitialRequestState<ProductCardViewModel[]>([]));
+```
+
+What happens:
+- the service returns an observable
+- the page subscribes to it
+- the signal updates loading, error, and product data
+- the template reacts automatically
+
+Why this combination makes sense:
+- observables are a natural fit for async requests
+- signals are a clean fit for local page state
+
+### Loading, Empty, And Error States
+
+A catalog page should not assume success every time.
+
+This page now handles:
+- loading: show product skeleton cards
+- empty: show the shared empty state when no results match
+- error: show the shared error state with retry
+
+Small mental model:
+
+```text
+request starts -> loading
+request succeeds with items -> grid
+request succeeds with no items -> empty state
+request fails -> error state
+```
+
+Why this matters:
+- real frontend apps always have multiple async outcomes
+- the user experience stays stable even when data is missing or broken
+
+### Reusing Shared Product UI
+
+The catalog did not build the card details from scratch.
+
+It reused:
+- product badge component
+- product rating display
+- product price display
+- product image placeholder
+- product grid layout
+
+Why that matters:
+- repeated UI stays consistent
+- future pages like home or wishlist can reuse the same product card language
+- feature pages stay smaller because small display logic lives in shared components
+
+### Beginner-Friendly Takeaway
+
+The catalog flow now looks like this:
+
+```text
+URL query params
+  -> ProductsPage reads filters
+  -> ProductsApiService returns filtered mock data
+  -> signal state updates loading/data/error
+  -> shared grid and card components render the result
+```
+
+That is a strong real-world Angular pattern:
+- route state
+- service layer
+- async data handling
+- reusable UI composition
+
+## What I Learned From This Step
+
+- a feature feels complete only when routing, UI, async states, and navigation all meet in one browser-visible flow
+- query params are a practical way to keep catalog filters in sync with the URL
+- signals work well for page state even when the data source still comes from observables
