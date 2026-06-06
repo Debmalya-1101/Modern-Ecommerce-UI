@@ -3559,3 +3559,55 @@ mat-form-field {
 }
 ```
 
+## Feature Update: Orders History & Details
+
+What was added:
+- Implementation of the `OrdersPage` to display a list of user orders.
+- Creation of `OrderDetailPage` to show specific details for a single order.
+- Routing setup including dynamic parameters for order IDs (`/orders/:id`).
+- Backend integration via `OrdersApiService` to fetch live data.
+
+Why it was added:
+- Users need to be able to track their previous orders and view order details (what they bought, where it was shipped).
+- It provides a real-world example of master-detail view implementation.
+- Uses path variables in routing for dynamic content fetching.
+
+### Dynamic Routing Parameters
+
+A common requirement in web apps is to show a detail page based on an ID in the URL. Angular provides `ActivatedRoute` to read these parameters.
+
+Example:
+```ts
+// In orders.routes.ts
+{ path: ':id', loadComponent: () => import('./order-detail.page').then(m => m.OrderDetailPage) }
+```
+
+```ts
+// In order-detail.page.ts
+this.route.paramMap.subscribe(params => {
+  const idParam = params.get('id');
+  if (idParam) {
+    this.loadOrderDetails(+idParam);
+  }
+});
+```
+
+What this means:
+- The route `:id` is a placeholder for the actual order ID.
+- The component subscribes to `paramMap` to get the ID when the route is loaded or changed.
+- Based on the ID, the component fetches data from the backend.
+
+### Master-Detail Architecture
+
+This feature implements the Master-Detail pattern:
+- **Master**: The `OrdersPage` shows a high-level summary list of all items.
+- **Detail**: Clicking an item navigates to the `OrderDetailPage` which shows full information.
+
+Why this is useful:
+- Avoids overcrowding a single screen.
+- Better performance since details are fetched only when needed.
+
+### What I Learned From This Step
+- `ActivatedRoute` is essential for building dynamic detail pages and reading URL parameters.
+- Reusing the application's design system (custom variables like `--shell-surface`) maintains a consistent, premium look.
+- Proper handling of loading and error states using signals provides a smoother user experience during API calls.

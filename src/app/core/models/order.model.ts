@@ -13,6 +13,11 @@ export interface OrderResponse {
   status: OrderStatus;
   createdAt: string;
   items: OrderItem[];
+  name?: string;
+  userName?: string;
+  email?: string;
+  address?: string;
+  phoneNo?: string | number;
 }
 
 export interface CheckoutRequest {

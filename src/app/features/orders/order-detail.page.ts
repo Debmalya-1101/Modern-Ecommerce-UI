@@ -1,17 +1,18 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
 
 import { OrdersApiService } from '../../core/services/orders-api.service';
 import { OrderResponse } from '../../core/models/order.model';
 import { APP_CONSTANTS } from '../../core/config/app.constants';
 
 @Component({
-  selector: 'app-orders-page',
+  selector: 'app-order-detail-page',
   standalone: true,
   imports: [
     CommonModule,
@@ -19,35 +20,49 @@ import { APP_CONSTANTS } from '../../core/config/app.constants';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDividerModule
   ],
-  templateUrl: './orders.page.html',
-  styleUrls: ['./orders.page.scss']
+  templateUrl: './order-detail.page.html',
+  styleUrls: ['./order-detail.page.scss']
 })
-export class OrdersPage implements OnInit {
+export class OrderDetailPage implements OnInit {
   private readonly ordersApiService = inject(OrdersApiService);
+  private readonly route = inject(ActivatedRoute);
   
   readonly currencyCode = APP_CONSTANTS.currencyCode;
-  readonly orders = signal<OrderResponse[]>([]);
+  readonly order = signal<OrderResponse | null>(null);
   readonly isLoading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
+  orderId: number | null = null;
 
   ngOnInit(): void {
-    this.loadOrders();
+    this.route.paramMap.subscribe(params => {
+      const idParam = params.get('id');
+      if (idParam) {
+        this.orderId = +idParam;
+        this.loadOrderDetails();
+      } else {
+        this.error.set('Invalid order ID.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
-  loadOrders(): void {
+  loadOrderDetails(): void {
+    if (!this.orderId) return;
+
     this.isLoading.set(true);
     this.error.set(null);
     
-    this.ordersApiService.getOrders().subscribe({
-      next: (orders) => {
-        this.orders.set(orders);
+    this.ordersApiService.getOrderDetail(this.orderId).subscribe({
+      next: (order) => {
+        this.order.set(order);
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading orders:', err);
-        this.error.set('Failed to load orders. Please try again later.');
+        console.error('Error loading order details:', err);
+        this.error.set('Failed to load order details. Please try again later.');
         this.isLoading.set(false);
       }
     });

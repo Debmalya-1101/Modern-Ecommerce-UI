@@ -12,23 +12,11 @@ export class OrdersApiService {
   private readonly apiService = inject(ApiService);
 
   getOrders(): Observable<OrderResponse[]> {
-    return this.apiService
-      .mockResponse<OrderResponse[]>(this.createMockOrders(), {
-        delayMs: 300,
-        message: `Mock GET ${API_ENDPOINTS.orders.root}`,
-        trackLoading: true
-      })
-      .pipe(map((response) => response.data ?? []));
+    return this.apiService.get<OrderResponse[]>(API_ENDPOINTS.orders.root, undefined, { trackLoading: true });
   }
 
   getOrderDetail(orderId: number): Observable<OrderResponse> {
-    return this.apiService
-      .mockResponse<OrderResponse>(this.createMockOrder(orderId), {
-        delayMs: 250,
-        message: `Mock GET ${API_ENDPOINTS.orders.detail(orderId)}`,
-        trackLoading: true
-      })
-      .pipe(map((response) => response.data ?? this.createMockOrder(orderId)));
+    return this.apiService.get<OrderResponse>(API_ENDPOINTS.orders.detail(orderId), undefined, { trackLoading: true });
   }
 
   checkout(request: CheckoutRequest): Observable<OrderResponse> {
@@ -37,26 +25,5 @@ export class OrdersApiService {
       request,
       { trackLoading: true }
     );
-  }
-
-  private createMockOrders(): OrderResponse[] {
-    return [this.createMockOrder(5001)];
-  }
-
-  private createMockOrder(orderId: number): OrderResponse {
-    return {
-      orderId,
-      total: 3299,
-      status: 'PLACED',
-      createdAt: new Date().toISOString(),
-      items: [
-        {
-          productName: 'Everyday Carry Backpack',
-          price: 3299,
-          quantity: 1,
-          total: 3299
-        }
-      ]
-    };
   }
 }

@@ -1,0 +1,64 @@
+<div class="orders-container">
+  <div class="page-header">
+    <h1>Order History</h1>
+    <p class="subtitle">Review your past orders and their status</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading your orders...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <h2>Oops! Something went wrong.</h2>
+      <p>{{ error() }}</p>
+      <button mat-flat-button color="primary" (click)="loadOrders()">Try Again</button>
+    </div>
+  } @else if (orders().length === 0) {
+    <div class="empty-state">
+      <mat-icon>receipt_long</mat-icon>
+      <h2>No orders found</h2>
+      <p>Looks like you haven't placed any orders yet.</p>
+      <button mat-flat-button color="primary" routerLink="/">Start Shopping</button>
+    </div>
+  } @else {
+    <div class="orders-grid">
+      @for (order of orders(); track order.orderId) {
+        <mat-card class="order-card" appearance="outlined">
+          <mat-card-header>
+            <div class="order-header-content">
+              <div class="order-meta">
+                <span class="order-id">#{{ order.orderId }}</span>
+                <span class="order-date">{{ order.createdAt | date:'longDate' }}</span>
+              </div>
+              <span class="status-badge" [class]="order.status.toLowerCase()">
+                {{ order.status }}
+              </span>
+            </div>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <div class="order-details">
+              <div class="detail-item">
+                <span class="label">Total Amount</span>
+                <span class="value">{{ order.total | currency:currencyCode:'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Items</span>
+                <span class="value">{{ order.items.length }} {{ order.items.length === 1 ? 'item' : 'items' }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            <button mat-button color="primary" [routerLink]="['/orders', order.orderId]">
+              View Details
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+</div>
