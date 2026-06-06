@@ -7,55 +7,25 @@
     <div class="auth-layout auth-layout--signup">
       <mat-card class="auth-hero" appearance="outlined">
         <div class="auth-hero__intro">
-          <p class="eyebrow">Create account</p>
-          <h2>Start with a clean account setup built for a modern storefront</h2>
+          <p class="eyebrow">Modern Commerce</p>
+          <h2>Join Our Global Tech Community</h2>
           <p class="hero-copy">
-            Create your account to unlock protected profile, order, and checkout areas with the same reusable authentication foundation used across the app.
+            Create an account to save your favorite setups, track shipping, and receive member-exclusive hardware drops.
           </p>
-        </div>
-
-        <div class="auth-hero__visual" aria-hidden="true">
-          <div class="auth-hero__surface">
-            <span class="auth-hero__surface-pill">New member</span>
-            <span class="auth-hero__surface-title">Faster onboarding</span>
-            <span class="auth-hero__surface-line"></span>
-            <span class="auth-hero__surface-line auth-hero__surface-line--short"></span>
-          </div>
-
-          <div class="auth-hero__surface auth-hero__surface--accent">
-            <span class="auth-hero__surface-title">Profile ready</span>
-            <span class="auth-hero__surface-line"></span>
-            <span class="auth-hero__surface-line auth-hero__surface-line--short"></span>
-          </div>
         </div>
 
         <div class="hero-highlights">
           <div>
-            <strong>Real backend signup</strong>
-            <span>The page posts directly to the backend signup endpoint with typed request models.</span>
+            <strong>Early Access</strong>
+            <span>Be the first to shop limited-edition tech releases and next-gen hardware.</span>
           </div>
           <div>
-            <strong>Validation first</strong>
-            <span>Reactive forms catch common input issues before the request is sent.</span>
+            <strong>Profile Dashboard</strong>
+            <span>Manage shipping preferences, invoices, and your complete purchase history.</span>
           </div>
           <div>
-            <strong>Ready to scale</strong>
-            <span>The same auth service and interceptor continue to power the rest of the application.</span>
-          </div>
-        </div>
-
-        <div class="hero-metrics">
-          <div>
-            <strong>4</strong>
-            <span>Validated fields</span>
-          </div>
-          <div>
-            <strong>1</strong>
-            <span>Shared auth service</span>
-          </div>
-          <div>
-            <strong>Real</strong>
-            <span>API integration</span>
+            <strong>Exclusive Invitations</strong>
+            <span>Receive updates on limited drops, private sales, and community stories.</span>
           </div>
         </div>
       </mat-card>
@@ -63,9 +33,8 @@
       <mat-card class="auth-card" appearance="outlined">
         <div class="auth-card__header">
           <div>
-            <p class="eyebrow">Signup route</p>
             <h3>Create your account</h3>
-            <p class="auth-subtitle">Enter your details to start a secure session-ready account.</p>
+            <p class="auth-subtitle">Enter your details to start your shopping journey.</p>
           </div>
           <a routerLink="/" class="back-link">Back to home</a>
         </div>
@@ -162,11 +131,7 @@
             }
           </mat-form-field>
 
-          <p class="auth-hint">
-            Use a name and email you can easily recognize later when profile and order history screens are expanded.
-          </p>
-
-          <div class="auth-actions">
+          <div class="auth-actions" style="margin-top: 1rem;">
             <button
               mat-flat-button
               appButtonStyle="primary"
@@ -182,7 +147,7 @@
             </button>
           </div>
 
-          <p class="auth-footer-copy">
+          <p class="auth-footer-copy" style="margin-top: 0.5rem;">
             Already have an account?
             <a routerLink="/login" class="inline-link">Sign in</a>
           </p>

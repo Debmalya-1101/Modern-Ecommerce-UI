@@ -3611,3 +3611,69 @@ Why this is useful:
 - `ActivatedRoute` is essential for building dynamic detail pages and reading URL parameters.
 - Reusing the application's design system (custom variables like `--shell-surface`) maintains a consistent, premium look.
 - Proper handling of loading and error states using signals provides a smoother user experience during API calls.
+
+## Feature Update: Modern Authentication UX
+
+What was improved:
+- The developer-centric notes and metrics on `/login`, `/signup`, `/forgot-password`, and `/reset-password` were replaced with consumer-facing copy.
+- The hero layout was updated to feature a premium background image (`auth_hero_showcase.png`) with a glassmorphism blur overlay (`backdrop-filter: blur(12px)`).
+- The `reset-password.page.ts` component was updated to include a fully functional, reactive mock form.
+
+Why it was improved:
+- Real-world e-commerce applications focus heavily on brand perception and customer trust during authentication.
+- Showing technical specs (e.g., "Real Backend JWT login") to end users breaks immersion.
+- Interactive, polished forms (even with mock logic) provide a better foundation for when the real API integration is complete.
+
+### Glassmorphism UI Explained Simply
+
+Glassmorphism is a UI design trend where elements look like frosted glass.
+
+In this project:
+- A rich background image is used behind the `.auth-hero` card.
+- A semi-transparent overlay sits on top of the feature highlights.
+- `backdrop-filter: blur(12px)` applies the blur effect to the background visible through the overlay.
+
+Small example:
+```scss
+.hero-highlights div {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+```
+
+Why this is useful:
+- It creates a sense of depth and modernity.
+- It ensures text remains highly readable over complex or colorful background imagery without resorting to solid opaque boxes.
+
+### Reactive Forms with Validation Explained
+
+Reactive forms allow us to define form structure and validation rules directly in the component class instead of the HTML template.
+
+In the `ResetPasswordPage`, we added:
+- `password` control with minimum length validation.
+- `confirmPassword` control.
+- A custom validator `confirmPasswordValidator` to ensure both fields match.
+
+Small example:
+```ts
+protected readonly resetForm = this.formBuilder.nonNullable.group(
+  {
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', [Validators.required]]
+  },
+  {
+    validators: confirmPasswordValidator
+  }
+);
+```
+
+Why this is useful:
+- The logic is clean and testable.
+- Form states (`invalid`, `touched`, `pending`) are managed synchronously by Angular.
+- Adding custom multi-field validators (like password match checking) is straightforward and keeps the template free of complex logic.
+
+### What I Learned From This Step
+- Aesthetic updates combined with functional state mocking drastically improve the perceived quality of a frontend feature.
+- `backdrop-filter` is a powerful CSS property for achieving modern, premium design aesthetics with minimal code.
+- Reactive forms easily support complex cross-field validations (like matching passwords) without cluttering the component.

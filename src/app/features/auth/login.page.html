@@ -7,55 +7,25 @@
     <div class="auth-layout auth-layout--login">
       <mat-card class="auth-hero" appearance="outlined">
         <div class="auth-hero__intro">
-          <p class="eyebrow">Authentication</p>
-          <h2>Welcome back to your curated storefront workspace</h2>
+          <p class="eyebrow">Modern Commerce</p>
+          <h2>Modern Tech, Tailored for You</h2>
           <p class="hero-copy">
-            Sign in to continue browsing, manage orders, and move through protected checkout flows with a real backend-authenticated session.
+            Sign in to access your custom storefront, view your saved gear, and manage tech orders with ease.
           </p>
-        </div>
-
-        <div class="auth-hero__visual" aria-hidden="true">
-          <div class="auth-hero__surface">
-            <span class="auth-hero__surface-pill">Trusted login</span>
-            <span class="auth-hero__surface-title">Account access</span>
-            <span class="auth-hero__surface-line"></span>
-            <span class="auth-hero__surface-line auth-hero__surface-line--short"></span>
-          </div>
-
-          <div class="auth-hero__surface auth-hero__surface--accent">
-            <span class="auth-hero__surface-title">Protected checkout</span>
-            <span class="auth-hero__surface-line"></span>
-            <span class="auth-hero__surface-line auth-hero__surface-line--short"></span>
-          </div>
         </div>
 
         <div class="hero-highlights">
           <div>
-            <strong>Trusted session flow</strong>
-            <span>Stored securely in browser storage for refresh persistence.</span>
+            <strong>Curated Hardware</strong>
+            <span>Explore hand-picked premium laptops, smart devices, and next-gen tech essentials.</span>
           </div>
           <div>
-            <strong>Protected routes</strong>
-            <span>Checkout, orders, and profile redirect unauthenticated users here.</span>
+            <strong>Express Checkout</strong>
+            <span>Your saved preferences are ready for secure, instantaneous tech upgrades.</span>
           </div>
           <div>
-            <strong>Enterprise structure</strong>
-            <span>Protected API calls automatically receive the bearer token.</span>
-          </div>
-        </div>
-
-        <div class="hero-metrics">
-          <div>
-            <strong>2</strong>
-            <span>Dedicated auth pages</span>
-          </div>
-          <div>
-            <strong>3</strong>
-            <span>Protected user areas</span>
-          </div>
-          <div>
-            <strong>Real</strong>
-            <span>Backend JWT login</span>
+            <strong>Client Care</strong>
+            <span>Access 24/7 dedicated support and order tracking in a single click.</span>
           </div>
         </div>
       </mat-card>
@@ -63,9 +33,8 @@
       <mat-card class="auth-card" appearance="outlined">
         <div class="auth-card__header">
           <div>
-            <p class="eyebrow">Login route</p>
-            <h3>Sign in</h3>
-            <p class="auth-subtitle">Use your username or email to continue.</p>
+            <h3>Welcome back</h3>
+            <p class="auth-subtitle">Please enter your details to continue.</p>
           </div>
           <a routerLink="/" class="back-link">Back to home</a>
         </div>
@@ -135,11 +104,7 @@
             </button>
           </div>
 
-          <p class="auth-hint">
-            Keep this checked on personal devices. Use the password recovery flow if you cannot access your account.
-          </p>
-
-          <div class="auth-actions">
+          <div class="auth-actions" style="margin-top: 1rem;">
             <button
               mat-flat-button
               appButtonStyle="primary"
@@ -155,7 +120,7 @@
             </button>
           </div>
 
-          <p class="auth-footer-copy">
+          <p class="auth-footer-copy" style="margin-top: 0.5rem;">
             New here?
             <a routerLink="/signup" class="inline-link">Create an account</a>
           </p>
