@@ -1,12 +1,214 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, CurrencyPipe, DecimalPipe, DatePipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatChipsModule } from '@angular/material/chips';
+import { forkJoin, catchError, of, finalize, tap } from 'rxjs';
+
+import { AdminAnalyticsService } from '../../../core/services/admin-analytics.service';
+import { AdminOrdersService } from '../../../core/services/admin-orders.service';
+import { AdminProductsService } from '../../../core/services/admin-products.service';
+import { AdminCategoriesService } from '../../../core/services/admin-categories.service';
+
+import { DashboardAnalyticsDTO } from '../../../core/models/admin-analytics.model';
+import { AdminOrder } from '../../../core/models/admin-order.model';
+import { AdminProductDTO } from '../../../core/models/admin-product.model';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [MatCardModule, MatIconModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    CurrencyPipe,
+    DecimalPipe,
+    DatePipe,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    MatTableModule,
+    MatProgressSpinnerModule,
+    MatDividerModule,
+    MatChipsModule
+  ],
   templateUrl: './admin-dashboard.page.html',
   styleUrl: './admin-dashboard.page.scss'
 })
-export class AdminDashboardPage {
+export class AdminDashboardPage implements OnInit {
+  private analyticsService = inject(AdminAnalyticsService);
+  private ordersService = inject(AdminOrdersService);
+  private productsService = inject(AdminProductsService);
+  private categoriesService = inject(AdminCategoriesService);
+  private cdr = inject(ChangeDetectorRef);
+
+  isLoading = true;
+  hasError = false;
+
+  analyticsData: DashboardAnalyticsDTO | null = null;
+  recentOrders: AdminOrder[] = [];
+  lowStockProducts: AdminProductDTO[] = [];
+  totalCategories = 0;
+
+  averageOrderValue = 0;
+  placedCount = 0;
+  shippedCount = 0;
+  deliveredCount = 0;
+
+  displayedOrderColumns: string[] = ['orderId', 'createdAt', 'total', 'status', 'actions'];
+  displayedStockColumns: string[] = ['name', 'stock', 'status', 'actions'];
+  displayedTopProductsColumns: string[] = ['name', 'unitsSold', 'totalRevenue', 'rating'];
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+    this.isLoading = true;
+    this.hasError = false;
+    this.cdr.markForCheck();
+    
+    console.log('AdminDashboardPage: Starting to load dashboard data...');
+
+    try {
+      forkJoin({
+        analytics: this.analyticsService.getDashboardAnalytics().pipe(
+          tap({
+            next: (val) => console.log('AdminDashboardPage: Analytics API emitted data:', val),
+            error: (err) => console.error('AdminDashboardPage: Analytics API error:', err),
+            complete: () => console.log('AdminDashboardPage: Analytics API completed')
+          }),
+          catchError((err) => {
+            console.warn('AdminDashboardPage: Catching Analytics API error, returning null:', err);
+            return of(null);
+          })
+        ),
+        orders: this.ordersService.getOrders({ page: 0, size: 5, status: 'PLACED' }).pipe(
+          tap({
+            next: (val) => console.log('AdminDashboardPage: Orders API emitted data:', val),
+            error: (err) => console.error('AdminDashboardPage: Orders API error:', err),
+            complete: () => console.log('AdminDashboardPage: Orders API completed')
+          }),
+          catchError((err) => {
+            console.warn('AdminDashboardPage: Catching Orders API error, returning null:', err);
+            return of(null);
+          })
+        ),
+        products: this.productsService.getProducts(0, 5, undefined, 'stock', 'asc').pipe(
+          tap({
+            next: (val) => console.log('AdminDashboardPage: Products API emitted data:', val),
+            error: (err) => console.error('AdminDashboardPage: Products API error:', err),
+            complete: () => console.log('AdminDashboardPage: Products API completed')
+          }),
+          catchError((err) => {
+            console.warn('AdminDashboardPage: Catching Products API error, returning null:', err);
+            return of(null);
+          })
+        ),
+        categories: this.categoriesService.getCategories().pipe(
+          tap({
+            next: (val) => console.log('AdminDashboardPage: Categories API emitted data:', val),
+            error: (err) => console.error('AdminDashboardPage: Categories API error:', err),
+            complete: () => console.log('AdminDashboardPage: Categories API completed')
+          }),
+          catchError((err) => {
+            console.warn('AdminDashboardPage: Catching Categories API error, returning empty array:', err);
+            return of([]);
+          })
+        )
+      })
+      .pipe(
+        finalize(() => {
+          console.log('AdminDashboardPage: forkJoin finalize executed, setting isLoading = false');
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (results) => {
+          console.log('AdminDashboardPage: forkJoin next handler received results:', results);
+          try {
+            if (!results.analytics) {
+              console.warn('AdminDashboardPage: Analytics data is empty, setting error state');
+              this.hasError = true;
+              this.cdr.markForCheck();
+              return;
+            }
+
+            this.analyticsData = {
+              ...results.analytics,
+              ordersByStatus: results.analytics.ordersByStatus || [],
+              monthlySalesGraph: results.analytics.monthlySalesGraph || [],
+              topSellingProducts: results.analytics.topSellingProducts || []
+            };
+            this.recentOrders = results.orders?.content || [];
+            this.lowStockProducts = results.products?.content || [];
+            this.totalCategories = results.categories?.length || 0;
+
+            // Compute metrics
+            if (this.analyticsData.totalOrders > 0) {
+              this.averageOrderValue = (this.analyticsData.totalRevenue || 0) / this.analyticsData.totalOrders;
+            } else {
+              this.averageOrderValue = 0;
+            }
+
+            // Reset status counters
+            this.placedCount = 0;
+            this.shippedCount = 0;
+            this.deliveredCount = 0;
+
+            this.analyticsData.ordersByStatus.forEach(statusCount => {
+              if (statusCount.status === 'PLACED') this.placedCount = statusCount.count;
+              else if (statusCount.status === 'SHIPPED') this.shippedCount = statusCount.count;
+              else if (statusCount.status === 'DELIVERED') this.deliveredCount = statusCount.count;
+            });
+            
+            console.log('AdminDashboardPage: Data processed successfully. averageOrderValue:', this.averageOrderValue);
+            this.cdr.markForCheck();
+          } catch (innerError) {
+            console.error('AdminDashboardPage: Exception while processing successful results:', innerError);
+            this.hasError = true;
+            this.cdr.markForCheck();
+          }
+        },
+        error: (err) => {
+          console.error('AdminDashboardPage: forkJoin subscription error:', err);
+          this.hasError = true;
+          this.cdr.markForCheck();
+        },
+        complete: () => {
+          console.log('AdminDashboardPage: forkJoin subscription completed');
+        }
+      });
+    } catch (outerError) {
+      console.error('AdminDashboardPage: Exception during forkJoin setup:', outerError);
+      this.hasError = true;
+      this.isLoading = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  retry(): void {
+    this.loadDashboardData();
+  }
+
+  getStatusColor(status: string): string {
+    switch (status) {
+      case 'PLACED': return 'primary';
+      case 'SHIPPED': return 'accent';
+      case 'DELIVERED': return 'primary';
+      case 'CANCELLED': return 'warn';
+      default: return '';
+    }
+  }
+
+  getStockColor(stock: number): string {
+    if (stock === 0) return 'warn';
+    if (stock <= 10) return 'accent';
+    return 'primary';
+  }
 }

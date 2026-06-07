@@ -1,48 +1,341 @@
-<div class="page-header">
-  <h1>Dashboard Overview</h1>
-  <p>Welcome to the admin control panel.</p>
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Dashboard Overview</h1>
+      <p class="page-subtitle">Welcome to the admin control panel. Here is what's happening today.</p>
+    </div>
+    <div class="header-actions">
+      <button mat-flat-button color="primary" (click)="retry()" [disabled]="isLoading">
+        <mat-icon>refresh</mat-icon>
+        Refresh Data
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading dashboard metrics...</p>
+    </div>
+  } @else if (hasError || !analyticsData) {
+    <div class="error-state">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <p>Failed to load dashboard data. Please try again later.</p>
+      <button mat-stroked-button color="primary" (click)="retry()">Retry</button>
+    </div>
+  } @else {
+    <!-- KPIs Section -->
+    <div class="kpi-grid">
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-header">
+            <div class="kpi-title">Total Revenue</div>
+            <div class="kpi-icon-wrapper primary-light">
+              <mat-icon color="primary">payments</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-value">{{ analyticsData.totalRevenue | currency:'INR' }}</div>
+          <div class="kpi-trend positive"><mat-icon>trending_up</mat-icon> Up-to-date</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-header">
+            <div class="kpi-title">Total Orders</div>
+            <div class="kpi-icon-wrapper accent-light">
+              <mat-icon color="accent">shopping_bag</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-value">{{ analyticsData.totalOrders | number }}</div>
+          <div class="kpi-trend positive"><mat-icon>trending_up</mat-icon> Up-to-date</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-header">
+            <div class="kpi-title">Total Customers</div>
+            <div class="kpi-icon-wrapper warn-light">
+              <mat-icon color="warn">people</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-value">{{ analyticsData.totalUsers | number }}</div>
+          <div class="kpi-trend neutral"><mat-icon>remove</mat-icon> Steady</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-header">
+            <div class="kpi-title">Avg Order Value</div>
+            <div class="kpi-icon-wrapper info-light">
+              <mat-icon class="info-text">insights</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-value">{{ averageOrderValue | currency:'INR' }}</div>
+          <div class="kpi-trend positive"><mat-icon>trending_up</mat-icon> Up-to-date</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Status Overview -->
+    <div class="section-title">
+      <h2>Operational Status</h2>
+    </div>
+    <div class="status-grid">
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="status-content">
+            <mat-icon color="primary">pending_actions</mat-icon>
+            <div class="status-info">
+              <div class="status-label">Placed (Pending)</div>
+              <div class="status-count">{{ placedCount }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="status-content">
+            <mat-icon color="accent">local_shipping</mat-icon>
+            <div class="status-info">
+              <div class="status-label">Shipped</div>
+              <div class="status-count">{{ shippedCount }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="status-content">
+            <mat-icon class="success-text">check_circle</mat-icon>
+            <div class="status-info">
+              <div class="status-label">Delivered</div>
+              <div class="status-count">{{ deliveredCount }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="status-content">
+            <mat-icon color="primary">category</mat-icon>
+            <div class="status-info">
+              <div class="status-label">Active Categories</div>
+              <div class="status-count">{{ totalCategories }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Dashboard Widgets Grid -->
+    <div class="dashboard-widgets">
+      
+      <!-- Recent Orders Widget -->
+      <mat-card class="widget-card lg-col-span-2">
+        <mat-card-header>
+          <mat-card-title>Orders to Ship</mat-card-title>
+          <mat-card-subtitle>Most recent placed orders</mat-card-subtitle>
+          <div class="header-action-btn">
+            <a mat-button color="primary" routerLink="/admin/orders" [queryParams]="{ status: 'PLACED' }">View All</a>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          @if (recentOrders.length === 0) {
+            <div class="empty-state">
+              <mat-icon>check_circle_outline</mat-icon>
+              <p>No pending orders to ship.</p>
+            </div>
+          } @else {
+            <div class="table-container">
+              <table mat-table [dataSource]="recentOrders">
+                <ng-container matColumnDef="orderId">
+                  <th mat-header-cell *matHeaderCellDef> Order ID </th>
+                  <td mat-cell *matCellDef="let order" class="fw-medium"> #{{ order.orderId }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="createdAt">
+                  <th mat-header-cell *matHeaderCellDef> Date </th>
+                  <td mat-cell *matCellDef="let order" class="text-muted"> {{ order.createdAt | date:'short' }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="total">
+                  <th mat-header-cell *matHeaderCellDef> Total </th>
+                  <td mat-cell *matCellDef="let order" class="fw-medium"> {{ order.total | currency:'INR' }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef> Status </th>
+                  <td mat-cell *matCellDef="let order"> 
+                    <mat-chip [color]="getStatusColor(order.status)" highlighted class="status-chip">{{ order.status }}</mat-chip>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef class="text-right"> Actions </th>
+                  <td mat-cell *matCellDef="let order" class="text-right">
+                    <a mat-icon-button color="primary" routerLink="/admin/orders">
+                      <mat-icon>visibility</mat-icon>
+                    </a>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedOrderColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedOrderColumns;"></tr>
+              </table>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Low Stock Warnings -->
+      <mat-card class="widget-card">
+        <mat-card-header>
+          <mat-card-title>Low Stock Alerts</mat-card-title>
+          <mat-card-subtitle>Products needing attention</mat-card-subtitle>
+          <div class="header-action-btn">
+            <a mat-button color="primary" routerLink="/admin/products">View Inventory</a>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          @if (lowStockProducts.length === 0) {
+            <div class="empty-state">
+              <mat-icon>inventory_2</mat-icon>
+              <p>Inventory levels are healthy.</p>
+            </div>
+          } @else {
+            <div class="table-container">
+              <table mat-table [dataSource]="lowStockProducts">
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef> Product </th>
+                  <td mat-cell *matCellDef="let product" class="text-truncate" style="max-width: 150px;"> {{ product.name }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="stock">
+                  <th mat-header-cell *matHeaderCellDef> Stock </th>
+                  <td mat-cell *matCellDef="let product"> 
+                    <span class="fw-bold" [ngClass]="{'text-danger': product.stock === 0, 'text-warning': product.stock > 0 && product.stock <= 10}">
+                      {{ product.stock }}
+                    </span>
+                  </td>
+                </ng-container>
+                
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef> Status </th>
+                  <td mat-cell *matCellDef="let product">
+                    <mat-chip [color]="getStockColor(product.stock)" highlighted class="status-chip">
+                      {{ product.stock === 0 ? 'Out of Stock' : 'Low Stock' }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef class="text-right"> </th>
+                  <td mat-cell *matCellDef="let product" class="text-right">
+                    <a mat-icon-button color="primary" routerLink="/admin/products">
+                      <mat-icon>edit</mat-icon>
+                    </a>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedStockColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedStockColumns;"></tr>
+              </table>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Top Selling Products -->
+      <mat-card class="widget-card lg-col-span-2">
+        <mat-card-header>
+          <mat-card-title>Top Selling Products</mat-card-title>
+          <mat-card-subtitle>Best performing items</mat-card-subtitle>
+          <div class="header-action-btn">
+            <a mat-button color="primary" routerLink="/admin/analytics">Detailed Report</a>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          @if (analyticsData.topSellingProducts.length === 0) {
+            <div class="empty-state">
+              <mat-icon>trending_flat</mat-icon>
+              <p>No sales data available yet.</p>
+            </div>
+          } @else {
+            <div class="table-container">
+              <table mat-table [dataSource]="analyticsData.topSellingProducts">
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef> Product </th>
+                  <td mat-cell *matCellDef="let product" class="fw-medium"> {{ product.productName }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="unitsSold">
+                  <th mat-header-cell *matHeaderCellDef> Units Sold </th>
+                  <td mat-cell *matCellDef="let product"> {{ product.unitsSold | number }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="totalRevenue">
+                  <th mat-header-cell *matHeaderCellDef> Revenue </th>
+                  <td mat-cell *matCellDef="let product" class="fw-medium text-primary"> {{ product.totalRevenue | currency:'INR' }} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="rating">
+                  <th mat-header-cell *matHeaderCellDef> Rating </th>
+                  <td mat-cell *matCellDef="let product">
+                    <div class="rating-display">
+                      <mat-icon class="star-icon">star</mat-icon>
+                      <span>{{ product.rating | number:'1.1-1' }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedTopProductsColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedTopProductsColumns;"></tr>
+              </table>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Quick Shortcuts -->
+      <mat-card class="widget-card shortcuts-widget">
+        <mat-card-header>
+          <mat-card-title>Quick Actions</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="shortcuts-grid">
+            <a routerLink="/admin/products" class="shortcut-item">
+              <div class="shortcut-icon-wrapper bg-primary-light">
+                <mat-icon color="primary">add_box</mat-icon>
+              </div>
+              <span>Add Product</span>
+            </a>
+            <a routerLink="/admin/categories" class="shortcut-item">
+              <div class="shortcut-icon-wrapper bg-accent-light">
+                <mat-icon color="accent">category</mat-icon>
+              </div>
+              <span>Categories</span>
+            </a>
+            <a routerLink="/admin/orders" class="shortcut-item">
+              <div class="shortcut-icon-wrapper bg-info-light">
+                <mat-icon class="info-text">local_shipping</mat-icon>
+              </div>
+              <span>Ship Orders</span>
+            </a>
+            <a routerLink="/admin/analytics" class="shortcut-item">
+              <div class="shortcut-icon-wrapper bg-warn-light">
+                <mat-icon color="warn">bar_chart</mat-icon>
+              </div>
+              <span>Analytics</span>
+            </a>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
 </div>
-
-<div class="dashboard-grid">
-  <mat-card class="kpi-card">
-    <mat-card-content>
-      <div class="kpi-header">
-        <span class="kpi-title">Total Sales</span>
-        <mat-icon class="kpi-icon">payments</mat-icon>
-      </div>
-      <div class="kpi-value">$24,500</div>
-      <div class="kpi-trend positive">+15% from last month</div>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="kpi-card">
-    <mat-card-content>
-      <div class="kpi-header">
-        <span class="kpi-title">Orders</span>
-        <mat-icon class="kpi-icon">shopping_bag</mat-icon>
-      </div>
-      <div class="kpi-value">1,245</div>
-      <div class="kpi-trend positive">+8% from last month</div>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="kpi-card">
-    <mat-card-content>
-      <div class="kpi-header">
-        <span class="kpi-title">Customers</span>
-        <mat-icon class="kpi-icon">people</mat-icon>
-      </div>
-      <div class="kpi-value">8,920</div>
-      <div class="kpi-trend negative">-2% from last month</div>
-    </mat-card-content>
-  </mat-card>
-</div>
-
-<mat-card class="placeholder-section">
-  <mat-card-header>
-    <mat-card-title>Recent Activity</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
-    <p>Loading activity feed... (API integration pending)</p>
-  </mat-card-content>
-</mat-card>

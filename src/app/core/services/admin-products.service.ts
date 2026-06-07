@@ -19,7 +19,7 @@ export class AdminProductsService {
     { id: 5, name: 'Dell XPS 15', description: 'InfinityEdge display, Core i9.', price: 185000.00, imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=500&q=80', imageUrls: [], categoryId: 3, categoryName: 'Laptops', stock: 28, active: true, brand: 'Dell', rating: 4.6, attributes: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
   ];
 
-  getProducts(page: number = 0, size: number = 10, search?: string): Observable<ProductPaginationResponseDTO> {
+  getProducts(page: number = 0, size: number = 10, search?: string, sortBy?: string, order: string = 'desc'): Observable<ProductPaginationResponseDTO> {
     let params: Record<string, string | number | boolean> = {
       page: page,
       size: size
@@ -27,6 +27,10 @@ export class AdminProductsService {
       
     if (search) {
       params['search'] = search;
+    }
+    if (sortBy) {
+      params['sortBy'] = sortBy;
+      params['order'] = order;
     }
 
     return this.apiService.get<ProductPaginationResponseDTO>(API_ENDPOINTS.admin.products, params).pipe(
@@ -38,6 +42,12 @@ export class AdminProductsService {
           filtered = filtered.filter(p => p.name.toLowerCase().includes(lowerSearch) || p.categoryName.toLowerCase().includes(lowerSearch));
         }
         
+        if (sortBy === 'stock') {
+          filtered = [...filtered].sort((a, b) => {
+            return order === 'asc' ? a.stock - b.stock : b.stock - a.stock;
+          });
+        }
+
         const start = page * size;
         const end = start + size;
         const paginatedContent = filtered.slice(start, end);
