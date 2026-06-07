@@ -43,6 +43,10 @@ export const API_ENDPOINTS = {
     orders: '/api/admin/orders',
     orderDetail: (orderId: number | string) => `/api/admin/orders/${orderId}`,
     orderStatus: (orderId: number | string) => `/api/admin/orders/${orderId}/status`,
-    analyticsDashboard: '/api/admin/analytics/dashboard'
+    analyticsDashboard: '/api/admin/analytics/dashboard',
+    categories: '/api/admin/categories',
+    categoryDetail: (categoryId: number | string) => `/api/admin/categories/${categoryId}`,
+    attributeKeys: '/api/admin/attribute-keys',
+    attributeKeyDetail: (keyId: number | string) => `/api/admin/attribute-keys/${keyId}`
   }
 } as const;

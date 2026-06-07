@@ -3,11 +3,11 @@
   h1 {
     margin: 0;
     font-size: 1.75rem;
-    color: #212b36;
+    color: var(--color-neutral-900);
   }
   p {
     margin: 0.5rem 0 0;
-    color: #637381;
+    color: var(--color-neutral-600);
   }
 }
 
@@ -32,20 +32,20 @@
 
 .kpi-title {
   font-weight: 600;
-  color: #637381;
+  color: var(--color-neutral-600);
   font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .kpi-icon {
-  color: #919eab;
+  color: var(--color-neutral-600);
 }
 
 .kpi-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #212b36;
+  color: var(--color-neutral-900);
   margin-bottom: 0.5rem;
 }
 
@@ -53,15 +53,15 @@
   font-size: 0.875rem;
   font-weight: 600;
   
-  &.positive { color: #00a76f; }
-  &.negative { color: #ff5630; }
+  &.positive { color: var(--color-success-700); }
+  &.negative { color: var(--color-danger-600); }
 }
 
 .placeholder-section {
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   p {
-    color: #637381;
+    color: var(--color-neutral-600);
     padding: 2rem 0;
     text-align: center;
   }

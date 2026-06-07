@@ -71,15 +71,15 @@ export class AdminAnalyticsPage implements OnInit {
           {
             label: 'Total Revenue (INR)',
             data: sortedSales.map((s) => s.totalRevenue),
-            backgroundColor: 'rgba(33, 43, 54, 0.8)',
+            backgroundColor: 'rgba(181, 95, 52, 0.85)',
             yAxisID: 'y'
           },
           {
             label: 'Total Orders',
             data: sortedSales.map((s) => s.totalOrders),
             type: 'line',
-            borderColor: '#00a76f',
-            backgroundColor: '#00a76f',
+            borderColor: '#4b6a50',
+            backgroundColor: '#4b6a50',
             borderWidth: 2,
             tension: 0.3,
             yAxisID: 'y1'
@@ -109,11 +109,11 @@ export class AdminAnalyticsPage implements OnInit {
     const statusData = data.ordersByStatus.map(s => s.count);
     const statusColors = data.ordersByStatus.map(s => {
       switch (s.status) {
-        case 'PLACED': return '#1890ff';
-        case 'SHIPPED': return '#faad14';
-        case 'DELIVERED': return '#52c41a';
-        case 'CANCELLED': return '#f5222d';
-        default: return '#8c8c8c';
+        case 'PLACED': return '#b55f34';
+        case 'SHIPPED': return '#8a6433';
+        case 'DELIVERED': return '#4b6a50';
+        case 'CANCELLED': return '#a14634';
+        default: return '#5a473d';
       }
     });
 

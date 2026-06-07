@@ -1,0 +1,127 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-text">
+      <h1>Categories Management</h1>
+      <p>Manage product categories and define their dynamic attribute keys.</p>
+    </div>
+    <button mat-flat-button color="primary" class="create-btn" (click)="openCategoryDialog()">
+      <mat-icon>add</mat-icon>
+      New Category
+    </button>
+  </div>
+
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <div class="loading-shade" *ngIf="isLoading()">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="category-table">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Category Name </th>
+            <td mat-cell *matCellDef="let element" class="font-medium text-main"> 
+              {{element.name}} 
+            </td>
+          </ng-container>
+
+          <!-- Attributes Count Column -->
+          <ng-container matColumnDef="attributesCount">
+            <th mat-header-cell *matHeaderCellDef> Attribute Keys </th>
+            <td mat-cell *matCellDef="let element">
+              <div class="attr-chip">
+                {{element.attributeKeys.length}} Keys
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let element">
+              <button mat-icon-button (click)="expandedElement = expandedElement === element ? null : element; $event.stopPropagation()">
+                <mat-icon>{{expandedElement === element ? 'expand_less' : 'expand_more'}}</mat-icon>
+              </button>
+              <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()" class="action-btn">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu" class="modern-menu">
+                <button mat-menu-item (click)="openCategoryDialog(element)">
+                  <mat-icon color="primary">edit</mat-icon>
+                  <span>Edit Name</span>
+                </button>
+                <button mat-menu-item (click)="openAttributeDialog(element)">
+                  <mat-icon color="accent">add_circle</mat-icon>
+                  <span>Add Attribute Key</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteCategory(element)" class="delete-item">
+                  <mat-icon color="warn">delete</mat-icon>
+                  <span class="text-warn">Delete Category</span>
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <!-- Expanded Content Column -->
+          <ng-container matColumnDef="expandedDetail">
+            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+              <div class="element-detail" [@detailExpand]="element === expandedElement ? 'expanded' : 'collapsed'">
+                <div class="attributes-panel">
+                  <div class="panel-header">
+                    <h4>Attribute Keys for {{element.name}}</h4>
+                    <button mat-stroked-button color="primary" (click)="openAttributeDialog(element)">
+                      <mat-icon>add</mat-icon> Add Key
+                    </button>
+                  </div>
+                  
+                  <div class="attributes-grid" *ngIf="element.attributeKeys.length > 0; else noKeys">
+                    <div class="attr-card" *ngFor="let key of element.attributeKeys">
+                      <div class="attr-info">
+                        <span class="key-name">{{key.keyName}}</span>
+                        <span class="key-type">{{key.type}}</span>
+                      </div>
+                      <div class="attr-actions">
+                        <button mat-icon-button color="primary" (click)="openAttributeDialog(element, key)" matTooltip="Edit">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" (click)="deleteAttributeKey(key)" matTooltip="Delete">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <ng-template #noKeys>
+                    <div class="no-keys-state">
+                      <p>No attribute keys defined for this category.</p>
+                      <p class="text-sub">Add keys like "RAM" or "Color" to collect these details when adding products.</p>
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+              class="element-row"
+              [class.expanded-row]="expandedElement === element"
+              (click)="expandedElement = expandedElement === element ? null : element">
+          </tr>
+          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+          
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell empty-state" [attr.colspan]="displayedColumns.length">
+              <div class="empty-state-content">
+                <mat-icon>category</mat-icon>
+                <h3>No categories found</h3>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

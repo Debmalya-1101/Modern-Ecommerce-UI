@@ -3,11 +3,11 @@
   h1 {
     margin: 0;
     font-size: 1.75rem;
-    color: #212b36;
+    color: var(--color-neutral-900);
   }
   p {
     margin: 0.5rem 0 0;
-    color: #637381;
+    color: var(--color-neutral-600);
   }
 }
 
@@ -16,6 +16,6 @@
   border-radius: 12px;
   padding: 3rem;
   text-align: center;
-  color: #637381;
+  color: var(--color-neutral-600);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
