@@ -24,6 +24,7 @@ import { ProductImagePlaceholderComponent } from '../../shared/ui/product/produc
 import { ProductPriceDisplayComponent } from '../../shared/ui/product/product-price-display/product-price-display.component';
 import { ProductRatingDisplayComponent } from '../../shared/ui/product/product-rating-display/product-rating-display.component';
 import { ProductStockIndicatorComponent } from '../../shared/ui/product/product-stock-indicator/product-stock-indicator.component';
+import { ProductReviewsComponent } from './components/product-reviews/product-reviews.component';
 
 /** A gallery image entry shown as a thumbnail button on the details page. */
 interface GalleryItem {
@@ -48,7 +49,8 @@ interface GalleryItem {
     ProductImagePlaceholderComponent,
     ProductPriceDisplayComponent,
     ProductRatingDisplayComponent,
-    ProductStockIndicatorComponent
+    ProductStockIndicatorComponent,
+    ProductReviewsComponent
   ],
   templateUrl: './product-details.page.html',
   styleUrl: './product-details.page.scss'

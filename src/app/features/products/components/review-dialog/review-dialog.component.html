@@ -1,0 +1,70 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit Your Review' : 'Write a Review' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="reviewForm" (ngSubmit)="onSubmit()" id="review-form">
+    <div class="rating-section">
+      <p class="rating-label">Overall Rating *</p>
+      <div class="star-selector" role="radiogroup" aria-label="Select a rating">
+        @for (star of stars; track star) {
+          <button
+            type="button"
+            class="star-btn"
+            [class.active]="reviewForm.get('rating')?.value >= star"
+            [disabled]="isSubmitting()"
+            (click)="setRating(star)"
+            [attr.aria-label]="star + ' stars'"
+          >
+            <mat-icon>{{ reviewForm.get('rating')?.value >= star ? 'star' : 'star_border' }}</mat-icon>
+          </button>
+        }
+      </div>
+      @if (reviewForm.get('rating')?.touched && reviewForm.get('rating')?.invalid) {
+        <mat-error class="rating-error">Please select a rating.</mat-error>
+      }
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Your Review</mat-label>
+      <textarea
+        matInput
+        formControlName="reviewText"
+        rows="5"
+        placeholder="What did you like or dislike? What should other shoppers know?"
+        cdkTextareaAutosize
+        cdkAutosizeMinRows="5"
+        cdkAutosizeMaxRows="10"
+      ></textarea>
+      <mat-hint align="end">
+        {{ reviewForm.get('reviewText')?.value?.length || 0 }} / 500
+      </mat-hint>
+      @if (reviewForm.get('reviewText')?.hasError('required')) {
+        <mat-error>Review text is required.</mat-error>
+      }
+      @if (reviewForm.get('reviewText')?.hasError('minlength')) {
+        <mat-error>Review must be at least 10 characters.</mat-error>
+      }
+      @if (reviewForm.get('reviewText')?.hasError('maxlength')) {
+        <mat-error>Review cannot exceed 500 characters.</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close [disabled]="isSubmitting()">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="submit"
+    form="review-form"
+    [disabled]="isSubmitting() || reviewForm.invalid"
+    class="submit-btn"
+  >
+    @if (isSubmitting()) {
+      <mat-spinner diameter="20" class="spinner"></mat-spinner>
+      <span>Submitting...</span>
+    } @else {
+      <span>{{ isEditMode ? 'Update' : 'Submit' }}</span>
+    }
+  </button>
+</mat-dialog-actions>

@@ -3895,3 +3895,50 @@ Instead of telling the user "start over," our Retry button hits a dedicated `/ap
     }
     ```
   - We then configured the specific plain-text API calls (like `confirmPayment` and `/auth/signup`) to use `responseType: 'text'`. This tells the Angular HttpClient to skip JSON parsing and successfully pass the raw string downstream to our subscribers.
+
+---
+
+## Implementing the Reviews Feature
+
+**Objective**: Allow users to browse, create, edit, and delete product reviews using modular dialogs and robust state management.
+
+### 1. Handling API Constraints gracefully
+
+**Concept**: Sometimes the backend enforces constraints that the frontend cannot easily predict (e.g. "User must have purchased the product").
+
+**How we did it**: 
+Instead of trying to pre-fetch the user's entire order history just to verify if they can click "Write a Review", we allowed the user to submit the form and explicitly handled the backend `400 Bad Request` rejection message. We catch the `HttpErrorResponse` using our `AppHttpError` normalizer and display the specific reason ("You can only review products you have purchased") directly in a snackbar.
+
+### 2. Dual-Purpose Reactive Forms in Dialogs
+
+**Concept**: A single form component can serve both "Create" and "Edit" purposes by initializing its Reactive Form with injected dialog data.
+
+**How we did it**:
+We used Angular Material's `MatDialog` to open `ReviewDialogComponent`.
+```typescript
+constructor(@Inject(MAT_DIALOG_DATA) public data: ReviewDialogData) {
+  this.reviewForm = this.fb.group({
+    rating: [this.data.review?.rating || 0, [Validators.required, Validators.min(1)]],
+    reviewText: [this.data.review?.reviewText || '', [Validators.minLength(10)]]
+  });
+}
+```
+If `data.review` exists, the form pre-fills and the submit handler calls `updateReview`. If it's missing, it calls `createReview`. This cuts component duplication in half.
+
+### 3. Calculating Aggregates dynamically
+
+**Concept**: If an API provides a paginated list but no metadata summary (like rating distribution), we can dynamically calculate it on the frontend for the loaded dataset to give immediate visual feedback.
+
+**How we did it**:
+Using Angular Signals, we mapped our `reviews` signal into a `ratingDistribution` computed signal. 
+```typescript
+readonly ratingDistribution = computed(() => {
+  const all = this.reviews();
+  const total = all.length;
+  return [5, 4, 3, 2, 1].map(star => {
+    const count = all.filter(r => r.rating === star).length;
+    return { star, count, percentage: total ? (count / total) * 100 : 0 };
+  });
+});
+```
+Every time a new review is added, edited, or deleted, or a new page is loaded, the distribution bars instantly recalculate and animate to their new widths.

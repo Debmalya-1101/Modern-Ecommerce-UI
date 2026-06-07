@@ -1,0 +1,96 @@
+<div class="reviews-header">
+  <div>
+    <h3 class="reviews-title">Customer Reviews</h3>
+    <p class="reviews-subtitle">What others are saying about this product</p>
+  </div>
+  @if (isAuthenticated()) {
+    <button
+      mat-flat-button
+      color="primary"
+      [disabled]="hasUserReviewed() || isLoading()"
+      (click)="openReviewDialog()"
+    >
+      <mat-icon>edit</mat-icon>
+      Write a Review
+    </button>
+  }
+</div>
+
+@if (!isAuthenticated()) {
+  <mat-card class="guest-gate" appearance="outlined">
+    <mat-icon class="gate-icon">lock</mat-icon>
+    <h4>Please log in to view and write reviews</h4>
+    <p>Sign in to your account to read authentic experiences from other shoppers.</p>
+  </mat-card>
+} @else if (isLoading()) {
+  <div class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading reviews...</p>
+  </div>
+} @else if (reviews().length === 0) {
+  <mat-card class="empty-state" appearance="outlined">
+    <mat-icon class="empty-icon">chat_bubble_outline</mat-icon>
+    <h4>No reviews yet</h4>
+    <p>Be the first to share your experience with this product!</p>
+  </mat-card>
+} @else {
+  <div class="reviews-content">
+    <mat-card class="reviews-summary" appearance="outlined">
+      <div class="summary-top">
+        <span class="average-rating">{{ averageRating().toFixed(1) }}</span>
+        <app-product-rating-display [rating]="averageRating()" [reviewCount]="pageData()?.totalElements || reviews().length" />
+      </div>
+      <mat-divider></mat-divider>
+      <div class="distribution-list">
+        @for (item of ratingDistribution(); track item.star) {
+          <div class="distribution-row">
+            <span class="star-label">{{ item.star }} stars</span>
+            <mat-progress-bar mode="determinate" [value]="item.percentage" class="distribution-bar"></mat-progress-bar>
+            <span class="percentage-label">{{ item.percentage | number:'1.0-0' }}%</span>
+          </div>
+        }
+      </div>
+    </mat-card>
+
+    <div class="reviews-list">
+      @for (review of reviews(); track review.id) {
+        <mat-card class="review-card" appearance="outlined">
+          <div class="review-card-header">
+            <div class="author-info">
+              <div class="avatar">{{ review.userName.charAt(0) | uppercase }}</div>
+              <div>
+                <strong>{{ review.userName }}</strong>
+                <span class="date">{{ review.createdAt | date:'mediumDate' }}</span>
+              </div>
+            </div>
+            @if (review.userName === currentUserName()) {
+              <div class="review-actions">
+                <button mat-icon-button aria-label="Edit review" (click)="openReviewDialog(review)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" aria-label="Delete review" (click)="deleteReview(review.id)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+          </div>
+          <app-product-rating-display [rating]="review.rating" [reviewCount]="0" class="card-rating" />
+          <p class="review-text">{{ review.reviewText }}</p>
+        </mat-card>
+      }
+
+      @if (pageData()?.last === false) {
+        <div class="load-more-container">
+          <button mat-stroked-button (click)="loadMore()" [disabled]="isLoadingMore()">
+            @if (isLoadingMore()) {
+              <mat-spinner diameter="20"></mat-spinner>
+              Loading...
+            } @else {
+              Load More
+            }
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+}
