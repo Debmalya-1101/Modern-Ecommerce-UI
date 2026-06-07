@@ -31,6 +31,44 @@
   padding: 0.35rem;
   border-radius: 1.1rem;
   background: linear-gradient(135deg, rgba(255, 239, 228, 0.95), rgba(255, 250, 244, 0.92));
+  aspect-ratio: 1 / 1; /* Enforce square aspect ratio */
+  display: flex;
+
+  app-product-image-placeholder {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.product-card__wishlist {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  z-index: 2;
+
+  .wishlist-btn {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 50%;
+    color: #8a776d;
+    box-shadow: 0 4px 12px rgba(80, 54, 36, 0.06);
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.95);
+      color: #b55f34;
+      box-shadow: 0 6px 16px rgba(80, 54, 36, 0.12);
+      transform: scale(1.05);
+    }
+
+    &--active {
+      color: #e91e63;
+      &:hover {
+        color: #c2185b;
+      }
+    }
+  }
 }
 
 .product-card__badge {
@@ -58,6 +96,7 @@
   gap: 0.75rem;
   align-items: center;
   flex-wrap: wrap;
+  min-height: 1.75rem; /* Reserve space even if category/brand are missing */
 }
 
 .product-card__brand {

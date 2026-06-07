@@ -132,24 +132,36 @@
               <mat-icon>add</mat-icon>
             </button>
           </div>
-          <button
-            mat-flat-button
-            appButtonStyle="primary"
-            type="button"
-            [disabled]="productDetail.stockStatus === 'out-of-stock'"
-            (click)="addToCart(productDetail)"
-          >
-            Add To Cart
-          </button>
-          <button
-            mat-stroked-button
-            appButtonStyle="secondary"
-            type="button"
-            [disabled]="productDetail.stockStatus === 'out-of-stock'"
-            (click)="buyNow(productDetail.name)"
-          >
-            Buy Now
-          </button>
+          <div class="detail-actions__group">
+            <div class="detail-actions__primary">
+              <button
+                mat-flat-button
+                appButtonStyle="primary"
+                class="detail-actions__add-btn"
+                (click)="addToCart(productDetail)"
+              >
+                <mat-icon>shopping_cart</mat-icon>
+                Add to Cart
+              </button>
+              <button
+                mat-stroked-button
+                appButtonStyle="secondary"
+                class="detail-actions__buy-btn"
+                (click)="buyNow(productDetail.name)"
+              >
+                Buy Now
+              </button>
+            </div>
+            <button
+              mat-icon-button
+              class="detail-actions__wishlist-btn"
+              [class.active]="isInWishlist(productDetail.id)"
+              (click)="toggleWishlist(productDetail.id)"
+              [attr.aria-label]="isInWishlist(productDetail.id) ? 'Remove from Wishlist' : 'Add to Wishlist'"
+            >
+              <mat-icon>{{ isInWishlist(productDetail.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
+          </div>
         </div>
       </mat-card>
     </section>

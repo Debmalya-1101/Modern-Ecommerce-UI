@@ -3677,3 +3677,145 @@ Why this is useful:
 - Aesthetic updates combined with functional state mocking drastically improve the perceived quality of a frontend feature.
 - `backdrop-filter` is a powerful CSS property for achieving modern, premium design aesthetics with minimal code.
 - Reactive forms easily support complex cross-field validations (like matching passwords) without cluttering the component.
+
+## Shell Layout and Global Search Modernization
+
+What was improved:
+- Consolidated the product catalog search with the header, making it the single source of search entry.
+- Redesigned the header toolbar to feel modern and premium with glassmorphism and clear visual states.
+- Removed the redundant left drawer on desktop screens, letting the main content occupy full width. On mobile, the left drawer remains as a slide-out menu.
+- Added Material Icons next to navigation items in the mobile drawer for a cleaner visual language.
+- Removed Checkout from direct navigation menus; it is now accessible only through the cart checkout button.
+- Removed the secondary sub-nav completely, merging primary links directly into the header on desktop.
+
+### Router-Based State Synchronization (URL as Single Source of Truth)
+
+In backend development, route parameters decide what data to return. On the frontend, we can do the same to sync search inputs across different pages.
+
+Instead of keeping search query variables in a local service or global state, we update the URL query parameter `q` (e.g. `/products?q=smartphone`).
+
+In `App` component (root shell):
+- We subscribe to the Router's `NavigationEnd` events.
+- We extract the query param `q` from the active URL and update a local signal `searchQuery`.
+- This ensures that if the user searches, or navigates backwards, or clears the search, the header search input automatically updates to stay in sync.
+
+Small example:
+```ts
+this.router.events
+  .pipe(filter(event => event instanceof NavigationEnd))
+  .subscribe(() => {
+    const urlTree = this.router.parseUrl(this.router.url);
+    this.searchQuery.set(urlTree.queryParams['q'] || '');
+  });
+```
+
+Why this is useful:
+- Resolves search state across page transitions (searching from Home redirects to Products with query loaded).
+- Solves browser back/forward buttons automatically since URL query parameters drive the UI.
+- No complex state management library is needed; the router acts as the single source of truth.
+
+### CSS `:focus-within` Selector Explained Simply
+
+The `:focus-within` pseudo-class matches any parent element if any of its children are currently focused.
+
+In this layout, our search container `.toolbar-search` contains an `<input>`. We want the container to have a border highlight and shadow glow when the user clicks inside the input.
+
+Small example:
+```scss
+.toolbar-search {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #b55f34;
+    box-shadow: 0 0 0 4px rgba(181, 95, 52, 0.15);
+  }
+}
+```
+
+Why this is useful:
+- Eliminates the need for JavaScript focus/blur listeners to toggle active classes on the wrapper element.
+- CSS handles styling of container structures reactively and efficiently based on browser focus states.
+
+### CSS Grid for Responsive Two-Row Headers
+
+When building responsive interfaces, we sometimes need to stack layout components on mobile but keep them inline on desktop. Instead of duplicating elements in HTML, we can reposition them using CSS Grid.
+
+In our mobile header toolbar:
+- Row 1 shows Logo/Menu (left) and Cart Icon/Login (right).
+- Row 2 shows the Search Bar spanning full width.
+
+Small example:
+```scss
+@media (max-width: 768px) {
+  .shell-toolbar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    row-gap: 0.75rem;
+  }
+
+  .toolbar-left {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .toolbar-links {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  .toolbar-search {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+  }
+}
+```
+
+Why this is useful:
+- Keeps the HTML layout clean and dry (no duplication of elements for mobile vs desktop views).
+- Extreme layout flexibility with minimal CSS selectors.
+
+### What I Learned From This Step
+- A persistent sidebar in desktop mode is not always ideal for e-commerce stores; hiding it creates a more spacious and premium storefront look.
+- Synchronizing search with URL query parameters guarantees that bookmarks, page refreshes, and back/forward navigation work seamlessly.
+- Grid template positioning lets us build complex responsive headers without modifying the DOM element ordering.
+## Feature Update: Wishlist
+
+What was added:
+- Wishlist API service to perform HTTP calls to backend.
+- Local Wishlist state management using Angular Signals.
+- Wishlist page displaying all saved products.
+- Wishlist toggle actions on Product cards and Product detail pages.
+- Navigation links connecting the App Shell to the Wishlist page.
+
+Why it was added:
+- It's a core e-commerce feature allowing users to bookmark items for later.
+- It provides an opportunity to practice shared component re-use (Product cards) and state management side-by-side with the Cart.
+
+### State Management with Signals Explained Simply
+
+We used Signals to track local Wishlist state in WishlistService while mirroring updates to the backend.
+
+Small example:
+`	s
+  private readonly _wishlist = signal<Wishlist>({ items: [] });
+  public readonly wishlist = this._wishlist.asReadonly();
+  public readonly items = computed(() => this.wishlist().items);
+`
+
+What this means:
+- The internal state is completely mutable by the service via set and update.
+- External consumers (components) can only read the derived or readonly signals.
+
+### Optimistic UI Updates
+
+Optimistic updates mean we update the local Signal state immediately before the backend call finishes.
+
+Why this is useful:
+- The UI feels instantly responsive. The heart icon turns solid immediately without a loading delay.
+- If the API call fails, we capture the failure in an RxJS error block, revert the local state back, and show a Snackbar error.
+
+### What I Learned From This Step
+- Optimistic updates dramatically improve the feel of the UI but require careful error handling to rollback if needed.
+- Exposing a computed boolean from a service (like isInWishlist(id)) keeps component templates very clean compared to looping over arrays in the template.

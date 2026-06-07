@@ -4,8 +4,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+
+import { AuthService } from '../../core/services/auth.service';
+import { WishlistService } from '../../core/services/wishlist.service';
 
 import { AppHttpError, createInitialRequestState } from '../../core/models/api.model';
 import { ProductDetail } from '../../core/models/product.model';
@@ -56,6 +59,9 @@ export class ProductDetailsPage implements OnInit {
   private readonly productsApiService = inject(ProductsApiService);
   private readonly snackbarService = inject(SnackbarService);
   private readonly cartService = inject(CartService);
+  private readonly authService = inject(AuthService);
+  private readonly wishlistService = inject(WishlistService);
+  private readonly router = inject(Router);
 
   private readonly productState = signal(createInitialRequestState<ProductDetail>());
   protected readonly productId = signal<number | null>(null);
@@ -125,6 +131,20 @@ export class ProductDetailsPage implements OnInit {
 
   protected buyNow(productName: string): void {
     this.snackbarService.info(`Buy now flow for ${productName} is coming soon.`);
+  }
+
+  protected isInWishlist(productId: number): boolean {
+    return this.wishlistService.hasItem(productId);
+  }
+
+  protected toggleWishlist(productId: number): void {
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], {
+        queryParams: { redirectTo: this.router.url }
+      });
+      return;
+    }
+    this.wishlistService.toggleWishlist(productId);
   }
 
   private loadProduct(routeId: number): void {

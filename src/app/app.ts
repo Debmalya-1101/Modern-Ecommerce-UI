@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { filter } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
 import { CartService } from './core/services/cart.service';
+import { WishlistService } from './core/services/wishlist.service';
 import { ButtonStyleDirective } from './shared/directives/button-style.directive';
 import { CartDrawerComponent } from './features/cart/components/cart-drawer/cart-drawer.component';
 
@@ -20,6 +21,7 @@ interface NavigationItem {
   label: string;
   path: string;
   description: string;
+  icon: string;
 }
 
 @Component({
@@ -48,13 +50,15 @@ export class App {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly cartService = inject(CartService);
+  private readonly wishlistService = inject(WishlistService);
   private readonly mobileBreakpoint = '(max-width: 768px)';
   private readonly startsOnMobile = this.breakpointObserver.isMatched(this.mobileBreakpoint);
   private readonly currentUrl = signal(this.router.url);
 
   protected readonly title = 'Modern Commerce';
   protected readonly isMobile = signal(this.startsOnMobile);
-  protected readonly isSidebarOpen = signal(!this.startsOnMobile);
+  protected readonly isSidebarOpen = signal(false); // Start with sidebar closed
+  protected readonly searchQuery = signal(''); // Header search text
   protected readonly authState = this.authService.state;
   protected readonly session = this.authService.session;
   protected readonly isAuthenticated = this.authService.isAuthenticated;
@@ -72,37 +76,44 @@ export class App {
     () => this.session().user?.username ?? 'Guest'
   );
   protected readonly cartItemCount = this.cartService.itemCount;
+  protected readonly wishlistItemCount = this.wishlistService.itemCount;
   protected readonly isCartDrawerOpen = this.cartService.isDrawerOpen;
   protected readonly navigationItems: NavigationItem[] = [
     {
       label: 'Home',
       path: '/',
-      description: 'Back to the storefront home'
+      description: 'Back to the storefront home',
+      icon: 'home'
     },
     {
       label: 'Products',
       path: '/products',
-      description: 'Browse the product catalog'
+      description: 'Browse the product catalog',
+      icon: 'shopping_bag'
+    },
+    {
+      label: 'Wishlist',
+      path: '/wishlist',
+      description: 'Your saved items',
+      icon: 'favorite'
     },
     {
       label: 'Cart',
       path: '/cart',
-      description: 'View your shopping cart'
-    },
-    {
-      label: 'Checkout',
-      path: '/checkout',
-      description: 'Complete your order'
+      description: 'View your shopping cart',
+      icon: 'shopping_cart'
     },
     {
       label: 'Orders',
       path: '/orders',
-      description: 'Your order history'
+      description: 'Your order history',
+      icon: 'receipt_long'
     },
     {
       label: 'Profile',
       path: '/profile',
-      description: 'Manage your account'
+      description: 'Manage your account',
+      icon: 'person'
     }
   ];
 
@@ -112,7 +123,7 @@ export class App {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ matches }) => {
         this.isMobile.set(matches);
-        this.isSidebarOpen.set(!matches);
+        this.isSidebarOpen.set(false); // Always close on screen transitions
       });
 
     this.router.events
@@ -121,7 +132,12 @@ export class App {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((event) => {
-        this.currentUrl.set(event.urlAfterRedirects);
+        const url = event.urlAfterRedirects;
+        this.currentUrl.set(url);
+
+        // Sync header search bar with router query params
+        const urlTree = this.router.parseUrl(url);
+        this.searchQuery.set(urlTree.queryParams['q'] || '');
       });
   }
 
@@ -144,6 +160,26 @@ export class App {
 
   protected closeCartDrawer(): void {
     this.cartService.closeDrawer();
+  }
+
+  protected onSearch(event: Event, value: string): void {
+    event.preventDefault();
+    const q = value.trim();
+    this.router.navigate(['/products'], {
+      queryParams: { q: q || null }
+    });
+  }
+
+  protected onSearchInput(value: string): void {
+    this.searchQuery.set(value);
+  }
+
+  protected clearSearch(inputEl: HTMLInputElement): void {
+    this.searchQuery.set('');
+    inputEl.value = '';
+    this.router.navigate(['/products'], {
+      queryParams: { q: null }
+    });
   }
 
   protected logout(): void {

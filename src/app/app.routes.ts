@@ -57,6 +57,11 @@ export const routes: Routes = [
       import('./features/profile/profile.routes').then((m) => m.PROFILE_ROUTES)
   },
   {
+    path: 'wishlist',
+    loadChildren: () =>
+      import('./features/wishlist/wishlist.routes').then((m) => m.routes)
+  },
+  {
     path: '**',
     redirectTo: ''
   }

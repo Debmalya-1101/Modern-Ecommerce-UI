@@ -55,25 +55,6 @@
   <!-- ── Slim filter bar ──────────────────────────────────────────── -->
   <div class="catalog-bar">
 
-    <!-- Search input -->
-    <div class="catalog-bar__search">
-      <mat-icon class="search-icon">search</mat-icon>
-      <input
-        class="search-input"
-        type="text"
-        placeholder="Search products, brands or categories..."
-        [value]="searchDraft()"
-        (input)="searchDraft.set($any($event.target).value)"
-        (keyup.enter)="applySearch()"
-      />
-      @if (searchDraft()) {
-        <button class="search-clear-btn" type="button" (click)="clearSearch()" aria-label="Clear search">
-          <mat-icon>close</mat-icon>
-        </button>
-      }
-      <button class="search-submit-btn" type="button" (click)="applySearch()">Search</button>
-    </div>
-
     <!-- Result meta -->
     <div class="catalog-bar__meta">
       <span class="meta-count">{{ productCountLabel() }}</span>

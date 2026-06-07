@@ -97,6 +97,7 @@ h3,
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+
 .detail-thumb {
   display: grid;
   gap: 0;
@@ -216,7 +217,61 @@ h3,
 .detail-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(80, 54, 36, 0.1);
+
+  &__group {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__primary {
+    display: flex;
+    flex: 1;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  &__add-btn,
+  &__buy-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 1.5rem 0;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  &__wishlist-btn {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(80, 54, 36, 0.15);
+    background: transparent;
+    color: #8a776d;
+    transition: all 0.2s ease;
+
+    mat-icon {
+      font-size: 1.75rem;
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+
+    &:hover {
+      background: rgba(80, 54, 36, 0.05);
+      transform: translateY(-2px);
+    }
+
+    &.active {
+      color: #e91e63;
+      border-color: rgba(233, 30, 99, 0.3);
+      background: rgba(233, 30, 99, 0.05);
+    }
+  }
 }
 
 .detail-specifications {
@@ -295,6 +350,11 @@ h3,
 
   .detail-actions {
     flex-direction: column;
+
+    &__group, &__primary {
+      flex-direction: column;
+      width: 100%;
+    }
   }
 
   .detail-actions button {

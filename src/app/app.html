@@ -85,9 +85,10 @@
               mat-list-item
               [routerLink]="item.path"
               routerLinkActive="active-link"
-              [routerLinkActiveOptions]="{ exact: true }"
+              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
               (click)="closeSidebarOnMobile()"
             >
+              <mat-icon matListItemIcon class="sidebar-nav-icon">{{ item.icon }}</mat-icon>
               <span matListItemTitle>{{ item.label }}</span>
               <span matListItemLine>{{ item.description }}</span>
             </a>
@@ -165,31 +166,70 @@
       <header class="shell-header">
         <mat-toolbar class="shell-toolbar">
           <div class="toolbar-left">
-            <button
-              mat-button
-              type="button"
-              class="menu-button"
-              (click)="toggleSidebar()"
-            >
-              Menu
-            </button>
+            @if (isMobile()) {
+              <button
+                mat-icon-button
+                type="button"
+                class="menu-button"
+                (click)="toggleSidebar()"
+                aria-label="Toggle navigation menu"
+              >
+                <mat-icon>menu</mat-icon>
+              </button>
+            }
 
             <a routerLink="/" class="brand-mark">
               <span class="brand-mark__eyebrow">Modern Storefront</span>
               <span class="brand-mark__title">{{ title }}</span>
             </a>
+
+            @if (!isMobile()) {
+              <nav class="desktop-nav" aria-label="Desktop navigation">
+                <a routerLink="/products" routerLinkActive="desktop-nav__link--active" class="desktop-nav__link">Shop</a>
+                @if (isAuthenticated()) {
+                  <a routerLink="/orders" routerLinkActive="desktop-nav__link--active" class="desktop-nav__link">Orders</a>
+                  <a routerLink="/profile" routerLinkActive="desktop-nav__link--active" class="desktop-nav__link">Profile</a>
+                }
+              </nav>
+            }
           </div>
 
-          <div class="toolbar-search" aria-label="Application search placeholder">
+          <form class="toolbar-search" (submit)="onSearch($event, searchInput.value)">
             <span class="toolbar-search__category">Browse</span>
-            <span class="toolbar-search__prompt">Search products, brands, and categories</span>
-            <button mat-flat-button appButtonStyle="primary" type="button">
+            <input
+              #searchInput
+              class="toolbar-search__input"
+              type="text"
+              placeholder="Search products, brands, and categories..."
+              [value]="searchQuery()"
+              (input)="onSearchInput(searchInput.value)"
+            />
+            @if (searchQuery()) {
+              <button class="toolbar-search__clear" type="button" (click)="clearSearch(searchInput)" aria-label="Clear search">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+            <button mat-flat-button appButtonStyle="primary" type="submit" class="toolbar-search__btn">
               Search
             </button>
-          </div>
+          </form>
 
           <nav class="toolbar-links" aria-label="Quick links">
             @if (isAuthenticated()) {
+              <a 
+                routerLink="/wishlist" 
+                class="toolbar-link cart-badge-link" 
+                aria-label="Wishlist"
+                [style.cursor]="'pointer'"
+              >
+                <mat-icon
+                  [matBadge]="wishlistItemCount()"
+                  matBadgeColor="accent"
+                  [matBadgeHidden]="wishlistItemCount() === 0"
+                >
+                  favorite_border
+                </mat-icon>
+              </a>
               <a 
                 [routerLink]="isMobile() ? '/cart' : null" 
                 (click)="toggleCartDrawer($event)"
@@ -205,16 +245,16 @@
                   shopping_cart
                 </mat-icon>
               </a>
-              <a routerLink="/orders" class="toolbar-link">Orders</a>
-              <a routerLink="/profile" class="toolbar-link">Profile</a>
-              <button
-                mat-stroked-button
-                appButtonStyle="secondary"
-                type="button"
-                (click)="logout()"
-              >
-                Logout
-              </button>
+              @if (!isMobile()) {
+                <button
+                  mat-stroked-button
+                  appButtonStyle="secondary"
+                  type="button"
+                  (click)="logout()"
+                >
+                  Logout
+                </button>
+              }
             } @else {
               <a
                 mat-stroked-button
@@ -235,23 +275,6 @@
             }
           </nav>
         </mat-toolbar>
-
-        <div class="shell-subnav">
-          <p class="shell-subnav__label">Explore</p>
-          <div class="shell-subnav__links">
-            @for (item of navigationItems; track item.path) {
-              <a
-                [routerLink]="item.path"
-                routerLinkActive="shell-subnav__link--active"
-                [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-                class="shell-subnav__link"
-                (click)="closeSidebarOnMobile()"
-              >
-                {{ item.label }}
-              </a>
-            }
-          </div>
-        </div>
       </header>
 
       <main class="shell-main">

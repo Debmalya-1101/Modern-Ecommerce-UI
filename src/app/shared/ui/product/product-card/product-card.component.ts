@@ -1,8 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { Router, RouterLink } from '@angular/router';
 
+import { AuthService } from '../../../../core/services/auth.service';
+import { WishlistService } from '../../../../core/services/wishlist.service';
 import { ButtonStyleDirective } from '../../../directives/button-style.directive';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
 import { ProductCategoryChipComponent } from '../product-category-chip/product-category-chip.component';
@@ -16,6 +19,7 @@ import { ProductCardViewModel } from '../product-ui.model';
   imports: [
     MatButtonModule,
     MatCardModule,
+    MatIconModule,
     RouterLink,
     ButtonStyleDirective,
     ProductBadgeComponent,
@@ -28,9 +32,15 @@ import { ProductCardViewModel } from '../product-ui.model';
   styleUrl: './product-card.component.scss'
 })
 export class ProductCardComponent {
+  private readonly wishlistService = inject(WishlistService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+
   @Input({ required: true }) product!: ProductCardViewModel;
   @Output() quickView = new EventEmitter<number>();
   @Output() addToCart = new EventEmitter<number>();
+
+  protected readonly isInWishlist = computed(() => this.wishlistService.hasItem(this.product.id));
 
   protected openQuickView(): void {
     this.quickView.emit(this.product.id);
@@ -39,5 +49,19 @@ export class ProductCardComponent {
   protected onAddToCart(event: Event): void {
     event.stopPropagation();
     this.addToCart.emit(this.product.id);
+  }
+
+  protected onToggleWishlist(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login'], {
+        queryParams: { redirectTo: this.router.url }
+      });
+      return;
+    }
+
+    this.wishlistService.toggleWishlist(this.product.id);
   }
 }

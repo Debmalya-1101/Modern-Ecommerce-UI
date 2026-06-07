@@ -5,6 +5,18 @@
       [label]="product.imageLabel"
     />
 
+    <div class="product-card__wishlist">
+      <button
+        mat-icon-button
+        class="wishlist-btn"
+        [class.wishlist-btn--active]="isInWishlist()"
+        (click)="onToggleWishlist($event)"
+        [attr.aria-label]="isInWishlist() ? 'Remove from Wishlist' : 'Add to Wishlist'"
+      >
+        <mat-icon>{{ isInWishlist() ? 'favorite' : 'favorite_border' }}</mat-icon>
+      </button>
+    </div>
+
     @if (product.badge) {
       <div class="product-card__badge">
         <app-product-badge [label]="product.badge" />
@@ -14,8 +26,12 @@
 
   <div class="product-card__content">
     <div class="product-card__meta">
-      <app-product-category-chip [label]="product.category" />
-      <span class="product-card__brand">{{ product.brand }}</span>
+      @if (product.category) {
+        <app-product-category-chip [label]="product.category" />
+      }
+      @if (product.brand) {
+        <span class="product-card__brand">{{ product.brand }}</span>
+      }
     </div>
 
     <h3>{{ product.name }}</h3>

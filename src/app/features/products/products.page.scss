@@ -9,112 +9,23 @@
 }
 
 // ── Slim filter bar ───────────────────────────────────────────────────
-// One thin row at the top — search + result count side by side.
-// Inspired by Amazon/Flipkart: immediate, functional, no wasted space.
+// One thin row at the top — result count, filters, and actions side by side.
 .catalog-bar {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.55rem 0.85rem;
+  padding: 0.65rem 1rem;
   border-radius: 1rem;
   background: rgba(255, 252, 247, 0.98);
   border: 1px solid rgba(87, 61, 44, 0.13);
   box-shadow: 0 4px 14px rgba(80, 54, 36, 0.06);
-  flex-wrap: wrap;
-}
-
-// ── Search box ────────────────────────────────────────────────────────
-.catalog-bar__search {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1 1 auto;
-  min-width: 0;
-  padding: 0.4rem 0.75rem;
-  border-radius: 0.65rem;
-  background: #fff;
-  border: 1.5px solid rgba(87, 61, 44, 0.15);
-  transition: border-color 180ms ease, box-shadow 180ms ease;
-
-  &:focus-within {
-    border-color: rgba(181, 95, 52, 0.5);
-    box-shadow: 0 0 0 3px rgba(181, 95, 52, 0.1);
-  }
-}
-
-.search-icon {
-  font-size: 1.15rem;
-  width: 1.15rem;
-  height: 1.15rem;
-  color: #9e7059;
-  flex-shrink: 0;
-}
-
-.search-input {
-  flex: 1 1 auto;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 0.92rem;
-  color: #2d241f;
-  min-width: 0;
-
-  &::placeholder {
-    color: #b09a8d;
-  }
-}
-
-.search-clear-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: #9e7059;
-  flex-shrink: 0;
-
-  mat-icon {
-    font-size: 1.1rem;
-    width: 1.1rem;
-    height: 1.1rem;
-  }
-
-  &:hover {
-    color: #b55f34;
-  }
-}
-
-.search-submit-btn {
-  flex-shrink: 0;
-  padding: 0.3rem 0.9rem;
-  border: none;
-  border-radius: 0.45rem;
-  background: #b55f34;
-  color: #fff;
-  font-size: 0.84rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 150ms ease, transform 100ms ease;
-
-  &:hover {
-    background: #9e4f28;
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: none;
-  }
 }
 
 // ── Result meta (count + active filter + clear) ───────────────────────
 .catalog-bar__meta {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  white-space: nowrap;
-  flex-shrink: 0;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .meta-count {
@@ -383,7 +294,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: 0.5rem;
+  margin-left: auto;
 }
 
 .sort-select {

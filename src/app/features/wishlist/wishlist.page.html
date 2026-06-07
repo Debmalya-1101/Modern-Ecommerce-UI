@@ -1,0 +1,38 @@
+<main class="wishlist-page">
+  <div class="wishlist-page__header">
+    <h2 class="wishlist-page__title">My Wishlist</h2>
+    <p class="wishlist-page__subtitle">{{ itemCount() }} item(s) saved</p>
+  </div>
+
+  @if (loading()) {
+    <div class="wishlist-page__loading">
+      <app-loading-spinner label="Loading your wishlist..." [diameter]="50" />
+    </div>
+  } @else if (error()) {
+    <div class="wishlist-page__error">
+      <app-error-state
+        [title]="'Oops! Something went wrong'"
+        [description]="error()!"
+        (action)="retryLoading()"
+      />
+    </div>
+  } @else if (isEmpty()) {
+    <div class="wishlist-page__empty">
+      <app-empty-state
+        icon="favorite_border"
+        title="Your wishlist is empty"
+        description="Save your favorite items here to buy them later."
+        actionLabel="Browse Products"
+        actionLink="/products"
+      />
+    </div>
+  } @else {
+    <div class="wishlist-grid">
+      @for (product of wishlistProducts(); track product.id) {
+        <app-product-card
+          [product]="product"
+        />
+      }
+    </div>
+  }
+</main>
