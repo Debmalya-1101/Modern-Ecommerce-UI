@@ -42,6 +42,6 @@ export class CartApiService {
   }
 
   clearCart(): Observable<string> {
-    return this.apiService.delete<string>(API_ENDPOINTS.cart.clear, undefined, { trackLoading: true });
+    return this.apiService.delete<string>(API_ENDPOINTS.cart.clear, undefined, { trackLoading: true, responseType: 'text' });
   }
 }

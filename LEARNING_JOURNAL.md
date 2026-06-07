@@ -3819,3 +3819,79 @@ Why this is useful:
 ### What I Learned From This Step
 - Optimistic updates dramatically improve the feel of the UI but require careful error handling to rollback if needed.
 - Exposing a computed boolean from a service (like isInWishlist(id)) keeps component templates very clean compared to looping over arrays in the template.
+
+---
+
+## Implementing the Payment Module
+
+**Objective**: Building a resilient, secure payment integration experience with multiple transaction states.
+
+### 1. Async Workflows in Multi-step Transactions
+
+**Concept**: A payment isn't a single API call; it's an asynchronous workflow where the frontend and backend must sync states across multiple steps without blocking the user interface indefinitely.
+
+**How we did it**:
+In our application, when a user pays for an order, they trigger a sequence:
+1. `checkout()` completes -> Creates Order (Returns `orderId`).
+2. Navigate to `/payment/:orderId`.
+3. Call `initiatePayment(orderId)` -> Generates a secure session token.
+4. User fills form and clicks "Pay" -> Call `confirmPayment(token, true)`.
+5. Upon confirmation, navigate to `/payment/success` or `/payment/failure`.
+
+**Example for Backend Devs**:
+Think of this like a database transaction with a 2-Phase Commit (2PC), but spread across HTTP. The backend issues a token (like a transaction ID). The frontend holds the token. Once the user provides their credentials (card details), the frontend "commits" the transaction using that token. If any step fails, the token expires, preventing duplicate charges.
+
+### 2. State Transitions
+
+**Concept**: Safely guiding the user interface through different visual states (Idle -> Processing -> Success/Failure) to prevent double submissions.
+
+**How we did it**:
+We used Angular Signals to explicitly manage the UI boundaries:
+- `isProcessing = signal(false)`: Disables the "Pay" button and triggers a full-screen loading overlay.
+- `session = signal(null)`: Only renders the payment form once the backend has issued a valid token.
+
+```typescript
+// Disabling inputs to prevent double-charging
+onPay(): void {
+  if (this.isProcessing()) return; // State guard
+  
+  this.isProcessing.set(true); // Lock state
+  
+  this.paymentApi.confirmPayment(payload).subscribe({
+    next: () => this.router.navigate(['/success']),
+    error: () => {
+      this.isProcessing.set(false); // Unlock state on fail
+      this.router.navigate(['/failure']);
+    }
+  });
+}
+```
+
+### 3. Retry Patterns
+
+**Concept**: Networks drop and cards get declined. A retry pattern allows a user to smoothly restart the transaction without losing their underlying context (the Order).
+
+**How we did it**:
+When a payment fails, we route to `/payment/failure?orderId=X`. The cart is already cleared because the order *exists*, it just isn't *paid*.
+Instead of telling the user "start over," our Retry button hits a dedicated `/api/payments/retry` endpoint.
+
+**Why this is powerful**: The backend generates a *new* `paymentToken` for the *same* `orderId`. It resets the transaction context on the server, and the frontend redirects the user right back to `/payment/:orderId` where they can type in a different credit card and try again.
+
+### What I Learned From This Step
+- A true modern payment flow protects its route states meticulously so that users can't accidentally double-pay by hitting the "back" button.
+- Retrying a transaction against a pre-created order ID is safer than keeping items in the cart and trying to check out multiple times.
+- **Handling Plain Text/Raw String Responses in HttpClient**: 
+  Backend developers frequently return a raw string (like `"Payment successful"` or `"Email already in use"`) from their endpoints instead of a structured JSON object. 
+  By default, Angular's `HttpClient` assumes `responseType: 'json'`. If the backend returns raw text, the parsing fails, throwing a `HttpErrorResponse` (with a JSON parsing syntax error) even if the HTTP status was `200 OK`. 
+  To fix this:
+  - We added `responseType?: 'json' | 'text'` to our `ApiRequestOptions` model.
+  - We passed this option through our `HttpWrapperService` to the underlying `HttpClient` request, casting it as `any` to satisfy generic method overloads:
+    ```typescript
+    post<TResponse, TBody>(path: string, body: TBody, options?: ApiRequestOptions): Observable<TResponse> {
+      return this.http.post<TResponse>(this.buildUrl(path), body, {
+        params: this.createParams(options?.params),
+        responseType: (options?.responseType || 'json') as any
+      });
+    }
+    ```
+  - We then configured the specific plain-text API calls (like `confirmPayment` and `/auth/signup`) to use `responseType: 'text'`. This tells the Angular HttpClient to skip JSON parsing and successfully pass the raw string downstream to our subscribers.

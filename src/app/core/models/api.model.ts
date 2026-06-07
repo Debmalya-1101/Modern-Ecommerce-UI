@@ -23,6 +23,7 @@ export interface ApiQueryParams {
 export interface ApiRequestOptions {
   params?: ApiQueryParams;
   trackLoading?: boolean;
+  responseType?: 'json' | 'text';
 }
 
 export interface MockRequestOptions {

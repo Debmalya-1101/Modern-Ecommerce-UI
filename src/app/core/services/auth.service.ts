@@ -63,7 +63,8 @@ export class AuthService {
 
     return this.apiService
       .post<string, SignupRequest>(API_ENDPOINTS.auth.signup, request, {
-        trackLoading: true
+        trackLoading: true,
+        responseType: 'text'
       })
       .pipe(
         catchError((error: AppHttpError) => {

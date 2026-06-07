@@ -1,0 +1,47 @@
+<div class="success-container">
+  <mat-card class="success-card">
+    <div class="success-header">
+      <div class="check-circle">
+        <mat-icon>check</mat-icon>
+      </div>
+      <h1>Payment Successful!</h1>
+      <p>Thank you for your purchase.</p>
+    </div>
+
+    <mat-card-content>
+      <mat-divider></mat-divider>
+      
+      <div class="receipt-details">
+        <div class="detail-row" *ngIf="orderId">
+          <span>Order Number</span>
+          <strong>#{{ orderId }}</strong>
+        </div>
+        <div class="detail-row" *ngIf="referenceId">
+          <span>Transaction ID</span>
+          <span class="mono">{{ referenceId }}</span>
+        </div>
+        <div class="detail-row" *ngIf="amount">
+          <span>Amount Paid</span>
+          <strong class="amount">{{ amount | currency:currencyCode }}</strong>
+        </div>
+        <div class="detail-row">
+          <span>Date</span>
+          <span>{{ undefined | date:'medium' }}</span>
+        </div>
+      </div>
+      
+      <mat-divider></mat-divider>
+      
+      <p class="email-notice">We've sent a confirmation email with your order details.</p>
+    </mat-card-content>
+
+    <mat-card-actions class="action-buttons">
+      <a mat-stroked-button color="primary" [routerLink]="['/orders', orderId]" *ngIf="orderId">
+        View Order Details
+      </a>
+      <a mat-flat-button color="primary" routerLink="/products">
+        Continue Shopping
+      </a>
+    </mat-card-actions>
+  </mat-card>
+</div>

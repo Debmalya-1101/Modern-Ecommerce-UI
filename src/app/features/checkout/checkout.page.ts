@@ -76,7 +76,7 @@ export class CheckoutPage {
         this.snackbar.success('Order placed successfully!');
         // We clear the cart state to simulate what the backend does
         this.cartService.loadCart(); // Backend clears it, so reload will fetch empty cart
-        this.router.navigate(['/order-success']);
+        this.router.navigate(['/payment', response.orderId]);
       },
       error: (err) => {
         this.isSubmitting.set(false);

@@ -1,0 +1,32 @@
+<div class="failure-container">
+  <mat-card class="failure-card">
+    <div class="failure-header">
+      <div class="error-circle">
+        <mat-icon>error_outline</mat-icon>
+      </div>
+      <h1>Payment Failed</h1>
+      <p>We couldn't process your payment. Your card may have been declined or the connection timed out.</p>
+    </div>
+
+    <mat-card-content>
+      <div class="help-box">
+        <h3>What can you do?</h3>
+        <ul>
+          <li>Check your card details and try again.</li>
+          <li>Ensure you have sufficient funds.</li>
+          <li>Try using a different payment method.</li>
+        </ul>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions class="action-buttons">
+      <button mat-flat-button color="warn" class="retry-btn" (click)="onRetry()" [disabled]="isRetrying()">
+        <mat-spinner diameter="20" *ngIf="isRetrying()"></mat-spinner>
+        <span *ngIf="!isRetrying()">Retry Payment</span>
+      </button>
+      <a mat-stroked-button routerLink="/cart">
+        Return to Cart
+      </a>
+    </mat-card-actions>
+  </mat-card>
+</div>

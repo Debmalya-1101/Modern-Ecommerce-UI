@@ -17,7 +17,8 @@ export class HttpWrapperService {
   get<T>(path: string, options?: ApiRequestOptions): Observable<T> {
     return this.http
       .get<T>(this.buildUrl(path), {
-        params: this.createParams(options?.params)
+        params: this.createParams(options?.params),
+        responseType: (options?.responseType || 'json') as any
       })
       .pipe(timeout(this.requestTimeoutMs));
   }
@@ -25,7 +26,8 @@ export class HttpWrapperService {
   post<TResponse, TBody>(path: string, body: TBody, options?: ApiRequestOptions): Observable<TResponse> {
     return this.http
       .post<TResponse>(this.buildUrl(path), body, {
-        params: this.createParams(options?.params)
+        params: this.createParams(options?.params),
+        responseType: (options?.responseType || 'json') as any
       })
       .pipe(timeout(this.requestTimeoutMs));
   }
@@ -33,7 +35,8 @@ export class HttpWrapperService {
   put<TResponse, TBody>(path: string, body: TBody, options?: ApiRequestOptions): Observable<TResponse> {
     return this.http
       .put<TResponse>(this.buildUrl(path), body, {
-        params: this.createParams(options?.params)
+        params: this.createParams(options?.params),
+        responseType: (options?.responseType || 'json') as any
       })
       .pipe(timeout(this.requestTimeoutMs));
   }
@@ -41,7 +44,8 @@ export class HttpWrapperService {
   patch<TResponse, TBody>(path: string, body: TBody, options?: ApiRequestOptions): Observable<TResponse> {
     return this.http
       .patch<TResponse>(this.buildUrl(path), body, {
-        params: this.createParams(options?.params)
+        params: this.createParams(options?.params),
+        responseType: (options?.responseType || 'json') as any
       })
       .pipe(timeout(this.requestTimeoutMs));
   }
@@ -49,7 +53,8 @@ export class HttpWrapperService {
   delete<T>(path: string, options?: ApiRequestOptions): Observable<T> {
     return this.http
       .delete<T>(this.buildUrl(path), {
-        params: this.createParams(options?.params)
+        params: this.createParams(options?.params),
+        responseType: (options?.responseType || 'json') as any
       })
       .pipe(timeout(this.requestTimeoutMs));
   }
