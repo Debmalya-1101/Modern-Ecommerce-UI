@@ -1,0 +1,21 @@
+.page-header {
+  margin-bottom: 2rem;
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    color: #212b36;
+  }
+  p {
+    margin: 0.5rem 0 0;
+    color: #637381;
+  }
+}
+
+.placeholder-content {
+  background: white;
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  color: #637381;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}

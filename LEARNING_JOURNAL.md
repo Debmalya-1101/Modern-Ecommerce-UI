@@ -4006,3 +4006,40 @@ In our profile template ([profile.page.html](file:///c:/Users/debma/My-Space/Cod
 </button>
 ```
 Now, Angular Material properly applies the button component classes, and our styling directive correctly hooks into the design system to display a premium, styled action button matching our e-commerce aesthetics.
+
+---
+
+## Setting up an Admin Shell with Standalone Components and Guards
+
+**Date:** June 2026
+
+**Concept:** 
+Creating an entirely separate layout (shell) for administrative users without breaking the existing storefront layout, while securing it with Role-Based Access Control (RBAC).
+
+**Why it's important:** 
+Enterprise applications often have vastly different UX requirements for customers vs. administrators. Customers need shopping carts and catalog search bars, while administrators need data grids, sidebar navigation, and analytics tools. Attempting to shoehorn both into a single layout component leads to brittle, messy conditional (`*ngIf`) logic. A separate layout shell is cleaner.
+
+**How we did it:**
+1. **Route Detection:** We introduced an `isAdminRoute` computed signal in the root `App` component that checks if the current URL starts with `/admin`.
+2. **Conditional Shells:** In `app.html`, we bypassed the storefront `mat-drawer-container` if `isAdminRoute` is true. Instead, we render a simple `<div class="admin-shell"><router-outlet /></div>` container.
+3. **Dedicated Admin Layout Component:** We created a brand new `AdminLayoutComponent` loaded by the `/admin` route. This component provides the admin-specific sidebar, header, and its own nested `<router-outlet>` for admin pages (Dashboard, Analytics, Products, Orders).
+4. **Role Guards:** We secured the entire `/admin` path in the root routing config using a chained guard: `canActivate: [authGuard, adminGuard]`. This ensures the user must be authenticated AND possess the `ROLE_ADMIN` claim before the code chunks for the admin section are even loaded.
+5. **Dynamic Navigation:** We used Angular's Signals (`computed`) to conditionally inject an "Admin Panel" link into the storefront side navigation, making it visible only to authenticated users with `ROLE_ADMIN`.
+
+---
+
+## Integrating Chart.js in Angular Standalone Components with API Fallbacks
+
+**Date:** June 2026
+
+**Concept:** 
+Building a robust admin analytics dashboard utilizing native `chart.js` rendering and elegant offline service mock fallbacks.
+
+**Why it's important:** 
+Using native `chart.js` rather than wrapper libraries avoids version-lock issues and keeps the dependency tree lean. Furthermore, building API resilience (offline fallbacks) ensures that UI development and demonstrations can continue even when the backend is down, providing an excellent developer and user experience.
+
+**How we did it:**
+1. **Direct Canvas Integration:** We installed the base `chart.js` library and utilized Angular's `@ViewChild` to capture the native HTML `<canvas>` elements for rendering.
+2. **Lifecycle Chart Management:** Inside `ngOnInit`, after data is received, we execute `new Chart(...)`. We ensure to call `.destroy()` on any existing chart instances to avoid canvas re-rendering memory leaks or ghosting effects during hot-reloads.
+3. **Service-Level Fallback:** In the `AdminAnalyticsService`, we mapped `GET /api/admin/analytics/dashboard` to an Observable. By attaching a `.pipe(catchError(...))` operator, we intercept any network failures (e.g., connection refused) and immediately return an `of(this.getMockAnalyticsData())`. This makes the fallback completely transparent to the UI component.
+4. **Data Formatting:** We leveraged Angular's `CurrencyPipe` directly in the template (`{{ value | currency:'INR':'symbol-narrow' }}`) to accurately and professionally format revenue metrics according to our regional requirements.

@@ -1,0 +1,68 @@
+.page-header {
+  margin-bottom: 2rem;
+  h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    color: #212b36;
+  }
+  p {
+    margin: 0.5rem 0 0;
+    color: #637381;
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.kpi-title {
+  font-weight: 600;
+  color: #637381;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-icon {
+  color: #919eab;
+}
+
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212b36;
+  margin-bottom: 0.5rem;
+}
+
+.kpi-trend {
+  font-size: 0.875rem;
+  font-weight: 600;
+  
+  &.positive { color: #00a76f; }
+  &.negative { color: #ff5630; }
+}
+
+.placeholder-section {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  p {
+    color: #637381;
+    padding: 2rem 0;
+    text-align: center;
+  }
+}

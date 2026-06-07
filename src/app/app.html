@@ -66,6 +66,10 @@
       </div>
     </main>
   </div>
+} @else if (isAdminRoute()) {
+  <div class="admin-shell">
+    <router-outlet />
+  </div>
 } @else {
   <mat-drawer-container class="shell-container">
     <mat-drawer
@@ -82,7 +86,7 @@
 
       <nav class="sidebar-nav" aria-label="Primary navigation">
         <mat-nav-list>
-          @for (item of navigationItems; track item.path) {
+          @for (item of filteredNavigationItems(); track item.path) {
             <a
               mat-list-item
               [routerLink]="item.path"
@@ -192,6 +196,9 @@
                 @if (isAuthenticated()) {
                   <a routerLink="/orders" routerLinkActive="desktop-nav__link--active" class="desktop-nav__link">Orders</a>
                   <a routerLink="/profile" routerLinkActive="desktop-nav__link--active" class="desktop-nav__link">Profile</a>
+                  @if (isAdmin()) {
+                    <a routerLink="/admin" routerLinkActive="desktop-nav__link--active" class="desktop-nav__link">Admin Panel</a>
+                  }
                 }
               </nav>
             }

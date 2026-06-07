@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
 
+import { adminGuard } from './core/guards/admin.guard';
+import { authGuard } from './core/guards/auth.guard';
+
 export const routes: Routes = [
   {
     path: 'login',
@@ -65,6 +68,12 @@ export const routes: Routes = [
     path: 'wishlist',
     loadChildren: () =>
       import('./features/wishlist/wishlist.routes').then((m) => m.routes)
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard, adminGuard],
+    loadChildren: () =>
+      import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES)
   },
   {
     path: '**',

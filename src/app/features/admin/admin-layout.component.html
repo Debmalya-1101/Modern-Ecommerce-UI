@@ -1,0 +1,77 @@
+<mat-drawer-container class="admin-shell-container">
+  <mat-drawer
+    class="admin-sidebar"
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="isSidebarOpen()"
+  >
+    <div class="sidebar-brand">
+      <h2>Store Admin</h2>
+      <p class="sidebar-copy">Manage your storefront.</p>
+    </div>
+
+    <mat-divider />
+
+    <nav class="sidebar-nav" aria-label="Admin navigation">
+      <mat-nav-list>
+        @for (item of navigationItems; track item.path) {
+          <a
+            mat-list-item
+            [routerLink]="item.path"
+            routerLinkActive="active-link"
+            (click)="closeSidebarOnMobile()"
+          >
+            <mat-icon matListItemIcon class="sidebar-nav-icon">{{ item.icon }}</mat-icon>
+            <span matListItemTitle>{{ item.label }}</span>
+          </a>
+        }
+      </mat-nav-list>
+    </nav>
+
+    <mat-divider />
+
+    <div class="sidebar-bottom">
+      <a mat-stroked-button appButtonStyle="secondary" routerLink="/">
+        <mat-icon>storefront</mat-icon>
+        Back to Store
+      </a>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content class="admin-content">
+    <header class="admin-header">
+      <mat-toolbar class="admin-toolbar">
+        <div class="toolbar-left">
+          <button
+            mat-icon-button
+            type="button"
+            (click)="toggleSidebar()"
+            aria-label="Toggle admin menu"
+          >
+            <mat-icon>menu</mat-icon>
+          </button>
+        </div>
+
+        <div class="toolbar-right">
+          <div class="admin-profile">
+            <span class="admin-profile__name">{{ currentUserLabel() }}</span>
+            <span class="admin-profile__role">{{ currentRole() }}</span>
+          </div>
+          <button
+            mat-stroked-button
+            appButtonStyle="secondary"
+            type="button"
+            (click)="logout()"
+          >
+            Logout
+          </button>
+        </div>
+      </mat-toolbar>
+    </header>
+
+    <main class="admin-main">
+      <div class="admin-main__container">
+        <router-outlet />
+      </div>
+    </main>
+  </mat-drawer-content>
+</mat-drawer-container>

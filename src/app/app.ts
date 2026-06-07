@@ -70,8 +70,12 @@ export class App {
       || url.startsWith('/forgot-password')
       || url.startsWith('/reset-password');
   });
+  protected readonly isAdminRoute = computed(() => this.currentUrl().startsWith('/admin'));
   protected readonly isLoginRoute = computed(() => this.currentUrl().startsWith('/login'));
   protected readonly isSignupRoute = computed(() => this.currentUrl().startsWith('/signup'));
+  protected readonly isAdmin = computed(
+    () => this.isAuthenticated() && this.session().user?.role === 'ROLE_ADMIN'
+  );
   protected readonly currentUserLabel = computed(
     () => this.session().user?.username ?? 'Guest'
   );
@@ -116,6 +120,19 @@ export class App {
       icon: 'person'
     }
   ];
+
+  protected readonly filteredNavigationItems = computed(() => {
+    const items = [...this.navigationItems];
+    if (this.isAuthenticated() && this.authService.hasRole('ROLE_ADMIN')) {
+      items.push({
+        label: 'Admin Panel',
+        path: '/admin',
+        description: 'Manage products and orders',
+        icon: 'admin_panel_settings'
+      });
+    }
+    return items;
+  });
 
   constructor() {
     this.breakpointObserver
