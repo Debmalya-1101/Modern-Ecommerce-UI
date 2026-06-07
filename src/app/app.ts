@@ -53,7 +53,7 @@ export class App {
   private readonly wishlistService = inject(WishlistService);
   private readonly mobileBreakpoint = '(max-width: 768px)';
   private readonly startsOnMobile = this.breakpointObserver.isMatched(this.mobileBreakpoint);
-  private readonly currentUrl = signal(this.router.url);
+  protected readonly currentUrl = signal(this.router.url);
 
   protected readonly title = 'Modern Commerce';
   protected readonly isMobile = signal(this.startsOnMobile);

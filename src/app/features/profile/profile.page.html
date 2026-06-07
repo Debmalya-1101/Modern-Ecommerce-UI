@@ -1,0 +1,86 @@
+<div class="profile-container">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <app-loading-spinner label="Loading your profile..." [diameter]="60"></app-loading-spinner>
+    </div>
+  } @else if (error()) {
+    <mat-card class="error-card" appearance="outlined">
+      <mat-icon color="warn" class="error-icon">error_outline</mat-icon>
+      <h3>Oops! Something went wrong.</h3>
+      <p>{{ error() }}</p>
+      <button mat-flat-button color="primary" (click)="loadProfile()">Try Again</button>
+    </mat-card>
+  } @else if (user()) {
+    <div class="profile-layout">
+      <!-- Header Section -->
+      <header class="profile-header">
+        <div class="avatar-circle">
+          {{ user()!.username.charAt(0) | uppercase }}
+        </div>
+        <div class="welcome-text">
+          <h1>Welcome back, {{ user()!.username }}!</h1>
+          <p>Manage your account settings and preferences here.</p>
+        </div>
+      </header>
+
+      <div class="profile-content">
+        <!-- Account Information Section -->
+        <section class="profile-section">
+          <h2>Account Information</h2>
+          <mat-card class="info-card" appearance="outlined">
+            <div class="info-row">
+              <mat-icon class="info-icon">person</mat-icon>
+              <div class="info-details">
+                <span class="info-label">Username</span>
+                <span class="info-value">{{ user()!.username }}</span>
+              </div>
+            </div>
+            
+            <mat-divider></mat-divider>
+            
+            <div class="info-row">
+              <mat-icon class="info-icon">email</mat-icon>
+              <div class="info-details">
+                <span class="info-label">Email Address</span>
+                <span class="info-value">{{ user()!.emailId }}</span>
+              </div>
+            </div>
+          </mat-card>
+        </section>
+
+        <!-- Role Information Section -->
+        <section class="profile-section">
+          <h2>Role Information</h2>
+          <mat-card class="info-card" appearance="outlined">
+            <div class="info-row">
+              <mat-icon class="info-icon">badge</mat-icon>
+              <div class="info-details">
+                <span class="info-label">Account Level</span>
+                <span class="info-value role-badge" [ngClass]="user()!.role">
+                  {{ formatRole(user()!.role) }}
+                </span>
+              </div>
+            </div>
+          </mat-card>
+        </section>
+
+        <!-- Session Management Section -->
+        <section class="profile-section session-section">
+          <h2>Session Management</h2>
+          <mat-card class="info-card session-card" appearance="outlined">
+            <div class="session-content">
+              <div class="session-text">
+                <h3>Sign Out</h3>
+                <p>Ready to leave? Sign out of your account securely.</p>
+              </div>
+              <button mat-flat-button appButtonStyle="danger" type="button" (click)="logout()">
+                <mat-icon>logout</mat-icon>
+                Logout
+              </button>
+            </div>
+          </mat-card>
+        </section>
+      </div>
+    </div>
+  }
+</div>

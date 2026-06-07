@@ -104,7 +104,7 @@ export class LoginPage implements OnInit {
 
   private navigateAfterLogin(): void {
     const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-    const targetUrl = redirectTo?.startsWith('/') ? redirectTo : '/profile';
+    const targetUrl = redirectTo?.startsWith('/') ? redirectTo : '/';
 
     this.router.navigateByUrl(targetUrl);
   }

@@ -3942,3 +3942,67 @@ readonly ratingDistribution = computed(() => {
 });
 ```
 Every time a new review is added, edited, or deleted, or a new page is loaded, the distribution bars instantly recalculate and animate to their new widths.
+
+---
+
+## Implementing the User Profile Feature
+
+**Objective**: Create a responsive profile page where authenticated users can view their account information and safely log out.
+
+### 1. Authenticated API Requests
+
+**Concept**: A secure backend endpoint like `GET /auth/me` requires the client to prove who they are on every single request. Rather than manually grabbing the token from `localStorage` and constructing headers for every API call, we automate this.
+
+**How we did it**:
+We reused the `JwtInterceptor` (`jwt.interceptor.ts`). Because Angular registers this interceptor globally for all outgoing HTTP traffic, it checks if a user is logged in. If they are, it clones the outgoing request and securely appends the `Authorization: Bearer <token>` header before it hits the network. The backend then decodes this token to confidently return the profile data associated with that user.
+
+### 2. User State Management
+
+**Concept**: Data shouldn't be haphazardly stored in different components. When multiple parts of an application (like the top navigation bar, the checkout page, and the profile page) need to know the current user, there must be a single source of truth.
+
+**How we did it**:
+We used Angular Signals inside a singleton `AuthService`. The `AuthService` exposes computed properties like `session()` which is derived directly from the `currentUser` signal. On the profile page (`ProfilePage`), we simply injected `AuthService`, bound the template to `authService.session().user`, and called `authService.refreshCurrentUser()` to perform a fresh fetch. This guarantees that if the server updates the user's role, the local UI syncs immediately.
+
+### 3. Route Guards
+
+**Concept**: Simply hiding the "Profile" button from guests isn't secure enough; users can manually type `/profile` into their browser address bar.
+
+**How we did it**:
+We attached an `AuthGuard` (`auth.guard.ts`) to the `/profile` route configuration. Before Angular attempts to load the Profile component, it executes the guard function. The guard checks `authService.isAuthenticated()`. If true, the user passes through. If false, it blocks navigation and constructs a `UrlTree` directing the user back to the `/login` page securely.
+
+### 4. Directing Users Post-Login (Redirect Parameters)
+
+**Concept**: To provide a seamless user experience, logging in should return users back to the page they were previously browsing (the "current page") instead of dumping them onto a generic landing page like the User Profile on every login.
+
+**How we did it**:
+In our application shell template ([app.html](file:///c:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/src/app/app.html)) and typescript layout ([app.ts](file:///c:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/src/app/app.ts)), we updated the login action links to dynamically attach a `redirectTo` query parameter set to the current URL—but only if the user isn't already on an authentication-related route:
+```html
+<a
+  mat-stroked-button
+  appButtonStyle="secondary"
+  routerLink="/login"
+  [queryParams]="isAuthRoute() ? null : { redirectTo: currentUrl() }"
+>
+  Sign in
+</a>
+```
+Inside the login page controller ([login.page.ts](file:///c:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/src/app/features/auth/login.page.ts)), we modified the post-login routing logic. If a `redirectTo` parameter exists, they return to that page; if not, we direct them to the homepage (`/`) by default, rather than forcing them to the `/profile` screen:
+```typescript
+const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
+const targetUrl = redirectTo?.startsWith('/') ? redirectTo : '/';
+this.router.navigateByUrl(targetUrl);
+```
+
+### 5. Proper Host Class Binding for Directives
+
+**Concept**: Angular directives that decorate UI elements (like our custom `appButtonStyle` button theme directive) often depend on specific third-party framework host classes (such as Angular Material's `.mdc-button`). If a custom directive is applied to a raw HTML `<button>` without also attaching the underlying UI framework directive (like `mat-flat-button` or `mat-stroked-button`), the compiler-generated classes will fail to match properly in CSS, causing the button to render in its default browser-native look.
+
+**How we did it**:
+In our profile template ([profile.page.html](file:///c:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/src/app/features/profile/profile.page.html)), we corrected the logout button element by adding the missing `mat-flat-button` directive alongside our custom theme directive. We also set `type="button"` to follow standard HTML forms best practices:
+```html
+<button mat-flat-button appButtonStyle="danger" type="button" (click)="logout()">
+  <mat-icon>logout</mat-icon>
+  Logout
+</button>
+```
+Now, Angular Material properly applies the button component classes, and our styling directive correctly hooks into the design system to display a premium, styled action button matching our e-commerce aesthetics.

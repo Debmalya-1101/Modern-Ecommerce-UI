@@ -36,6 +36,7 @@
             mat-stroked-button
             appButtonStyle="secondary"
             routerLink="/login"
+            [queryParams]="isAuthRoute() ? null : { redirectTo: currentUrl() }"
           >
             Sign in
           </a>
@@ -44,6 +45,7 @@
             mat-stroked-button
             appButtonStyle="secondary"
             routerLink="/login"
+            [queryParams]="isAuthRoute() ? null : { redirectTo: currentUrl() }"
           >
             Sign in
           </a>
@@ -132,6 +134,7 @@
               mat-flat-button
               appButtonStyle="secondary"
               routerLink="/login"
+              [queryParams]="isAuthRoute() ? null : { redirectTo: currentUrl() }"
               (click)="closeSidebarOnMobile()"
             >
               Login
@@ -260,6 +263,7 @@
                 mat-stroked-button
                 appButtonStyle="secondary"
                 routerLink="/login"
+                [queryParams]="isAuthRoute() ? null : { redirectTo: currentUrl() }"
                 class="toolbar-login"
               >
                 Login
