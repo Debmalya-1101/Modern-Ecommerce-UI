@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
-import { CheckoutRequest, OrderResponse } from '../models/order.model';
+import { OrderDetail, CheckoutRequest, OrderResponse } from '../models/order.model';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -15,8 +15,8 @@ export class OrdersApiService {
     return this.apiService.get<OrderResponse[]>(API_ENDPOINTS.orders.root, undefined, { trackLoading: true });
   }
 
-  getOrderDetail(orderId: number): Observable<OrderResponse> {
-    return this.apiService.get<OrderResponse>(API_ENDPOINTS.orders.detail(orderId), undefined, { trackLoading: true });
+  getOrderDetail(orderId: number): Observable<OrderDetail> {
+    return this.apiService.get<OrderDetail>(API_ENDPOINTS.orders.detail(orderId), undefined, { trackLoading: true });
   }
 
   checkout(request: CheckoutRequest): Observable<OrderResponse> {

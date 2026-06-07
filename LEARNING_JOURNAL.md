@@ -4186,3 +4186,205 @@ An administrative dashboard typically requires data from multiple discrete domai
 5. **Aesthetic Consistency:** We styled the dashboard with `mat-card` elements, carefully curated semantic colors, and micro-interactions (hover states on shortcut links) to ensure the control panel feels premium and aligns with the modern e-commerce visual language of the existing application.
 6. **Defensive Model Mapping & Change Detection Safety:** We resolved an infinite loading spinner bug by adding defensive fallbacks and try-catch safety boundaries. If subproperties of the API response (like `ordersByStatus`, `topSellingProducts`, or `monthlySalesGraph`) are null or omitted, accessing properties on them (e.g., `.forEach` or `.length`) throws a synchronous `TypeError`. This crashes Angular's change-detection thread, causing the UI to freeze in its loading state. Applying default empty arrays (`|| []`) and wrapping mapping logic in `try-catch` prevents these fatal rendering crashes.
 
+## Feature Update: Order Details Page UI Enhancement
+
+What was added:
+- Updated the `OrderResponse` and `OrderDetail` models to match the new backend `OrderDetailDTO` schema.
+- Added visual display for payment status (`COMPLETED`, `INITIATED`, `FAILED`) using status badges.
+- Enhanced the item list rendering to display actual product images (`productImageUrl`) instead of a generic placeholder.
+- Included the item's `categoryName` as a subtitle underneath the product name for clearer organization.
+- Added display for the order's `updatedAt` timestamp.
+
+Why it was added:
+- To provide users with a more comprehensive and visually appealing summary of their purchases.
+- To take advantage of the enriched backend payload which now includes crucial e-commerce metadata (payment status, imagery, category).
+
+Angular concept behind it:
+- **Type Safety & Data Binding:** Updating interfaces ensures the component logic and HTML templates can safely access nested objects like `item.productImageUrl`.
+- **Structural Directives & Fallbacks:** Using `@if (item.productImageUrl)` safely falls back to a default `<mat-icon>` when no image is returned from the server.
+- **Dynamic Class Bindings:** Using `[class]="order()!.paymentStatus.toLowerCase()"` allows us to inject dynamic CSS classes directly from API values to colorize the badges.
+
+Simple example:
+```html
+<span class="payment-badge" [class]="order()!.paymentStatus.toLowerCase()">
+  <mat-icon inline="true">{{ order()!.paymentStatus === 'COMPLETED' ? 'check_circle' : 'pending' }}</mat-icon>
+  {{ order()!.paymentStatus === 'COMPLETED' ? 'Paid' : order()!.paymentStatus }}
+</span>
+```
+
+What I learned:
+- It is crucial to separate the model representing a list view (`OrderResponseDTO` -> `OrderResponse`) from the detailed view (`OrderDetailDTO` -> `OrderDetail`), as their data granularity frequently differs in robust backend systems.
+- Safely handling missing data directly in the template (e.g. using `order()?.items`) avoids null-reference errors during async data loading.
+- Reusing global SCSS patterns (like the `status-badge` rules) accelerates building new badges with consistent visual weight.
+
+## Feature Update: Order Details UI Redesign & Payment Status Badge Clarification
+
+What was added:
+- Relocated the payment status badge from the page header into the **Order Summary** card. Labeled it clearly as `Payment Status: Paid / Pending / Failed` and styled it with dedicated colored indicator pills.
+- Added mapped methods in `order-detail.page.ts` to normalize backend payment statuses (treating both `SUCCESS` and `COMPLETED` as `Paid` with a green checkmark).
+- Integrated a modern visual **Order Status Tracker** (Placed -> Shipped -> Delivered) directly under the header with animated connector lines and active highlights.
+- Redesigned card layouts: rounded corners (`16px`), custom elevations/shadows, category capsules, and a hover zoom-in transition on product images.
+- Added responsive overrides for mobile screens (e.g. layout stacking and image centering).
+- Resolved a Sass compilation warning by removing the deprecated `darken()` function, and adjusted the component style budget in `angular.json` to allow rich component styles.
+
+Why it was added:
+- Rendering the payment status `SUCCESS` right next to the shipping status `SHIPPED` in the header created visual confusion for users, who mistook it for a duplicate or duplicate-looking status. Relocating it into the Order Summary card makes its meaning immediately clear.
+- The visual order tracker provides an instantly recognizable status history, elevating the e-commerce user experience.
+- The Sass compilation warnings and component style budgets were restricting the design fidelity.
+
+Angular concept behind it:
+- **Helper Methods for State Transformation:** Instead of placing complex ternary logic inside HTML templates, we delegate state transformation (`getPaymentStatusLabel()`, `getPaymentStatusClass()`, etc.) to helper methods in the TypeScript class. This keeps templates highly readable and maintainable.
+- **Component Style Budgets:** Angular builds fail if component stylesheets exceed preconfigured budgets in `angular.json`. When building rich designs with animations and responsive layouts, adjusting the `anyComponentStyle` limits is standard practice to support advanced CSS/SCSS features.
+- **Visual Stepper Representation:** Mapping continuous backend states (e.g., `'SHIPPED'`) to discrete progress steps (e.g., `2` out of `3`) allows the template to conditionally toggle CSS classes (like `active` and `completed`) on connector bars and step icons.
+
+Simple example:
+```typescript
+// order-detail.page.ts
+getPaymentStatusLabel(status: string): string {
+  if (!status) return 'Pending';
+  const s = status.toUpperCase();
+  if (s === 'COMPLETED' || s === 'SUCCESS') return 'Paid';
+  return 'Pending';
+}
+```
+```html
+<!-- order-detail.page.html -->
+<span class="payment-badge-pill" [class]="getPaymentStatusClass(order()!.paymentStatus)">
+  <mat-icon>{{ getPaymentStatusIcon(order()!.paymentStatus) }}</mat-icon>
+  <span>{{ getPaymentStatusLabel(order()!.paymentStatus) }}</span>
+</span>
+```
+
+What I learned:
+- Avoid putting raw status codes (like `SUCCESS`) directly in headers without labels. Labeled badges inside summaries are far more readable.
+- Keep HTML templates clean by writing helper mapping methods in the component.
+- The Sass compiler warns against global helper functions like `darken()`, urging developers to use hardcoded values or newer functions like `color.adjust` to be ready for Sass 3.0.
+- When creating rich designs, adjust the component stylesheet budgets in `angular.json` under `anyComponentStyle` rather than compromising on CSS styling.
+
+## Feature Update: Balanced Order Details Layout, Bounded Scroll List, & Compact Spacing
+
+What was added:
+- Restructured the Order Details page layout to position the **Order Items** card as a full-width block at the top.
+- Placed the **Delivery Details** card and **Order Summary** card side-by-side in a two-column grid (`1.5fr 1fr`) at the bottom.
+- Applied a `max-height: 380px` constraint with `overflow-y: auto` and a custom-styled scrollbar to the items list container.
+- Configured `.item-details` with a horizontal flex alignment (`justify-content: space-between`) on desktop screen widths to fill the wider horizontal space cleanly.
+- Tightened vertical spacing across the top sections:
+  - Reduced outer container top padding from `2.5rem` to `1.25rem`.
+  - Shrank flexbox spacing gap between top components from `1.5rem` to `1.15rem`.
+  - Reduced the visual tracker card padding from `2rem` to `1.25rem 1.5rem`.
+  - Compacted the tracker step icon size to `38px` (from `48px`) and adjusted spacing for status labels.
+  - Scaled down the header title size to `2rem` (from `2.25rem`).
+
+Why it was added:
+- Previously, placing the items card on the left and both summary/delivery cards stacked on the right caused a vertical height mismatch. A single item left a massive blank space under it on the left, while the right column stretched very tall.
+- Placing the cards horizontally balances the layout.
+- Adding a `max-height` scroll limit to the items card ensures that users with a large number of items do not have to scroll down the entire browser window just to see delivery details and the payment summary.
+- The horizontal alignment of details inside the full-width item rows prevents product names from feeling awkwardly separated from their prices on large desktop monitors.
+- Spacing, padding, and stepper sizes were excessively large, taking up a significant portion of the page height. Compacting them pulls all order cards higher up on the screen, improving above-the-fold visibility.
+
+Angular concept behind it:
+- **Responsive Layout Design with Flex & Grid:** Using modern CSS Grid (`display: grid`) for side-by-side transaction blocks and CSS Flexbox for horizontal alignment within rows gives us precise control over how elements position themselves relative to their containers.
+- **Scroll Bounded Containers:** Utilizing standard CSS bounds (`max-height` + `overflow-y: auto`) on dynamic lists allows containers to expand naturally to fit content up to a certain threshold and scroll gracefully beyond it. This is a crucial design pattern for maintaining dashboard usability.
+- **Sizing Metrics Optimization:** Choosing proportional CSS sizing and paddings (e.g. `1.25rem` instead of `2rem` and `38px` step icons) ensures that complex user flows and UI trackers consume minimal vertical real estate, prioritizing critical detail cards.
+
+Simple example:
+```scss
+.items-list {
+  max-height: 380px;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--shell-border);
+    border-radius: 999px;
+  }
+}
+```
+
+What I learned:
+- Layout grids in e-commerce details pages should position growing content (like lists of products) in full-width rows, and relatively static content (like address cards and price summaries) side-by-side.
+- Adding bounded height scroll regions keeps pages short and prevents transaction information from being pushed "below the fold."
+- Media queries should not only handle column stack behaviors but also toggle row layout properties (e.g. converting a horizontal row of meta fields into a vertical stack) to maintain a premium mobile experience.
+- Trackers and visual flow diagram components should be kept compact (under `40px` icon sizes) so they do not dominate the screen layout.
+
+## Feature Update: Orders List Horizontal Cards, Tracker Relocation, & Spacing Optimizations
+
+What was added:
+- Relocated the visual progress tracker stepper from the **Order Details** page, freeing up vertical height at the top of the detail view.
+- Redesigned the **My Orders (list)** page layout to display orders in a vertical stack of horizontal cards (`.order-card-horizontal`).
+- Embedded a compact mini progress tracker stepper (Placed -> Shipped -> Delivered) inside each order card on the list page.
+- Added a text-only listing of product names in each card, formatted as a truncated comma-separated string, replacing product images.
+- Configured helper methods `getOrderStatusStep()` and `getProductNamesSummary()` in the component class to calculate and format values.
+- Implemented responsive mobile rules to stack horizontal card sections.
+- Tightened spacings across the Orders List page:
+  - Widened the page container's `max-width` to `1200px` (up from `1100px`) to span wider and reduce side margin blank space.
+  - Reduced top padding from `2rem` to `0.5rem` and side padding from `1.5rem` to `1rem`.
+  - Cleared default top margins (`margin-top: 0`) on the page header and h1 element.
+  - Shrank the page header's bottom margin from `2.5rem` to `0.75rem` and title size to `2rem`.
+  - Tightened card vertical list spacing gaps from `1.5rem` to `1rem`.
+
+Why it was added:
+- Moving the progress tracker to the list page gives users immediate visual feedback on the shipping status of all their past orders at a glance, without requiring them to click into each order detail.
+- Removing the tracker from the top of the details page creates a clean, compact header layout, fulfilling the spacing requirements.
+- Displaying product list text instead of image thumbnails on the history page maintains an extremely lightweight, clean, and cohesive card layout.
+- The default list page layout had oversized margins and headers. Compacting them pulls the order cards higher, improving above-the-fold content visibility, and widening the container uses wide desktop screens better.
+
+Angular concept behind it:
+- **String Transformations in Component Methods:** Implementing utility methods (such as `getProductNamesSummary()`) to transform model data arrays into formatted strings in the component class rather than writing complex logic directly inside HTML template bindings makes templates cleaner and easier to test.
+- **Relocated Template Blocks:** Relocating visual components between pages requires mapping equivalent state fields (e.g. detailed view `order()!.orderStatus` vs list view `order.status`) to ensure the stepper icons highlight active steps correctly.
+- **Widescreen Responsive Scaling:** Adjusting container limits (such as `max-width: 1200px`) along with responsive pad overrides (like `padding: 1rem 0.5rem` on mobile) ensures horizontal elements scale comfortably across both massive 4K monitors and narrow mobile viewports.
+
+Simple example:
+```typescript
+getProductNamesSummary(order: OrderResponse): string {
+  if (!order || !order.items) return '';
+  const names = order.items.map(item => item.productName);
+  const joined = names.join(', ');
+  return joined.length <= 65 ? joined : joined.substring(0, 65) + '...';
+}
+```
+
+What I learned:
+- Moving progress status trackers to listing pages dramatically increases e-commerce user experience by letting users see "where their package is" immediately upon opening their orders history.
+- Text-only summary fields are a highly clean layout alternative to loading product image thumbnails in summary lists, keeping layout sizes predictable.
+- Relocating template code requires checking that styles are self-contained or mapped correctly to local CSS classes.
+- Container limits should be adjusted to let horizontal elements span naturally across wide viewports without generating excessive empty margins.
+
+## Feature Update: Correct Product Image Fit & Containment in Order Details
+
+What was added:
+- Modified `.product-image` styling in `order-detail.page.scss` to use `object-fit: contain` instead of `object-fit: cover`.
+- Added a `padding: 4px` property to `.item-image-wrapper` to provide a subtle margin between the product images and their container borders.
+
+Why it was added:
+- Using `object-fit: cover` forced product images to crop and zoom in, which stretched/squished them awkwardly when they didn't match the square aspect ratio of the 72px x 72px box.
+- Switching to `object-fit: contain` ensures that product images fit entirely within the box while preserving their native aspect ratios.
+- Adding a 4px padding provides a clean visual boundary, preventing image pixels from directly touching the border of the rounded container.
+
+Angular concept behind it:
+- **CSS Object Fitting for Responsive Media:** The `object-fit` property controls how replaced content (like `<img>` or `<video>`) responds to the width and height of its box. Using `contain` maintains the media's aspect ratio while letterboxing or pillarboxing it to fit the box, whereas `cover` forces it to stretch and clip.
+
+Simple example:
+```scss
+.item-image-wrapper {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px; /* prevents image touching border */
+  
+  .product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* maintains original aspect ratio */
+  }
+}
+```
+
+What I learned:
+- In e-commerce product listings, images should almost always be scaled using `object-fit: contain` rather than `cover` when they are displayed in square thumb containers, as product photography varies greatly in height and width aspect ratios (e.g. phones, monitors, clothes).
+- Adding a minor padding inside image wrapper divs prevents colored product image boundaries from looking cropped or clipped against the wrapper's border radius.
+

@@ -52,4 +52,27 @@ export class OrdersPage implements OnInit {
       }
     });
   }
+
+  getOrderStatusStep(status: string): number {
+    if (!status) return 1;
+    const s = status.toUpperCase();
+    switch (s) {
+      case 'PLACED': return 1;
+      case 'SHIPPED': return 2;
+      case 'DELIVERED': return 3;
+      default: return 1;
+    }
+  }
+
+  getProductNamesSummary(order: OrderResponse): string {
+    if (!order || !order.items || order.items.length === 0) return 'No items';
+    const names = order.items.map(item => item.productName);
+    const joined = names.join(', ');
+    const maxLength = 65;
+    if (joined.length <= maxLength) {
+      return joined;
+    }
+    return joined.substring(0, maxLength) + '...';
+  }
 }
+

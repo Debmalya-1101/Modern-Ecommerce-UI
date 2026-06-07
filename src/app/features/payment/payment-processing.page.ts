@@ -16,7 +16,7 @@ import { OrdersApiService } from '../../core/services/orders-api.service';
 import { PaymentApiService } from '../../core/services/payment-api.service';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { APP_CONSTANTS } from '../../core/config/app.constants';
-import { OrderResponse } from '../../core/models/order.model';
+import { OrderDetail } from '../../core/models/order.model';
 import { PaymentInitiateResponse } from '../../core/models/payment.model';
 
 @Component({
@@ -53,7 +53,7 @@ export class PaymentProcessingPage implements OnInit {
   readonly isProcessing = signal<boolean>(false);
   readonly cardFlipped = signal<boolean>(false);
   
-  readonly order = signal<OrderResponse | null>(null);
+  readonly order = signal<OrderDetail | null>(null);
   readonly session = signal<PaymentInitiateResponse | null>(null);
 
   orderId: number | null = null;
@@ -88,7 +88,7 @@ export class PaymentProcessingPage implements OnInit {
       next: (order) => {
         this.order.set(order);
         
-        if (order.status !== 'PLACED') {
+        if (order.orderStatus !== 'PLACED') {
           // If already shipped/delivered or cancelled, payment shouldn't be processed here
           this.snackbar.info('This order has already been processed.');
           this.router.navigate(['/orders', orderId]);

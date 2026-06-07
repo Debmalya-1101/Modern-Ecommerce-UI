@@ -8,7 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDividerModule } from '@angular/material/divider';
 
 import { OrdersApiService } from '../../core/services/orders-api.service';
-import { OrderResponse } from '../../core/models/order.model';
+import { OrderDetail } from '../../core/models/order.model';
 import { APP_CONSTANTS } from '../../core/config/app.constants';
 
 @Component({
@@ -31,7 +31,7 @@ export class OrderDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   
   readonly currencyCode = APP_CONSTANTS.currencyCode;
-  readonly order = signal<OrderResponse | null>(null);
+  readonly order = signal<OrderDetail | null>(null);
   readonly isLoading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
   orderId: number | null = null;
@@ -67,4 +67,40 @@ export class OrderDetailPage implements OnInit {
       }
     });
   }
+
+  getPaymentStatusLabel(status: string): string {
+    if (!status) return 'Pending';
+    const s = status.toUpperCase();
+    if (s === 'COMPLETED' || s === 'SUCCESS') return 'Paid';
+    if (s === 'FAILED') return 'Failed';
+    return 'Pending';
+  }
+
+  getPaymentStatusClass(status: string): string {
+    if (!status) return 'initiated';
+    const s = status.toUpperCase();
+    if (s === 'COMPLETED' || s === 'SUCCESS') return 'completed';
+    if (s === 'FAILED') return 'failed';
+    return 'initiated';
+  }
+
+  getPaymentStatusIcon(status: string): string {
+    if (!status) return 'pending';
+    const s = status.toUpperCase();
+    if (s === 'COMPLETED' || s === 'SUCCESS') return 'check_circle';
+    if (s === 'FAILED') return 'error';
+    return 'pending';
+  }
+
+  getOrderStatusStep(status: string): number {
+    if (!status) return 1;
+    const s = status.toUpperCase();
+    switch (s) {
+      case 'PLACED': return 1;
+      case 'SHIPPED': return 2;
+      case 'DELIVERED': return 3;
+      default: return 1;
+    }
+  }
 }
+
