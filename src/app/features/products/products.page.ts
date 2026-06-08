@@ -245,7 +245,7 @@ export class ProductsPage implements OnInit {
               price: product.price,
               rating: product.rating,
               imageUrl: product.imageUrl,     // Real image URL from the backend
-              reviewCount: 0,                 // Backend list API does not return review count
+              reviewCount: product.ratingCount ?? 0,
               imageLabel: product.name,       // Use product name as the image alt text
               shortDescription: product.shortDescription,
               badge: product.badge,

@@ -4388,3 +4388,113 @@ What I learned:
 - In e-commerce product listings, images should almost always be scaled using `object-fit: contain` rather than `cover` when they are displayed in square thumb containers, as product photography varies greatly in height and width aspect ratios (e.g. phones, monitors, clothes).
 - Adding a minor padding inside image wrapper divs prevents colored product image boundaries from looking cropped or clipped against the wrapper's border radius.
 
+## Feature Update: Integrating New Product Details and Rating Count Fields
+
+What was added:
+- Added `ratingCount` to `ProductListDTO`, `ProductDetailDTO`, `ProductListItem`, and `ProductDetail` interfaces in `product.model.ts`.
+- Mapped `dto.ratingCount` from the backend to the UI view model's `reviewCount` and `ratingCount` properties.
+- Added `fullName` to product details interfaces and mapped it in `ProductsApiService`.
+- Updated `ProductCardViewModel` mapping in both the product list (`products.page.ts`) and cart recommendations (`cart-recommendations-carousel.component.ts`) components to display the actual rating count instead of hardcoding it to `0`.
+- Updated the Product Details template (`product-details.page.html`) to display the new descriptive `fullName` as the main heading.
+
+Why it was added:
+- The backend API was updated to provide actual rating counts and a fully detailed product name, which we want to surface on the product catalog cards and the details page to improve the user experience.
+
+Angular concept behind it:
+- **TypeScript DTO to View Model Mapping:** Keeping backend DTO interfaces strictly typed and separate from frontend UI/View models allows developers to map and transform properties (like mapping backend `ratingCount` to frontend component inputs expecting `reviewCount`) without breaking existing UI components.
+- **Conditional Fallbacks in Angular Templates:** Surfacing new optional fields in HTML templates using nullish coalescing or logical OR operators (`||`) ensures that the UI renders properly even if the backend returns a null or empty field for some records.
+
+Simple example:
+```html
+<!-- Display full detailed name if available, fallback to short name -->
+<h3>{{ productDetail.fullName || productDetail.name }}</h3>
+```
+
+What I learned:
+- Separating backend DTO models from frontend View Models acts as an anti-corruption layer, making API changes easy to adapt on the frontend with minimal ripple effects.
+- Using simple template expressions for fallbacks is clean and robust for UI rendering.
+
+## Feature Update: Product Details Layout Alignment & Polish
+
+What was added:
+- Integrated columns into a single unified `.detail-container-card` wrapper card.
+- Replaced the bottom thumbnails list with an interactive horizontal slider frame (`.gallery-slider`) that expands to fill space (`flex: 1`).
+- Relocated the product metadata row (ID, Brand, Category) directly below the image slider on the left.
+- Standardized the layout of the metadata row and purchase buttons on the right to align perfectly on the same bottom baseline:
+  - Synchronized the `.detail-left-info` and `.summary-bottom-info` container properties (`margin-top: auto`, `padding-top: 1.5rem`, and top borders).
+  - Removed `.info-grid`'s bottom margin (`margin-bottom: 0`) and removed top padding/borders from the inner `.detail-actions` div to prevent spacing offsets.
+- Wrapped product descriptions in a custom-styled coppery scroll container (`.detail-description-container`) to prevent card height bloating.
+
+Why it was added:
+- Misaligned columns and floating divider lines create a disjointed e-commerce page structure.
+- Aligning metadata cards (left column) and purchase buttons (right column) to the exact same baseline row gives a premium feel.
+- Restricting description heights to a scroll region ensures transaction components are always above-the-fold regardless of description length.
+
+Angular concept behind it:
+- **Baseline Flex Alignment in Multicolumn Grid:** In CSS grid layouts where columns stretch to equal heights (`align-items: stretch`), we can use flex column directions (`display: flex; flex-direction: column; height: 100%`) inside those columns. By specifying a flex-growing body and applying `margin-top: auto` to bottom segments, the elements naturally anchor to the bottom edge of their columns, aligning perfectly.
+- **Scroll Containment with Webkit Scrollbars:** Controlling overflows using `overflow-y: auto` prevents text length from expanding parent sizes. Customizing the browser's scrollbars (`::-webkit-scrollbar`, `::-webkit-scrollbar-thumb`) ensures these custom scrollbars maintain the project's brand design language.
+
+Simple example:
+```scss
+// Flex column layout pushing footer block to the bottom baseline
+.column-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  .growing-content {
+    flex: 1; /* consumes available vertical space */
+  }
+
+  .aligned-bottom-row {
+    margin-top: auto; /* anchors directly to bottom baseline */
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+```
+
+What I learned:
+- Hardcoding `height: 100%` on children of flex column elements can distort layout proportions; using `flex: 1` is cleaner as it instructs the browser to allocate the remaining space dynamically.
+- Symmetrical layout structures require matching not only the padding and margins of active elements but also their vertical flow properties and divider positions.
+- Bounding text blocks using maximum heights and scroll wrappers prevents layout distortions when rendering verbose user-submitted or backend database descriptions.
+
+## Feature Update: Hover Transitions, Image Container Stabilization, & Specifications Expandable Toggle
+
+What was added:
+- Eliminated redundant category chips and brand labels from the details summary panel.
+- Bounded image frame container sizing to `25rem` height to keep dimensions identical between vertical and horizontal imagery.
+- Hid image gallery slider arrows (`.slider-arrow`) by default, fading them in (`opacity: 1`) only when hovering over the slider.
+- Structured description scrolls to hide the scrollbar thumb/track by default, showing them only when hovering.
+- Sliced technical specifications to 6 items by default with a computed signal, appending a toggle button to expand/collapse.
+
+Why it was added:
+- Removing duplicate labels maximizes space for product names and description texts.
+- Fixed container sizing prevents distracting page-content layout shifts during product image transitions.
+- Hover-only visual tools (arrows/scrollbars) reduce page noise and produce a sleek user interface.
+- Expandable lists keep technical breakdowns structured and out of the way until requested.
+
+Angular concept behind it:
+- **Hover States and Transition Selectors:** Adding `opacity: 0` and `pointer-events: none` on standard elements, and switching them to `opacity: 1` and `pointer-events: auto` on `:hover` of parent wrappers creates lightweight, responsive animations.
+- **Computed Slice Logic on Arrays:** Using Angular's `computed` reactive signals to slice array data dynamically inside component classes rather than implementing complex logic inside template files keeps standard binding operations lightweight and maintainable.
+
+Simple example:
+```typescript
+// Component computed array slice based on expansion state signal
+protected readonly showAll = signal(false);
+
+protected readonly visibleItems = computed(() => {
+  const items = this.dataItems();
+  if (this.showAll() || items.length <= 5) {
+    return items;
+  }
+  return items.slice(0, 5);
+});
+```
+
+What I learned:
+- Toggling hover elements is best done by combining `opacity: 0` with `pointer-events: none` to prevent invisible buttons from blocking clicks.
+- Hover-triggered scrollbars can be elegantly styled in Webkit by setting scrollbar and track colors to transparent by default, then updating their colors inside a parent `:hover` rule.
+- Slicing data streams via computed signals keeps business rules out of template code, simplifying unit testing and component maintainability.
+
+

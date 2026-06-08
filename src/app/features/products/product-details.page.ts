@@ -19,7 +19,6 @@ import { SnackbarService } from '../../shared/services/snackbar.service';
 import { ErrorStateComponent } from '../../shared/ui/error-state/error-state.component';
 import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading-spinner.component';
 import { ProductBadgeComponent } from '../../shared/ui/product/product-badge/product-badge.component';
-import { ProductCategoryChipComponent } from '../../shared/ui/product/product-category-chip/product-category-chip.component';
 import { ProductImagePlaceholderComponent } from '../../shared/ui/product/product-image-placeholder/product-image-placeholder.component';
 import { ProductPriceDisplayComponent } from '../../shared/ui/product/product-price-display/product-price-display.component';
 import { ProductRatingDisplayComponent } from '../../shared/ui/product/product-rating-display/product-rating-display.component';
@@ -45,7 +44,6 @@ interface GalleryItem {
     ErrorStateComponent,
     LoadingSpinnerComponent,
     ProductBadgeComponent,
-    ProductCategoryChipComponent,
     ProductImagePlaceholderComponent,
     ProductPriceDisplayComponent,
     ProductRatingDisplayComponent,
@@ -75,6 +73,24 @@ export class ProductDetailsPage implements OnInit {
   // The quantity the user wishes to add to the cart
   protected readonly selectedQuantity = signal(1);
 
+  // Tracks whether the product specifications table is fully expanded
+  protected readonly showAllSpecifications = signal(false);
+
+  /**
+   * The list of specifications to display. Show only first 6 rows by default.
+   */
+  protected readonly visibleSpecifications = computed(() => {
+    const productDetail = this.product().data;
+    if (!productDetail) {
+      return [];
+    }
+    const specs = productDetail.specifications;
+    if (this.showAllSpecifications() || specs.length <= 6) {
+      return specs;
+    }
+    return specs.slice(0, 6);
+  });
+
   /**
    * Gallery items derived from the product's imageGallery array.
    * Each item has the raw URL (for <img src>) and a clean display label.
@@ -96,6 +112,33 @@ export class ProductDetailsPage implements OnInit {
 
     // Fallback: single item using the main product image
     return [{ url: productDetail.imageUrl, label: productDetail.name }];
+  });
+
+  /**
+   * Parses the product description dynamically.
+   * If it contains bullet characters (•), it splits them into clean list items.
+   * Otherwise, it splits it by double newlines to display as normal paragraphs.
+   */
+  protected readonly parsedDescription = computed(() => {
+    const productDetail = this.product().data;
+    if (!productDetail || !productDetail.description) {
+      return { isList: false, paragraphs: [] as string[] };
+    }
+
+    const desc = productDetail.description;
+
+    if (desc.includes('•') || desc.includes('\u2022')) {
+      const parts = desc.split(/•|\u2022/)
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
+      return { isList: true, paragraphs: parts };
+    }
+
+    const paragraphs = desc.split(/\n\n+/)
+      .map(p => p.trim())
+      .filter(p => p.length > 0);
+
+    return { isList: false, paragraphs };
   });
 
   ngOnInit(): void {
@@ -120,6 +163,24 @@ export class ProductDetailsPage implements OnInit {
 
   protected selectImage(url: string): void {
     this.selectedImageUrl.set(url);
+  }
+
+  protected prevImage(): void {
+    const items = this.galleryItems();
+    if (items.length <= 1) return;
+    const currentUrl = this.selectedImageUrl() || this.product().data?.imageUrl || '';
+    const currentIndex = items.findIndex(item => item.url === currentUrl);
+    const prevIndex = (currentIndex - 1 + items.length) % items.length;
+    this.selectedImageUrl.set(items[prevIndex].url);
+  }
+
+  protected nextImage(): void {
+    const items = this.galleryItems();
+    if (items.length <= 1) return;
+    const currentUrl = this.selectedImageUrl() || this.product().data?.imageUrl || '';
+    const currentIndex = items.findIndex(item => item.url === currentUrl);
+    const nextIndex = (currentIndex + 1) % items.length;
+    this.selectedImageUrl.set(items[nextIndex].url);
   }
 
   protected addToCart(productDetail: ProductDetail): void {
@@ -147,6 +208,10 @@ export class ProductDetailsPage implements OnInit {
       return;
     }
     this.wishlistService.toggleWishlist(productId);
+  }
+
+  protected toggleSpecifications(): void {
+    this.showAllSpecifications.update((val) => !val);
   }
 
   private loadProduct(routeId: number): void {
@@ -181,6 +246,7 @@ export class ProductDetailsPage implements OnInit {
           // Pre-select the first gallery image in the main viewer
           const firstImage = productDetail.imageGallery[0] ?? productDetail.imageUrl;
           this.selectedImageUrl.set(firstImage);
+          this.showAllSpecifications.set(false); // Reset specifications toggle
 
           this.productState.set({
             data: productDetail,

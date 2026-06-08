@@ -38,7 +38,7 @@ export class CartRecommendationsCarouselComponent implements OnInit {
             price: p.price,
             rating: p.rating,
             imageUrl: p.imageUrl,
-            reviewCount: 0,
+            reviewCount: p.ratingCount ?? 0,
             imageLabel: p.name,
             shortDescription: p.shortDescription,
             badge: p.badge,

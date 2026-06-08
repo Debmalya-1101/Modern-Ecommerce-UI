@@ -14,6 +14,7 @@ export interface ProductListDTO {
   price: number;
   imageUrl: string;
   rating: number;
+  ratingCount: number;
   active: boolean;
   brand: string;
   categoryName: string;
@@ -26,10 +27,12 @@ export interface ProductListDTO {
 export interface ProductDetailDTO {
   id: number;
   name: string;
+  fullName: string;
   description: string;
   price: number;
   imageUrl: string;
   rating: number;
+  ratingCount: number;
   active: boolean;
   brand: string;
   categoryName: string;
@@ -54,6 +57,7 @@ export interface ProductListItem {
   price: number;
   imageUrl: string;
   rating: number;
+  ratingCount?: number;
   active: boolean;
   brand: string;
   categoryName: string;
@@ -78,10 +82,12 @@ export type ProductStockStatus = 'in-stock' | 'limited' | 'out-of-stock';
 export interface ProductDetail {
   id: number;
   name: string;
+  fullName?: string;
   description: string;
   price: number;
   imageUrl: string;
   rating: number;
+  ratingCount?: number;
   active: boolean;
   brand: string;
   categoryName: string;

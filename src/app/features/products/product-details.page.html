@@ -1,23 +1,10 @@
 <section class="product-details-page">
-  <section class="page-header">
-    <div>
-      <p class="eyebrow">Product details</p>
-      <h2>Full product view from the backend API</h2>
-      <p class="page-copy">
-        This page reads the product ID from the URL, loads the matching product from the backend,
-        and stays refresh-safe because the route is the source of truth.
-      </p>
-    </div>
-
-    <button
-      mat-stroked-button
-      appButtonStyle="secondary"
-      type="button"
-      routerLink="/products"
-    >
-      Back to products
-    </button>
-  </section>
+  <div class="back-navigation">
+    <a routerLink="/products" class="back-link">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Back to products</span>
+    </a>
+  </div>
 
   @if (product().loading) {
     <mat-card class="detail-loading" appearance="outlined">
@@ -31,167 +18,215 @@
       (action)="reloadProduct()"
     />
   } @else if (product().data; as productDetail) {
-    <section class="detail-layout">
-      <mat-card class="detail-media" appearance="outlined">
-        <div class="detail-media__frame">
-          <app-product-image-placeholder
-            [src]="selectedImageUrl() || productDetail.imageUrl"
-            [label]="productDetail.name"
-            minHeight="25rem"
-          />
-        </div>
+    <mat-card class="detail-container-card" appearance="outlined">
+      <section class="detail-layout">
+        <div class="detail-media">
+          <div class="gallery-slider">
+            <app-product-image-placeholder
+              [src]="selectedImageUrl() || productDetail.imageUrl"
+              [label]="productDetail.name"
+              minHeight="25rem"
+            />
 
-        <div class="detail-media__thumbs">
-          @for (item of galleryItems(); track item.url) {
-            <button
-              type="button"
-              class="detail-thumb"
-              [class.detail-thumb--active]="selectedImageUrl() === item.url"
-              (click)="selectImage(item.url)"
-            >
-              <img
-                [src]="item.url"
-                [alt]="item.label"
-                class="detail-thumb__image"
-              />
-              <span class="detail-thumb__label">{{ item.label }}</span>
-            </button>
-          }
-        </div>
-      </mat-card>
+            @if (galleryItems().length > 1) {
+              <button
+                type="button"
+                class="slider-arrow slider-arrow--prev"
+                (click)="prevImage()"
+                aria-label="Previous image"
+              >
+                <mat-icon>chevron_left</mat-icon>
+              </button>
 
-      <mat-card class="detail-summary" appearance="outlined">
-        <div class="detail-summary__top">
-          <div class="detail-summary__chips">
-            <app-product-category-chip [label]="productDetail.categoryName" />
+              <button
+                type="button"
+                class="slider-arrow slider-arrow--next"
+                (click)="nextImage()"
+                aria-label="Next image"
+              >
+                <mat-icon>chevron_right</mat-icon>
+              </button>
 
-            @if (productDetail.badge) {
-              <app-product-badge [label]="productDetail.badge" />
+              <div class="slider-dots">
+                @for (item of galleryItems(); track item.url; let idx = $index) {
+                  <button
+                    type="button"
+                    class="slider-dot"
+                    [class.slider-dot--active]="selectedImageUrl() === item.url"
+                    (click)="selectImage(item.url)"
+                    [attr.aria-label]="'Go to slide ' + (idx + 1)"
+                  ></button>
+                }
+              </div>
             }
           </div>
 
-          @if (productDetail.stockStatus) {
-            <app-product-stock-indicator
-              [status]="productDetail.stockStatus"
-              [label]="productDetail.stockLabel ?? 'Check availability'"
-            />
-          }
+          <div class="detail-left-info">
+            <div class="info-grid">
+              <div class="info-grid__item">
+                <span>Product ID</span>
+                <strong>#{{ productDetail.id }}</strong>
+              </div>
+              <div class="info-grid__item">
+                <span>Brand</span>
+                <strong>{{ productDetail.brand }}</strong>
+              </div>
+              <div class="info-grid__item">
+                <span>Category</span>
+                <strong>{{ productDetail.categoryName }}</strong>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="detail-summary__heading">
-          <div>
-            <p class="detail-brand">{{ productDetail.brand }}</p>
-            <h3>{{ productDetail.name }}</h3>
+        <div class="detail-summary">
+          <div class="summary-top-info">
+            <div class="detail-summary__top">
+              <div class="detail-summary__chips">
+                @if (productDetail.badge) {
+                  <app-product-badge [label]="productDetail.badge" />
+                }
+              </div>
+
+              @if (productDetail.stockStatus) {
+                <app-product-stock-indicator
+                  [status]="productDetail.stockStatus"
+                  [label]="productDetail.stockLabel ?? 'Check availability'"
+                />
+              }
+            </div>
+
+            <div class="detail-summary__heading">
+              <div>
+                <h3>{{ productDetail.fullName || productDetail.name }}</h3>
+              </div>
+
+              <app-product-rating-display
+                [rating]="productDetail.rating"
+                [reviewCount]="productDetail.reviewCount ?? 0"
+              />
+            </div>
+
+            <app-product-price-display
+              [price]="productDetail.price"
+              [originalPrice]="productDetail.originalPrice"
+            />
           </div>
 
-          <app-product-rating-display
-            [rating]="productDetail.rating"
-            [reviewCount]="productDetail.reviewCount ?? 0"
-          />
+          <div class="detail-description-container">
+            @if (parsedDescription().isList) {
+              <ul class="detail-description-list">
+                @for (point of parsedDescription().paragraphs; track point) {
+                  <li>
+                    <span class="bullet-dot"></span>
+                    <span class="bullet-text">{{ point }}</span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              @for (para of parsedDescription().paragraphs; track para) {
+                <p class="detail-description">{{ para }}</p>
+              }
+            }
+          </div>
+
+          <div class="summary-bottom-info">
+            <div class="detail-actions">
+              <div class="detail-quantity" [class.disabled]="productDetail.stockStatus === 'out-of-stock'">
+                <button
+                  mat-icon-button
+                  type="button"
+                  aria-label="Decrease quantity"
+                  [disabled]="productDetail.stockStatus === 'out-of-stock' || selectedQuantity() <= 1"
+                  (click)="updateQuantity(-1)"
+                >
+                  <mat-icon>remove</mat-icon>
+                </button>
+                <span class="detail-quantity__value">{{ selectedQuantity() }}</span>
+                <button
+                  mat-icon-button
+                  type="button"
+                  aria-label="Increase quantity"
+                  [disabled]="productDetail.stockStatus === 'out-of-stock'"
+                  (click)="updateQuantity(1)"
+                >
+                  <mat-icon>add</mat-icon>
+                </button>
+              </div>
+              <div class="detail-actions__group">
+                <div class="detail-actions__primary">
+                  <button
+                    mat-flat-button
+                    appButtonStyle="primary"
+                    class="detail-actions__add-btn"
+                    (click)="addToCart(productDetail)"
+                  >
+                    <mat-icon>shopping_cart</mat-icon>
+                    Add to Cart
+                  </button>
+                  <button
+                    mat-stroked-button
+                    appButtonStyle="secondary"
+                    class="detail-actions__buy-btn"
+                    (click)="buyNow(productDetail.name)"
+                  >
+                    Buy Now
+                  </button>
+                </div>
+                <button
+                  mat-icon-button
+                  class="detail-actions__wishlist-btn"
+                  [class.active]="isInWishlist(productDetail.id)"
+                  (click)="toggleWishlist(productDetail.id)"
+                  [attr.aria-label]="isInWishlist(productDetail.id) ? 'Remove from Wishlist' : 'Add to Wishlist'"
+                >
+                  <mat-icon>{{ isInWishlist(productDetail.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
+    </mat-card>
 
-        <app-product-price-display
-          [price]="productDetail.price"
-          [originalPrice]="productDetail.originalPrice"
-        />
-
-        <p class="detail-description">{{ productDetail.description }}</p>
+    @if (productDetail.specifications.length) {
+      <mat-card class="detail-specifications" appearance="outlined">
+        <div class="detail-specifications__header">
+          <div>
+            <p class="eyebrow">Product breakdown</p>
+            <h3>Specifications</h3>
+          </div>
+          <p class="detail-specifications__copy">
+            Structured specification rows sourced directly from the backend API.
+          </p>
+        </div>
 
         <mat-divider />
 
-        <div class="detail-purchase">
-          <div class="detail-purchase__meta">
-            <span>Product ID</span>
-            <strong>#{{ productDetail.id }}</strong>
-          </div>
-          <div class="detail-purchase__meta">
-            <span>Brand</span>
-            <strong>{{ productDetail.brand }}</strong>
-          </div>
-        </div>
-
-        <div class="detail-actions">
-          <div class="detail-quantity" [class.disabled]="productDetail.stockStatus === 'out-of-stock'">
-            <button
-              mat-icon-button
-              type="button"
-              aria-label="Decrease quantity"
-              [disabled]="productDetail.stockStatus === 'out-of-stock' || selectedQuantity() <= 1"
-              (click)="updateQuantity(-1)"
-            >
-              <mat-icon>remove</mat-icon>
-            </button>
-            <span class="detail-quantity__value">{{ selectedQuantity() }}</span>
-            <button
-              mat-icon-button
-              type="button"
-              aria-label="Increase quantity"
-              [disabled]="productDetail.stockStatus === 'out-of-stock'"
-              (click)="updateQuantity(1)"
-            >
-              <mat-icon>add</mat-icon>
-            </button>
-          </div>
-          <div class="detail-actions__group">
-            <div class="detail-actions__primary">
-              <button
-                mat-flat-button
-                appButtonStyle="primary"
-                class="detail-actions__add-btn"
-                (click)="addToCart(productDetail)"
-              >
-                <mat-icon>shopping_cart</mat-icon>
-                Add to Cart
-              </button>
-              <button
-                mat-stroked-button
-                appButtonStyle="secondary"
-                class="detail-actions__buy-btn"
-                (click)="buyNow(productDetail.name)"
-              >
-                Buy Now
-              </button>
-            </div>
-            <button
-              mat-icon-button
-              class="detail-actions__wishlist-btn"
-              [class.active]="isInWishlist(productDetail.id)"
-              (click)="toggleWishlist(productDetail.id)"
-              [attr.aria-label]="isInWishlist(productDetail.id) ? 'Remove from Wishlist' : 'Add to Wishlist'"
-            >
-              <mat-icon>{{ isInWishlist(productDetail.id) ? 'favorite' : 'favorite_border' }}</mat-icon>
-            </button>
-          </div>
-        </div>
-      </mat-card>
-    </section>
-
-    <mat-card class="detail-specifications" appearance="outlined">
-      <div class="detail-specifications__header">
-        <div>
-          <p class="eyebrow">Product breakdown</p>
-          <h3>Specifications</h3>
-        </div>
-        <p class="detail-specifications__copy">
-          Structured specification rows sourced directly from the backend API.
-        </p>
-      </div>
-
-      <mat-divider />
-
-      @if (productDetail.specifications.length) {
         <div class="spec-grid">
-          @for (specification of productDetail.specifications; track specification.key) {
+          @for (specification of visibleSpecifications(); track specification.key) {
             <div class="spec-grid__item">
               <span>{{ specification.key }}</span>
               <strong>{{ specification.value }}</strong>
             </div>
           }
         </div>
-      } @else {
-        <p class="detail-specifications__copy">No specifications available for this product.</p>
-      }
-    </mat-card>
+
+        @if (productDetail.specifications.length > 6) {
+          <div class="detail-specifications__toggle">
+            <button
+              mat-button
+              class="spec-toggle-btn"
+              (click)="toggleSpecifications()"
+            >
+              {{ showAllSpecifications() ? 'View less' : 'View full details' }}
+              <mat-icon>{{ showAllSpecifications() ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
+            </button>
+          </div>
+        }
+      </mat-card>
+    }
+
 
     <section class="detail-reviews-container">
       <app-product-reviews [productId]="productDetail.id"></app-product-reviews>

@@ -199,11 +199,13 @@ export class ProductsApiService {
       price: dto.price,
       imageUrl: dto.imageUrl,
       rating: dto.rating,
+      ratingCount: dto.ratingCount,
       active: dto.active,
       brand: dto.brand,
       categoryName: dto.categoryName,
+      reviewCount: dto.ratingCount,
       // Fields not provided by the backend public API are left undefined.
-      // originalPrice, imageLabel, reviewCount, badge, shortDescription
+      // originalPrice, imageLabel, badge, shortDescription
     };
   }
 
@@ -211,17 +213,20 @@ export class ProductsApiService {
     return {
       id: dto.id,
       name: dto.name,
+      fullName: dto.fullName,
       description: dto.description,
       price: dto.price,
       imageUrl: dto.imageUrl,
       rating: dto.rating,
+      ratingCount: dto.ratingCount,
       active: dto.active,
       brand: dto.brand,
       categoryName: dto.categoryName,
       imageGallery: dto.imageGallery,
       specifications: dto.specifications,
+      reviewCount: dto.ratingCount,
       // Fields not provided by the backend public API are left undefined.
-      // originalPrice, imageLabel, reviewCount, badge, stockStatus, stockLabel
+      // originalPrice, imageLabel, badge, stockStatus, stockLabel
     };
   }
 }
