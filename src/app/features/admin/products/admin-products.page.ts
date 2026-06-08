@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -17,7 +17,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
 
 import { AdminProductsService } from '../../../core/services/admin-products.service';
 import { AdminProductDTO } from '../../../core/models/admin-product.model';
@@ -54,6 +54,8 @@ export class AdminProductsPage implements OnInit {
   private productsService = inject(AdminProductsService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  
+  private importSub?: Subscription;
 
   displayedColumns: string[] = ['imageUrl', 'name', 'categoryName', 'price', 'stock', 'active', 'actions'];
   dataSource = new MatTableDataSource<AdminProductDTO>([]);
@@ -78,6 +80,14 @@ export class AdminProductsPage implements OnInit {
       this.pageIndex.set(0);
       this.loadProducts();
     });
+
+    this.importSub = this.productsService.productImported$.subscribe(() => {
+      this.loadProducts();
+    });
+  }
+
+  ngOnDestroy() {
+    this.importSub?.unsubscribe();
   }
 
   loadProducts() {
@@ -109,13 +119,17 @@ export class AdminProductsPage implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.productsService.createProduct(result).subscribe({
-          next: () => {
-            this.showSuccess('Product created successfully');
-            this.loadProducts();
-          },
-          error: () => this.showError('Failed to create product')
-        });
+        if (result.isManual) {
+          this.productsService.createProduct(result).subscribe({
+            next: () => {
+              this.showSuccess('Product created successfully');
+              this.loadProducts();
+            },
+            error: () => this.showError('Failed to create product')
+          });
+        } else if (result.scraped) {
+          this.loadProducts(); // Scraped successfully and waited
+        }
       }
     });
   }

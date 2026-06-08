@@ -47,6 +47,8 @@ export const API_ENDPOINTS = {
     categories: '/api/admin/categories',
     categoryDetail: (categoryId: number | string) => `/api/admin/categories/${categoryId}`,
     attributeKeys: '/api/admin/attribute-keys',
-    attributeKeyDetail: (keyId: number | string) => `/api/admin/attribute-keys/${keyId}`
+    attributeKeyDetail: (keyId: number | string) => `/api/admin/attribute-keys/${keyId}`,
+    scraperAmazon: '/api/admin/scraper/amazon',
+    scraperFlipkart: '/api/admin/scraper/flipkart'
   }
 } as const;

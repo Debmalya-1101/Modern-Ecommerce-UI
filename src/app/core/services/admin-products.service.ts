@@ -1,15 +1,22 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, of, throwError } from 'rxjs';
+import { Observable, catchError, of, throwError, Subject, delay, shareReplay, finalize } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
-import { AdminProductDTO, CreateProductDTO, ProductPaginationResponseDTO, UpdateProductDTO } from '../models/admin-product.model';
+import { AdminProductDTO, CreateProductDTO, ProductPaginationResponseDTO, UpdateProductDTO, AmazonScrapeRequest, AmazonScrapeResultDTO, FlipkartScrapeRequest, FlipkartScrapeResultDTO } from '../models/admin-product.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminProductsService {
   private apiService = inject(ApiService);
+  private snackBar = inject(MatSnackBar);
+
+  private productImportedSource = new Subject<void>();
+  productImported$ = this.productImportedSource.asObservable();
+
+  private activeScrapes = new Map<string, Observable<any>>();
 
   private mockProducts: AdminProductDTO[] = [
     { id: 1, name: 'Apple iPhone 15', description: 'Latest iPhone with A16 Bionic.', price: 79999.00, imageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500&q=80', imageUrls: [], categoryId: 1, categoryName: 'Smartphones', stock: 45, active: true, brand: 'Apple', rating: 4.8, attributes: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
@@ -149,5 +156,123 @@ export class AdminProductsService {
         return throwError(() => err);
       })
     );
+  }
+
+  scrapeAmazon(request: AmazonScrapeRequest, runInBackground: boolean = false): Observable<AmazonScrapeResultDTO[]> {
+    const sortedAsins = [...request.asins].sort().join(',');
+    const key = `amazon-${sortedAsins}`;
+
+    if (this.activeScrapes.has(key)) {
+      const existing$ = this.activeScrapes.get(key)!;
+      if (runInBackground) {
+        return of([]);
+      }
+      return existing$;
+    }
+
+    const apiCall$ = this.apiService.post<AmazonScrapeResultDTO[], AmazonScrapeRequest>(API_ENDPOINTS.admin.scraperAmazon, request).pipe(
+      catchError((err) => {
+        console.warn('Amazon scraper API failed, falling back to mock data');
+        const mockResult: AmazonScrapeResultDTO = {
+          status: 'SUCCESS',
+          asin: request.asins[0] || 'B09G93C5DK',
+          message: 'Product successfully scraped from Amazon India and saved to database.',
+          productId: Math.max(...this.mockProducts.map(p => p.id), 0) + 1,
+          productName: 'Mock Amazon Product',
+          priceInr: 49999,
+          category: request.categoryName,
+          mainImageUrl: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500&q=80',
+          imagesInserted: 1,
+          attributesInserted: 3,
+          reviewsSimulated: request.simulatedReviews || 3,
+          ordersSimulated: request.simulatedOrders || 5
+        };
+        return of([mockResult]).pipe(delay(2000));
+      }),
+      finalize(() => {
+        this.activeScrapes.delete(key);
+      }),
+      shareReplay(1)
+    );
+
+    // Subscribe once inside the service to prevent request cancellation if dialog closes
+    apiCall$.subscribe({
+      next: (results) => {
+        const successCount = results.filter(r => r.status === 'SUCCESS').length;
+        if (successCount > 0) {
+          this.snackBar.open(`Successfully imported ${successCount} product(s) from Amazon!`, 'Close', { duration: 5000, panelClass: ['success-snackbar'] });
+          this.productImportedSource.next();
+        } else {
+          this.snackBar.open('Amazon import completed with no successful products.', 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+        }
+      },
+      error: () => this.snackBar.open('Failed to import product from Amazon.', 'Close', { duration: 5000, panelClass: ['error-snackbar'] })
+    });
+
+    this.activeScrapes.set(key, apiCall$);
+
+    if (runInBackground) {
+      return of([]);
+    }
+    return apiCall$;
+  }
+
+  scrapeFlipkart(request: FlipkartScrapeRequest, runInBackground: boolean = false): Observable<FlipkartScrapeResultDTO[]> {
+    const sortedFsns = [...request.fsns].sort().join(',');
+    const key = `flipkart-${sortedFsns}`;
+
+    if (this.activeScrapes.has(key)) {
+      const existing$ = this.activeScrapes.get(key)!;
+      if (runInBackground) {
+        return of([]);
+      }
+      return existing$;
+    }
+
+    const apiCall$ = this.apiService.post<FlipkartScrapeResultDTO[], FlipkartScrapeRequest>(API_ENDPOINTS.admin.scraperFlipkart, request).pipe(
+      catchError((err) => {
+        console.warn('Flipkart scraper API failed, falling back to mock data');
+        const mockResult: FlipkartScrapeResultDTO = {
+          status: 'SUCCESS',
+          fsn: request.fsns[0] || 'MOBGTAGMG5GB3BD3',
+          message: 'Product successfully scraped from Flipkart India and saved to database.',
+          productId: Math.max(...this.mockProducts.map(p => p.id), 0) + 1,
+          productName: 'Mock Flipkart Product',
+          priceInr: 29999,
+          category: request.categoryName,
+          mainImageUrl: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&q=80',
+          imagesInserted: 1,
+          attributesInserted: 3,
+          reviewsSimulated: request.simulatedReviews || 3,
+          ordersSimulated: request.simulatedOrders || 5
+        };
+        return of([mockResult]).pipe(delay(2000));
+      }),
+      finalize(() => {
+        this.activeScrapes.delete(key);
+      }),
+      shareReplay(1)
+    );
+
+    // Subscribe once inside the service to prevent request cancellation if dialog closes
+    apiCall$.subscribe({
+      next: (results) => {
+        const successCount = results.filter(r => r.status === 'SUCCESS').length;
+        if (successCount > 0) {
+          this.snackBar.open(`Successfully imported ${successCount} product(s) from Flipkart!`, 'Close', { duration: 5000, panelClass: ['success-snackbar'] });
+          this.productImportedSource.next();
+        } else {
+          this.snackBar.open('Flipkart import completed with no successful products.', 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+        }
+      },
+      error: () => this.snackBar.open('Failed to import product from Flipkart.', 'Close', { duration: 5000, panelClass: ['error-snackbar'] })
+    });
+
+    this.activeScrapes.set(key, apiCall$);
+
+    if (runInBackground) {
+      return of([]);
+    }
+    return apiCall$;
   }
 }

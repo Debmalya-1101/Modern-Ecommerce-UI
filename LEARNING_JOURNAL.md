@@ -4497,4 +4497,42 @@ What I learned:
 - Hover-triggered scrollbars can be elegantly styled in Webkit by setting scrollbar and track colors to transparent by default, then updating their colors inside a parent `:hover` rule.
 - Slicing data streams via computed signals keeps business rules out of template code, simplifying unit testing and component maintainability.
 
+## Feature Update: Amazon and Flipkart Product Scraping UI
 
+What was added:
+- Integrated Amazon and Flipkart scraping options directly into the existing "Add Product" dialog (`ProductDialogComponent`).
+- Converted the "Add Product" dialog to use a `MatButtonToggleGroup` for mode switching (Manual, Amazon Import, Flipkart Import) instead of routing to new components.
+- Added a "Hybrid Loading Model" inside the dialog. When an admin initiates a scrape, a glassmorphic progress spinner appears over the dialog form, with an option to click "Run in Background".
+- Integrated an RxJS `Subject` (`productImported$`) in the `AdminProductsService` to notify the `AdminProductsPage` when a background scraping task finishes, triggering an automatic data grid reload.
+
+Why it was added:
+- Adding options directly into the product creation dialog keeps the administrative workflows consolidated and intuitive.
+- Synchronous backend calls for scraping (which take multiple seconds depending on volume) previously risked locking up the UI or dropping HTTP connections if the page was closed. The hybrid model allows admins to wait for a quick completion or send larger imports into the background seamlessly.
+
+Angular concept behind it:
+- **Global Background Subjects & Subscriptions:** Angular singleton services (`@Injectable({ providedIn: 'root' })`) persist their state and ongoing RxJS subscriptions regardless of component lifecycle. We can trigger an HTTP POST request inside the service, subscribe to it immediately inside the service, and allow the component to be destroyed. When the HTTP request finishes, the service handles the global Snackbar notification and emits an event via a `Subject` so any currently active components (like the list page) can respond.
+- **Dynamic Form Resetting & Validation:** Modifying validation arrays dynamically on `FormGroup` controls (`setValidators`, `clearValidators`, `updateValueAndValidity`) allows a single form to support mutually exclusive inputs (e.g. "Select Existing Category" dropdown vs. "Create New Category" text input).
+
+Simple example:
+```typescript
+// Background Singleton Subscriptions
+scrapeFlipkart(request: FlipkartScrapeRequest, runInBackground: boolean): Observable<Result[]> {
+  const apiCall$ = this.apiService.post('/api/scraper', request);
+
+  if (runInBackground) {
+    // Service handles subscription so component can safely be destroyed
+    apiCall$.subscribe({
+      next: () => {
+        this.snackBar.open('Import success!');
+        this.productImportedSource.next(); // Alert active pages
+      }
+    });
+    return of([]); // Return instantly for the component
+  }
+  return apiCall$; // Standard blocking return
+}
+```
+
+What I learned:
+- Singleton services are perfect for managing global task lifecycles that need to outlive specific route components.
+- Providing users the choice between "Blocking UI" and "Background Processing" drastically improves perceived performance and usability for admin dashboards without forcing them into a complex async job-polling architecture on the backend.

@@ -43,3 +43,51 @@ export interface CreateProductDTO {
 }
 
 export interface UpdateProductDTO extends Partial<CreateProductDTO> {}
+
+export interface AmazonScrapeRequest {
+  asins: string[];
+  categoryName: string;
+  simulatedReviews?: number;
+  simulatedOrders?: number;
+}
+
+export interface FlipkartScrapeRequest {
+  fsns: string[];
+  categoryName: string;
+  simulatedReviews?: number;
+  simulatedOrders?: number;
+}
+
+export interface AmazonScrapeResultDTO {
+  status: string;
+  asin: string;
+  message: string;
+  productId?: number;
+  productName?: string;
+  fullProductName?: string;
+  priceInr?: number;
+  category?: string;
+  mainImageUrl?: string;
+  imagesInserted?: number;
+  attributesInserted?: number;
+  reviewsSimulated?: number;
+  ordersSimulated?: number;
+  galleryImageUrls?: string[];
+}
+
+export interface FlipkartScrapeResultDTO {
+  status: string;
+  fsn: string;
+  message: string;
+  productId?: number;
+  productName?: string;
+  fullProductName?: string;
+  priceInr?: number;
+  category?: string;
+  mainImageUrl?: string;
+  imagesInserted?: number;
+  attributesInserted?: number;
+  reviewsSimulated?: number;
+  ordersSimulated?: number;
+  galleryImageUrls?: string[];
+}
