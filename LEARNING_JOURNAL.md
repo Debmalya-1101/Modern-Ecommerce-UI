@@ -4536,3 +4536,320 @@ scrapeFlipkart(request: FlipkartScrapeRequest, runInBackground: boolean): Observ
 What I learned:
 - Singleton services are perfect for managing global task lifecycles that need to outlive specific route components.
 - Providing users the choice between "Blocking UI" and "Background Processing" drastically improves perceived performance and usability for admin dashboards without forcing them into a complex async job-polling architecture on the backend.
+
+## Feature Update: E-Commerce Storefront Landing Page Redesign
+
+What was added:
+- Replaced the diagnostic component demo page with a modern storefront home page layout.
+- Integrated a premium Hero Carousel displaying three seasonal banners ("Electronics", "Fashion", "Home & Living") with automatic scrolling, pause-on-hover controls, custom navigation arrows, and dot indicators.
+- Created a Category Showcase section displaying horizontal chips with custom material icons (devices, checkroom, home, etc.) and background gradients matching each category fetched from the backend.
+- Implemented a "Trending Products" section that fetches top-rated products using `ProductsApiService` and renders them in the `ProductGridComponent`, complete with skeleton loading and connection recovery fallbacks.
+- Constructed a two-column Promotional Grid card layout with glassmorphic tints, overlay text, and micro-hover scaling transitions.
+- Added a Customer Trust badges row and a live API Server Connectivity indicator showing store status (Online/Offline/Loading).
+- Copied three AI-generated PNG banners into the project's public folder to serve as slide images.
+
+Why it was added:
+- The initial home page was a basic placeholder displaying individual UI components (buttons, spinners, empty states). Building a proper storefront landing page connects these components into a unified flow and provides a real application layout.
+- The hero carousel, hover-based icon rotations, and glassmorphic cards create a premium e-commerce look and feel.
+- Dynamic categories and products fetch data directly from the API, ensuring that modifications on the database/backend are immediately visible on the home page.
+- Graceful loading skeleton and offline pills ensure that the application handles slow server queries or unreachable endpoints without breaking the user experience.
+
+Angular concept behind it:
+- **Signals-Driven Reactive UI States:** Using Angular Signals for components' state (`categoriesState`, `featuredProductsState`, `backendStatus`, and `carouselIndex`) simplifies tracking state transitions. By using read-only computed selectors or direct Signal reads in templates, the view updates automatically when data, loading flags, or error messages change.
+- **Type-Safe Nullable Guards in HTML Templates:** Implementing type narrowing inside templates using `@else if (state.data; as data)` allows strict compiler validation to pass. Since `ApiRequestState.data` is typed as `T | null`, checking for the existence of `data` and binding it to a local template variable ensures that the children elements (like the products grid) receive a non-null `T[]` array.
+- **Autoplay Timers and Destroy Cleanup:** Managing component-level background tasks (like `setInterval` for carousels) requires cleanups on component teardown to prevent memory leaks. By injecting `DestroyRef` and calling `destroyRef.onDestroy(() => clearInterval(id))`, the subscription is safely unbound when the page changes.
+
+Simple example:
+```typescript
+// Safe type narrowing and skeleton state conditional rendering in HTML
+@if (featuredProductsState().loading) {
+  <app-product-skeleton-loading [cards]="4" />
+} @else if (featuredProductsState().data; as products) {
+  <app-product-grid [products]="products" />
+}
+```
+
+What I learned:
+- When building image-heavy UI components like carousels, always restrict vertical image dimensions (`height: 440px`) and use `object-fit: cover` with image overlays/scrims to ensure that different banner shapes maintain uniform, legible text contrast.
+- Type narrowing in modern Angular control flow `@if (state.data; as data)` is cleaner and more robust than casting or utilizing non-null assertion operators in component properties.
+- Dynamic color styles (like gradients) are best returned from simple, readable helper methods mapping array indices to a predefined collection of CSS rules, keeping SCSS classes generic and reusable.
+
+## Feature Update: Product Grid UI Visual Redesign & Dynamic Badging
+
+What was added:
+- Modified product image container and card media backgrounds to solid white (`#ffffff`) to seamlessly blend with white backdrops of backend images, removing ugly square border blocks.
+- Added premium micro-animations (e.g., hover scaling `transform: scale(1.06)`) on product cards.
+- Integrated a dynamic badging system mapping badge categories (`18% OFF` -> sale, `Top Rated` -> top-rated, `Trending` -> trending) to semantic CSS styling classes.
+- Enhanced product ratings by styling filled star icons to an attractive amber-gold (`#f59e0b`).
+- Simulated original prices and percentage savings on even product IDs inside both the home page featured items mapping and the product catalog page mapping to activate the pre-existing struck-out pricing layout.
+
+Why it was added:
+- Plain red/blue elements and generic chips made the product listing feel unpolished.
+- Standard product image assets from databases frequently contain solid white backdrops. Placing them in colored gradient frames creates sharp borders; solid white frames merge the backdrops naturally, producing a clean, premium visual design.
+- The struck-through original price was already supported by `ProductPriceDisplayComponent` but never triggered since the backend does not return `originalPrice`. Simulating the savings on the frontend makes the page feel like a real discount e-commerce store.
+
+Angular concept behind it:
+- **Dynamic CSS Binding on Class Names:** Component controllers can compute dynamic class names based on string input matching and return them via helper methods bound inside templates: `[class]="getBadgeClass()"`.
+- **CSS Child Selectors on Hover:** Using `:hover` rules combined with child class selectors (e.g., `.product-card:hover ::ng-deep .product-image`) allows complex hover effects to trigger smoothly without requiring Javascript mouse events.
+- **Service/Data Mapping Enrichment:** Enriched mapped view models decouple visual components from backend DB constraints, allowing the application to display rich details (like discounts and badges) before backend database extensions are complete.
+
+Simple example:
+```typescript
+// Component helper returning class names bound to a template property
+protected getBadgeClass(): string {
+  const label = this.label.toLowerCase();
+  if (label.includes('off')) return 'badge-sale';
+  if (label.includes('rated')) return 'badge-top-rated';
+  return '';
+}
+```
+
+What I learned:
+- Designing images to sit on a matching solid background instead of contrasting gradients simulates image transparency beautifully when source files have solid backdrops.
+- Using `::ng-deep` enables parent SCSS to style children components (like nested images in placeholders) during complex mouse hover animations.
+- Local mapping transformations are an effective way to prototype UI features (like pricing discounts and sale badges) before database fields are officially deployed.
+
+## Feature Update: Responsive Header Navigation for Admin Pages
+
+What was added:
+- Restructured the admin panel layout shell to support two different navigation patterns based on screen size.
+- On large screens (laptops and desktops), the navigation links are rendered horizontally directly in the header toolbar, and the side drawer is hidden.
+- On small screens (mobile and tablet), the navigation links are hidden from the header, and a top-left hamburger menu button is displayed which toggles an overlay navigation drawer.
+- Added a "Back to Store" shortcut button in the header toolbar on desktop and at the bottom of the drawer on mobile.
+- Updated responsive state management in the component logic using Angular signals and `BreakpointObserver` to close the side drawer when transitioning to desktop.
+
+Why it was added:
+- On desktop, a persistent side navigation drawer consumes valuable horizontal space, leaving less room for wide tables, lists, and analytics charts.
+- Moving navigation links to the header matches the design pattern of user-facing pages, making the app feel more unified and premium.
+- Mobile users expect a clean header with a hamburger menu to access secondary pages without cluttering their viewport.
+
+Angular concept behind it:
+- **Responsive Sidenav Layout Container:** Using Angular Material's `mat-drawer-container` and `mat-drawer` with a dynamic `[opened]="isSidebarOpen()"` binding. The drawer mode is set to `"over"` so it operates as a sliding overlay on top of content when toggled, avoiding layout shifting.
+- **BreakpointObserver with Signal Synced Layouts:** Monitoring viewport transitions programmatically. When switching from mobile to desktop sizes, the `BreakpointObserver` subscription triggers a Signal update (`this.isSidebarOpen.set(false)`), cleaning up the UI state automatically.
+- **Conditional Routing Directives:** Utilizing Angular's built-in `@if` control flow blocks with reactive signals (`isMobile()`) to dynamically render different layout elements (such as hamburger button vs. desktop links) rather than relying purely on CSS media query hidden tricks.
+
+Simple example:
+```typescript
+// Component reacts to screen changes, closing the drawer when leaving mobile view
+this.breakpointObserver
+  .observe('(max-width: 768px)')
+  .pipe(takeUntilDestroyed())
+  .subscribe(({ matches }) => {
+    this.isMobile.set(matches);
+    if (!matches) {
+      this.isSidebarOpen.set(false); // Clean up mobile drawer state
+    }
+  });
+```
+
+What I learned:
+- Combining CSS media queries with Angular signals allows developer-friendly responsive component structure logic instead of duplicate layouts or complex display styles.
+- Keeping state synchronized (`isSidebarOpen` resets to `false` when transitioning to desktop) prevents UI glitches, such as an orphaned overlay backdrop when the viewport is resized.
+- Designing toolbar elements with flexbox and space-between alignments allows desktop links to sit beautifully next to the brand logo while maintaining a clean, professional aesthetic.
+- **Angular View Encapsulation Gotcha:** Custom wrapper layout classes (like `.toolbar-left`) styled in a parent component's SCSS (like `app.scss`) are not applied to child components/templates by default due to emulated scoping. Always define local layout classes directly within the target component's SCSS to guarantee proper layout rendering.
+
+## Feature Update: Storefront Header Redesign & Profile Dropdown
+
+What was added:
+- Renamed the store application to `Nexis Store` inside the component class and layout templates.
+- Generated a clean 128x128px minimalist circular brand logo using AI and integrated it next to the header title.
+- Removed the redundant "Profile" navigation tab from the desktop header navigation bar.
+- Replaced the simple "Logout" button on desktop with a MatMenu profile trigger button:
+  - Displays a clean circular initials-avatar (using the first character of the username).
+  - Displays the logged-in username.
+  - Toggles a dropdown menu containing "My Profile" (routing to `/profile`) and "Logout" (triggering authentication sign out).
+- Added SCSS variables and custom styles to style the brand logo, dropdown trigger button, avatar hover states, and MatMenu styling overrides.
+
+Why it was added:
+- Redefining the app title to `Nexis Store` with a custom logo builds a unique and professional brand identity.
+- Displaying user actions inside a right-aligned profile dropdown menu is a standard modern design pattern (compared to exposing a raw "Logout" button directly in the main header).
+- Removing the "Profile" link from the central navigation bar removes visual clutter on desktop since it is now accessible from the profile dropdown, while maintaining it in the mobile sidebar where drawer links make sense.
+
+Angular concept behind it:
+- **MatMenu Trigger Directive:** Utilizing Angular Material's `matMenuTriggerFor` directive to attach a dropdown menu panel to a button. The menu is lazy-loaded and matches context positioning automatically (`xPosition="before"`).
+- **Standalone Module Integration:** Importing `MatMenuModule` directly into the root component's `imports` block for modular standalone usage.
+- **Dynamic Initial Generation:** Computing string substrings in template bindings (`currentUserLabel().substring(0,1)`) to build dynamic initials-avatar blocks on the fly.
+
+Simple example:
+```html
+<!-- Trigger Button -->
+<button mat-button [matMenuTriggerFor]="profileMenu" class="profile-menu-trigger">
+  <span class="profile-avatar">{{ username.substring(0, 1).toUpperCase() }}</span>
+  <span>{{ username }}</span>
+</button>
+
+<!-- Lazy Dropdown Panel -->
+<mat-menu #profileMenu="matMenu">
+  <a mat-menu-item routerLink="/profile">Profile</a>
+  <button mat-menu-item (click)="logout()">Logout</button>
+</mat-menu>
+```
+
+What I learned:
+- Material MatMenu renders standard HTML button items with built-in accessibility (ARIA selectors, keyboard focus, and keyboard arrows navigation).
+- SCSS nested rules combined with child image hover modifiers (`.brand-link:hover .brand-logo`) can trigger elegant animation effects (such as logo rotation/scaling) without triggering javascript rendering cycles.
+- Angular templates easily handle basic javascript string functions like `.substring()` directly within expression interpolation tags to keep the controller clean.
+
+## Feature Update: Admin Header Back to Store Button Integration & Profile Dropdown Polish
+
+What was added:
+- Integrated a visible "Back to Store" button directly in the Admin header toolbar for desktop viewports.
+- Configured the button to render conditionally based on responsive layout state (`@if (!isMobile())`).
+- Added "My Profile" as the first option in the Admin profile dropdown menu.
+- Removed the redundant "Back to Store" link from the profile dropdown menu.
+
+Why it was added:
+- On desktop screens, the admin sidebar drawer (which hosts the sidebar "Back to Store" link) is hidden. Adding a direct, visible shortcut in the header toolbar allows desktop administrators to return to the customer storefront with a single click.
+- Once the direct toolbar button was added for desktop, keeping "Back to Store" inside the profile dropdown menu became redundant. Removing it keeps the dropdown options concise and focused ("My Profile" and "Logout").
+
+Angular concept behind it:
+- **Viewport-Aware Component Layouts:** Rendering secondary header items dynamically using signals synced to screen media queries (`isMobile`). This prevents mobile interfaces from becoming crowded while providing desktop layouts with full navigation controls.
+- **Visual Redundancy Elimination:** Refining template menus to display only contextual, high-value actions, ensuring navigation flows do not present duplicate operations in the same viewport state.
+
+Simple example:
+```html
+<!-- Visible on desktop toolbar -->
+@if (!isMobile()) {
+  <a mat-stroked-button appButtonStyle="secondary" routerLink="/">
+    <mat-icon>storefront</mat-icon>
+    Back to Store
+  </a>
+}
+```
+
+- Hiding layouts on different screen sizes requires providing alternative entry points for critical navigation links so user flows are never orphaned.
+- When an action is promoted to a primary layout component (like the toolbar), removing its secondary representation (like in a dropdown) keeps the layout clean and intuitive.
+
+## Feature Update: Compact Header Toolbar Heights
+
+What was added:
+- Reduced the header toolbar `min-height` from `5.5rem` to `4.5rem` in both storefront (`app.scss`) and Admin (`admin-layout.component.scss`) stylesheets.
+- Reduced the vertical padding of the toolbars from `0.9rem` to `0.5rem`.
+- Applied `!important` to both toolbar height, min-height, and padding rules on the Admin toolbar stylesheet to override default Material toolbar heights.
+- Overrode mobile `min-height` to `auto` in the Admin layout media queries to ensure compact rendering on mobile viewports.
+
+Why it was added:
+- A `5.5rem` header (88px) consumed excessive vertical space, pushing critical grid catalog contents and product descriptions further below the fold. Shrinking the header height to `4.5rem` (72px) presents a more modern, space-efficient, and premium layout.
+- In Angular Material, standard `<mat-toolbar>` components define default height constraints (like `height: 64px`). Using explicit `!important` modifiers ensures these UI framework defaults are bypassed correctly.
+
+Angular concept behind it:
+- **Automatic Vertical Centering via Layout Flow:** Utilizing CSS Grid/Flexbox alignments (`align-items: center`) inside the toolbar container ensures that scaling down parent dimensions automatically repositions all child components (logos, navigation chips, search inputs, badges, avatars, and menu arrows) along the exact vertical midpoint without needing complex inline overrides or custom height calculations.
+- **Overriding Component-Level Library Classes:** When third-party library stylesheets are loaded or have predefined inline style defaults, component-encapsulated selectors (which compile with specific attributes like `[_ngcontent-c12]`) require explicit `!important` properties to guarantee overrides take precedence.
+
+Simple example:
+```scss
+.admin-toolbar {
+  display: flex;
+  align-items: center; /* preserves midpoint centering automatically */
+  min-height: 4.5rem !important;  /* overrides default Material heights */
+  height: 4.5rem !important;
+  padding: 0.5rem 1.5rem !important; 
+}
+```
+
+What I learned:
+- Designing layout shells with automatic vertical alignment makes future sizing updates extremely easy, as elements scale around their midpoints naturally.
+- Third-party library elements often load their own CSS height defaults. Adding `!important` prevents them from conflicting with local design tokens.
+- Small adjustments to spacing and padding can drastically improve readability and data density in administrative dashboard tables.
+
+## Feature Update: Auth Layout Branding Unification
+
+What was added:
+- Replaced the text-only brand mark inside the authentication layout shell (`/login`, `/signup`, `/forgot-password`, `/reset-password`) with the unified brand logo (`/logo.png`) and application name (`Nexis Store`).
+- Removed the outdated `Modern Storefront` eyebrow label.
+- Renamed the header link style class to `.brand-link--auth` in both `app.html` and `app.scss`.
+
+Why it was added:
+- Keeping branding elements unified across all public entry points (including sign in and sign up pages) creates a consistent and professional look. Surfacing the circular brand logo next to the `Nexis Store` title ensures visitors immediately recognize the platform identity.
+
+Angular concept behind it:
+- **Centralized Layout Routing Shells:** Defining route-wide visual structures (like headers and footers for all authentication routes) inside structural route conditions (`isAuthRoute()`) in a single root shell component template ensures that modifying a single markup block updates login, signup, forgot password, and reset password layouts simultaneously.
+
+Simple example:
+```html
+@if (isAuthRoute()) {
+  <header class="auth-shell__header">
+    <a routerLink="/" class="brand-link">
+      <img src="/logo.png" alt="Logo" class="brand-logo" />
+      <span class="brand-mark__title">{{ title }}</span>
+    </a>
+  </header>
+}
+```
+
+- Leveraging shared CSS helper classes (like `.brand-link` and `.brand-logo`) across different shells (storefront, admin, and auth) drastically reduces SASS duplication.
+- Structuring conditional layout routing flows at the root level minimizes code maintenance overhead when updating global headers.
+
+## Feature Update: Brand Title Text Clipping Fix
+
+What was added:
+- Added `line-height: 1.25;` and `padding-bottom: 0.1em;` to both `.brand-mark__title` (storefront/auth headers) and `.admin-brand__title` (admin panel header) to prevent text clipping.
+
+Why it was added:
+- In Webkit browsers, utilizing the background gradient text clipping style (`-webkit-background-clip: text; -webkit-text-fill-color: transparent`) can cause character shapes near the baseline (especially descenders and letter bottoms) to get cropped straight across. Expanding the vertical bounds of the rendering box solves this layout bug.
+
+Angular concept behind it:
+- **Webkit Background Clip Typography Polish:** The browser clips background fill targets to the text content box bounds. To guarantee no layout edge-clipping occurs on custom high-weight display fonts (like Google Font *Outfit*), adding minor bottom padding (`0.1em`) extends the content rendering area safely.
+
+Simple example:
+```scss
+.clipped-gradient-text {
+  background: linear-gradient(to right, #000, #ff5e00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  
+  /* Prevent descender cropping */
+  line-height: 1.25;
+  padding-bottom: 0.1em;
+}
+```
+
+- Webkit gradient text clipping often requires vertical padding to prevent baseline slicing.
+- Consistent typography layout across different shell layouts requires aligning font flow properties like `line-height` and baseline bounds.
+
+## Feature Update: Ordered Reviews List, Background Page Search, & Disabled Duplicate Reviews
+
+What was added:
+- Created a `currentUserReview` signal to store the current user's review separately once located.
+- Implemented a recursive background page search method (`searchUserReview(page)`) that sequentially queries the paginated reviews API in the background until the current user's review is found or no more pages remain.
+- Configured initial loading (`loadReviews()`) to check page 0. If the user's review is not present on the first page, it fires the background page search.
+- Updated `displayReviews` computed signal to merge `currentUserReview` at the top of the list while filtering it out of the paginated `reviews()` list to avoid duplication.
+- Updated the "Write a Review" button to be disabled if `currentUserReview()` is loaded.
+
+Why it was added:
+- Under paginated APIs, if a user has written a review earlier, it might not return on the first page of reviews (page size = 5).
+- A simple frontend-only array filter failed to surface the review on initial load because the review had not been fetched yet.
+- Implementing a silent background pagination crawler finds the user's review regardless of what page it sits on, positioning it at the top immediately on page load, and disabling the "Write a Review" duplicate button.
+
+Angular concept behind it:
+- **State Merging with Computed Signals & Signals Separation:** Separating the paginated list (`reviews`) and the specific target item (`currentUserReview`) into two distinct signals allows the UI to display page-by-page listings naturally while anchoring the user's personal review at the top. The computed signal handles merging them seamlessly without duplicate items in the view loop.
+- **Asynchronous Background Crawling:** Querying subsequent paginated records programmatically without toggling user-facing loading flags keeps page rendering responsive and free of jarring UI spinner cycles.
+
+Simple example:
+```typescript
+// Background pagination crawler
+private searchUserReview(page = 1): void {
+  const uname = this.currentUserName();
+  if (!uname) return;
+
+  this.reviewsApi.getProductReviews(this.productId, page, 5).subscribe({
+    next: (response) => {
+      const found = response.content.find(r => r.userName === uname);
+      if (found) {
+        this.currentUserReview.set(found); // Located user review!
+      } else if (!response.last) {
+        this.searchUserReview(page + 1); // Crawl next page
+      }
+    }
+  });
+}
+```
+
+What I learned:
+- Frontend layout state (like anchoring a item to the top) must account for paginated backend APIs by checking if data is present on other pages.
+- Storing high-priority items in independent signals simplifies sorting and state merging using computed expressions.
+- Background crawling is a powerful way to enrich specific UI actions before pages are loaded by the user.
+
+
+

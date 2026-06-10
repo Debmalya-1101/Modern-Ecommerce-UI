@@ -54,6 +54,23 @@ export class ProductReviewsComponent implements OnInit {
   readonly isLoadingMore = signal(false);
   readonly reviews = signal<ReviewDTO[]>([]);
   readonly pageData = signal<PageResponse<ReviewDTO> | null>(null);
+  readonly currentUserReview = signal<ReviewDTO | null>(null);
+
+  readonly displayReviews = computed(() => {
+    const all = this.reviews();
+    const userRev = this.currentUserReview();
+    const uname = this.currentUserName();
+
+    if (!uname) return all;
+
+    const otherReviews = all.filter(r => r.userName !== uname);
+
+    if (userRev) {
+      return [userRev, ...otherReviews];
+    }
+
+    return all;
+  });
   
   // Calculated dynamically from loaded reviews for a realistic look based on visible data
   readonly averageRating = computed(() => {
@@ -77,11 +94,7 @@ export class ProductReviewsComponent implements OnInit {
     return dist;
   });
 
-  readonly hasUserReviewed = computed(() => {
-    const uname = this.currentUserName();
-    if (!uname) return false;
-    return this.reviews().some(r => r.userName === uname);
-  });
+  readonly hasUserReviewed = computed(() => this.currentUserReview() !== null);
 
   ngOnInit(): void {
     if (this.isAuthenticated()) {
@@ -89,9 +102,29 @@ export class ProductReviewsComponent implements OnInit {
     }
   }
 
+  private searchUserReview(page = 1): void {
+    const uname = this.currentUserName();
+    if (!uname) return;
+
+    this.reviewsApi.getProductReviews(this.productId, page, 5).subscribe({
+      next: (response) => {
+        const found = response.content.find(r => r.userName === uname);
+        if (found) {
+          this.currentUserReview.set(found);
+        } else if (!response.last) {
+          this.searchUserReview(page + 1);
+        }
+      },
+      error: (err) => {
+        console.error('Failed to search user review in background', err);
+      }
+    });
+  }
+
   loadReviews(page = 0): void {
     if (page === 0) {
       this.isLoading.set(true);
+      this.currentUserReview.set(null);
     } else {
       this.isLoadingMore.set(true);
     }
@@ -100,6 +133,16 @@ export class ProductReviewsComponent implements OnInit {
       next: (response) => {
         if (page === 0) {
           this.reviews.set(response.content);
+          
+          const uname = this.currentUserName();
+          if (uname) {
+            const found = response.content.find(r => r.userName === uname);
+            if (found) {
+              this.currentUserReview.set(found);
+            } else if (!response.last) {
+              this.searchUserReview(1);
+            }
+          }
         } else {
           this.reviews.update(prev => [...prev, ...response.content]);
         }
@@ -110,7 +153,6 @@ export class ProductReviewsComponent implements OnInit {
       error: (err) => {
         this.isLoading.set(false);
         this.isLoadingMore.set(false);
-        // Silently fail or show minimal error so it doesn't break the product page
         console.error('Failed to load reviews', err);
       }
     });
@@ -137,9 +179,11 @@ export class ProductReviewsComponent implements OnInit {
         if (review) {
           // Edit mode: update existing
           this.reviews.update(all => all.map(r => r.id === result.id ? result : r));
+          this.currentUserReview.set(result);
         } else {
           // Create mode: add to top
           this.reviews.update(all => [result, ...all]);
+          this.currentUserReview.set(result);
         }
       }
     });
@@ -154,6 +198,7 @@ export class ProductReviewsComponent implements OnInit {
       next: () => {
         this.snackbar.success('Review deleted successfully.');
         this.reviews.update(all => all.filter(r => r.id !== reviewId));
+        this.currentUserReview.set(null);
       },
       error: (err) => {
         this.snackbar.error(err.message || 'Failed to delete review.');

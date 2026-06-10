@@ -53,7 +53,7 @@
     </mat-card>
 
     <div class="reviews-list">
-      @for (review of reviews(); track review.id) {
+      @for (review of displayReviews(); track review.id) {
         <mat-card class="review-card" appearance="outlined">
           <div class="review-card-header">
             <div class="author-info">

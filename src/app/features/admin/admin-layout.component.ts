@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { AuthService } from '../../core/services/auth.service';
 import { ButtonStyleDirective } from '../../shared/directives/button-style.directive';
@@ -34,6 +35,7 @@ interface AdminNavigationItem {
     MatListModule,
     MatSidenavModule,
     MatToolbarModule,
+    MatMenuModule,
     ButtonStyleDirective
   ],
   templateUrl: './admin-layout.component.html',
@@ -48,7 +50,7 @@ export class AdminLayoutComponent {
   private readonly mobileBreakpoint = '(max-width: 768px)';
   
   protected readonly isMobile = signal(this.breakpointObserver.isMatched(this.mobileBreakpoint));
-  protected readonly isSidebarOpen = signal(!this.isMobile());
+  protected readonly isSidebarOpen = signal(false);
   protected readonly currentUrl = signal(this.router.url);
 
   protected readonly currentUserLabel = computed(() => this.authService.session().user?.username ?? 'Admin');
@@ -68,7 +70,9 @@ export class AdminLayoutComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ matches }) => {
         this.isMobile.set(matches);
-        this.isSidebarOpen.set(!matches);
+        if (!matches) {
+          this.isSidebarOpen.set(false);
+        }
       });
 
     this.router.events

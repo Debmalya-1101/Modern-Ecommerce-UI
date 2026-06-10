@@ -1,8 +1,9 @@
 <mat-drawer-container class="admin-shell-container">
   <mat-drawer
     class="admin-sidebar"
-    [mode]="isMobile() ? 'over' : 'side'"
+    mode="over"
     [opened]="isSidebarOpen()"
+    (closedStart)="isSidebarOpen.set(false)"
   >
     <div class="sidebar-brand">
       <h2>Store Admin</h2>
@@ -41,29 +42,72 @@
     <header class="admin-header">
       <mat-toolbar class="admin-toolbar">
         <div class="toolbar-left">
-          <button
-            mat-icon-button
-            type="button"
-            (click)="toggleSidebar()"
-            aria-label="Toggle admin menu"
-          >
-            <mat-icon>menu</mat-icon>
-          </button>
+          @if (isMobile()) {
+            <button
+              mat-icon-button
+              type="button"
+              (click)="toggleSidebar()"
+              aria-label="Toggle admin menu"
+            >
+              <mat-icon>menu</mat-icon>
+            </button>
+          }
+
+          <a routerLink="/admin/dashboard" class="admin-brand-link">
+            <img src="/logo.png" alt="Nexis Store Logo" class="admin-brand-logo" />
+            <div class="admin-brand">
+              <span class="admin-brand__title">Nexis Admin</span>
+            </div>
+          </a>
+
+          @if (!isMobile()) {
+            <nav class="desktop-nav" aria-label="Admin desktop navigation">
+              @for (item of navigationItems; track item.path) {
+                <a
+                  [routerLink]="item.path"
+                  routerLinkActive="desktop-nav__link--active"
+                  class="desktop-nav__link"
+                >
+                  {{ item.label }}
+                </a>
+              }
+            </nav>
+          }
         </div>
 
         <div class="toolbar-right">
-          <div class="admin-profile">
-            <span class="admin-profile__name">{{ currentUserLabel() }}</span>
-            <span class="admin-profile__role">{{ currentRole() }}</span>
-          </div>
+          @if (!isMobile()) {
+            <a
+              mat-stroked-button
+              appButtonStyle="secondary"
+              routerLink="/"
+              class="back-to-store-btn"
+            >
+              <mat-icon>storefront</mat-icon>
+              Back to Store
+            </a>
+          }
+
           <button
-            mat-stroked-button
-            appButtonStyle="secondary"
-            type="button"
-            (click)="logout()"
+            mat-button
+            [matMenuTriggerFor]="adminMenu"
+            class="admin-profile-menu-trigger"
           >
-            Logout
+            <span class="admin-avatar">{{ currentUserLabel().substring(0, 1).toUpperCase() }}</span>
+            <span class="admin-profile-name">{{ currentUserLabel() }}</span>
+            <mat-icon class="admin-profile-arrow">keyboard_arrow_down</mat-icon>
           </button>
+
+          <mat-menu #adminMenu="matMenu" xPosition="before" class="app-admin-profile-menu">
+            <a mat-menu-item routerLink="/profile">
+              <mat-icon>person</mat-icon>
+              <span>My Profile</span>
+            </a>
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              <span>Logout</span>
+            </button>
+          </mat-menu>
         </div>
       </mat-toolbar>
     </header>

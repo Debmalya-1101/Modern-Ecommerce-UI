@@ -3,7 +3,29 @@
 }
 
 .product-badge {
-  background: rgba(181, 95, 52, 0.12);
-  color: #9e522c;
+  background: rgba(90, 71, 61, 0.08);
+  color: #5a473d;
   font-weight: 700;
+  border: 1px solid rgba(90, 71, 61, 0.15);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  padding: 0.2rem 0.5rem;
+  
+  &.badge-sale {
+    background: #f0fdf4 !important;
+    color: #166534 !important;
+    border-color: #bbf7d0 !important;
+  }
+
+  &.badge-top-rated {
+    background: #fffbeb !important;
+    color: #b45309 !important;
+    border-color: #fde68a !important;
+  }
+
+  &.badge-trending {
+    background: #fdf2f8 !important;
+    color: #be185d !important;
+    border-color: #fbcfe8 !important;
+  }
 }

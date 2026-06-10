@@ -1,213 +1,229 @@
 <section class="home-page">
-  <section class="hero-panel">
-    <mat-card class="hero-card" appearance="outlined">
-      <p class="eyebrow">Home feature route</p>
-      <h2>Scalable feature routing with a storefront-style landing experience</h2>
-      <p class="hero-copy">
-        This home route is lazy loaded and organized like a real application shell:
-        clear hero messaging, grouped feature previews, and consistent interaction zones.
-      </p>
-
-      <div class="hero-actions">
-        <button
-          mat-flat-button
-          appButtonStyle="primary"
-          type="button"
-          (click)="showInfoMessage()"
-        >
-          Explore shared UI
-        </button>
-        <button
-          mat-stroked-button
-          appButtonStyle="secondary"
-          type="button"
-          (click)="openConfirmationDialog()"
-        >
-          Preview interaction flow
-        </button>
-      </div>
-    </mat-card>
-
-    <div class="hero-side">
-      <mat-card appearance="outlined">
-        <p class="mini-label">Feature routes</p>
-        <strong>7 placeholders</strong>
-        <span>Home, products, details, cart, checkout, orders, and profile.</span>
-      </mat-card>
-
-      <mat-card appearance="outlined">
-        <p class="mini-label">Shared patterns</p>
-        <strong>Reusable UI system</strong>
-        <span>Buttons, feedback states, loading patterns, snackbars, and dialogs.</span>
-      </mat-card>
-
-      <mat-card appearance="outlined">
-        <p class="mini-label">Architecture</p>
-        <strong>Feature-first structure</strong>
-        <span>Organized for future storefront growth without adding business screens yet.</span>
-      </mat-card>
-
-      @if (backendStatus().loading) {
-        <mat-card class="status-card" appearance="outlined">
-          <p class="mini-label">Backend status</p>
-          <app-loading-spinner label="Checking backend connection" [diameter]="36" />
-        </mat-card>
-      } @else if (backendStatus().error) {
-        <app-error-state
-          title="Backend connection failed"
-          [description]="backendStatus().error ?? 'Please try again in a moment.'"
-          actionLabel="Retry check"
-          (action)="retryBackendConnection()"
-        />
-      } @else if (backendStatus().data; as status) {
-        <mat-card class="status-card status-card--connected" appearance="outlined">
-          <p class="mini-label">Backend status</p>
-          <strong>Connected</strong>
-          <span>{{ status.message }}</span>
-          <div class="status-meta">
-            <p>Endpoint: <code>{{ status.endpoint }}</code></p>
-            <p>Sample total products: {{ status.sampleProductCount }}</p>
+  <!-- Hero Carousel -->
+  <section class="hero-carousel" 
+           (mouseenter)="onCarouselMouseEnter()" 
+           (mouseleave)="onCarouselMouseLeave()"
+           aria-label="Featured promotions carousel">
+    <div class="carousel-inner">
+      @for (slide of carouselSlides(); track slide.image; let idx = $index) {
+        <div class="carousel-slide" [class.active]="idx === carouselIndex()">
+          <div class="slide-image-container">
+            <img [src]="slide.image" [alt]="slide.title" class="slide-image" />
+            <div class="image-scrim"></div>
           </div>
-        </mat-card>
+          <div class="slide-overlay">
+            <div class="slide-content">
+              <span class="slide-tag">Featured Collection</span>
+              <h1 class="slide-title">{{ slide.title }}</h1>
+              <p class="slide-subtitle">{{ slide.subtitle }}</p>
+              <div class="slide-actions">
+                <a mat-flat-button appButtonStyle="primary" routerLink="/products" [queryParams]="{ category: slide.category }">
+                  {{ slide.ctaText }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Navigation Controls -->
+    <button class="carousel-control prev" (click)="prevSlide()" aria-label="Previous slide">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button class="carousel-control next" (click)="nextSlide()" aria-label="Next slide">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+
+    <!-- Indicators -->
+    <div class="carousel-indicators">
+      @for (slide of carouselSlides(); track slide.image; let idx = $index) {
+        <button class="indicator-dot" 
+              [class.active]="idx === carouselIndex()" 
+              (click)="setSlide(idx)"
+              [aria-label]="'Go to slide ' + (idx + 1)">
+        </button>
       }
     </div>
   </section>
 
-  <section class="section-block">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">Shared building blocks</p>
-        <h3>Core interface patterns</h3>
-      </div>
-      <p class="section-copy">
-        These pieces show the reusable UI foundation that future feature screens can rely on.
-      </p>
+  <!-- Categories Grid Section -->
+  <section class="section-container categories-section">
+    <div class="section-header">
+      <h2 class="section-title">Shop by Category</h2>
+      <p class="section-subtitle">Find exactly what you need in our curated listings.</p>
     </div>
 
-    <div class="info-grid">
-      <mat-card appearance="outlined">
-      <h3>Loading spinner</h3>
-      <app-loading-spinner label="Loading shared components" />
-      </mat-card>
+    @if (categoriesState().loading) {
+      <div class="categories-skeleton-grid">
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <div class="category-card-skeleton">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text"></div>
+          </div>
+        }
+      </div>
+    } @else if (categoriesState().error) {
+      <div class="state-container">
+        <app-error-state
+          title="Unable to load categories"
+          [description]="categoriesState().error ?? 'Please check your connection and try again.'"
+          actionLabel="Retry"
+          (action)="retryAllLoading()"
+        />
+      </div>
+    } @else if (categoriesState().data; as categories) {
+      <div class="categories-grid">
+        @for (category of categories; track category; let idx = $index) {
+          <a [routerLink]="['/products']" 
+             [queryParams]="{ category: category }" 
+             class="category-card">
+            <div class="category-img-wrapper">
+              <img [src]="getCategoryImg(category)" [alt]="category" class="category-img" />
+            </div>
+            <span class="category-name">{{ category }}</span>
+          </a>
+        }
+      </div>
+    }
+  </section>
 
-      <mat-card appearance="outlined">
-        <h3>Skeleton loader</h3>
-        <p>
-          Use a skeleton when page structure is known but data is still on the way.
-        </p>
-        <app-skeleton-loader />
-      </mat-card>
-
-      <mat-card appearance="outlined">
-        <h3>Reusable buttons</h3>
-        <div class="button-row">
-          <button mat-flat-button appButtonStyle="primary" type="button">
-            Primary
-          </button>
-          <button mat-stroked-button appButtonStyle="secondary" type="button">
-            Secondary
-          </button>
-          <button mat-flat-button appButtonStyle="tonal" type="button">
-            Tonal
-          </button>
-          <button mat-flat-button appButtonStyle="danger" type="button">
-            Danger
-          </button>
+  <!-- Promo Banners Section -->
+  <section class="section-container promo-section">
+    <div class="promo-grid">
+      <!-- Promo 1 -->
+      <div class="promo-banner-card promo-banner-card--tech">
+        <div class="promo-overlay-content">
+          <span class="promo-badge">Limited Time Offer</span>
+          <h3>Smart Office Essentials</h3>
+          <p>Get up to 20% off on premium noise-canceling headphones, smart watches, and workspace chargers.</p>
+          <a mat-flat-button appButtonStyle="tonal" routerLink="/products" [queryParams]="{ category: 'Laptops' }">
+            Shop Tech Deals
+          </a>
         </div>
-      </mat-card>
+      </div>
+
+      <!-- Promo 2 -->
+      <div class="promo-banner-card promo-banner-card--fashion">
+        <div class="promo-overlay-content">
+          <span class="promo-badge promo-badge--accent">New In</span>
+          <h3>Premium Wearables</h3>
+          <p>Track your active life, check your notifications, and style your wrist with elegant smartwatches.</p>
+          <a mat-flat-button appButtonStyle="tonal" routerLink="/products" [queryParams]="{ category: 'Smartwatches' }">
+            Shop Wearables
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="section-block">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">UI states</p>
-        <h3>Empty and recovery experiences</h3>
+  <!-- Featured Products Section -->
+  <section class="section-container products-section">
+    <div class="section-header">
+      <div class="header-left">
+        <h2 class="section-title">Trending Products</h2>
+        <p class="section-subtitle">Our most popular and highly rated essentials.</p>
       </div>
-      <p class="section-copy">
-        A real app needs clean fallback states, not just happy-path content cards.
-      </p>
+      <a mat-button appButtonStyle="secondary" routerLink="/products" class="view-all-btn">
+        <span>View all products</span>
+        <mat-icon>arrow_right_alt</mat-icon>
+      </a>
     </div>
 
-    <div class="state-grid">
-      <app-empty-state
-        title="No featured collections yet"
-        description="This reusable empty state can be used anywhere the app needs a clear placeholder."
-        actionLabel="Show snackbar"
-        (action)="handleEmptyAction()"
-      />
-
-      <app-error-state
-        title="Could not load a future home section"
-        description="This shared error state gives screens a consistent retry experience."
-        actionLabel="Retry example"
-        (action)="handleRetryAction()"
-      />
-    </div>
+    @if (featuredProductsState().loading) {
+      <app-product-skeleton-loading [cards]="4" />
+    } @else if (featuredProductsState().error) {
+      <div class="state-container">
+        <app-error-state
+          title="Could not retrieve featured products"
+          [description]="featuredProductsState().error ?? 'Please check your internet connection.'"
+          actionLabel="Retry Products"
+          (action)="retryAllLoading()"
+        />
+      </div>
+    } @else if (featuredProductsState().data; as products) {
+      @if (products.length === 0) {
+        <app-empty-state
+          title="No featured products found"
+          description="It looks like there are no active products in our featured collection right now."
+          actionLabel="Refresh List"
+          (action)="retryAllLoading()"
+        />
+      } @else {
+        <app-product-grid 
+          [products]="products" 
+          (quickView)="handleQuickView($event)" 
+          (addToCart)="handleAddToCart($event)"
+        />
+      }
+    }
   </section>
 
-  <section class="utility-layout">
-    <mat-card class="notes-card" appearance="outlined">
-      <div class="card-header">
-        <div>
-          <p class="eyebrow">Interaction utilities</p>
-          <h3>Reusable feedback actions</h3>
+  <!-- Trust Badges & System Connectivity -->
+  <section class="section-container trust-section">
+    <div class="trust-grid">
+      <div class="trust-item">
+        <div class="trust-icon-box">
+          <mat-icon>local_shipping</mat-icon>
+        </div>
+        <div class="trust-info">
+          <h4>Free shipping</h4>
+          <p>On all orders exceeding ₹500</p>
         </div>
       </div>
-      <mat-divider />
-      <p class="card-copy">
-        These actions use a shared snackbar service and a shared confirmation dialog service.
-      </p>
-      <div class="button-row">
-        <button
-          mat-flat-button
-          appButtonStyle="primary"
-          type="button"
-          (click)="showInfoMessage()"
-        >
-          Show info snackbar
-        </button>
-        <button
-          mat-stroked-button
-          appButtonStyle="secondary"
-          type="button"
-          (click)="showSuccessMessage()"
-        >
-          Show success snackbar
-        </button>
-        <button
-          mat-flat-button
-          appButtonStyle="tonal"
-          type="button"
-          (click)="showWarningMessage()"
-        >
-          Show warning snackbar
-        </button>
-        <button
-          mat-flat-button
-          appButtonStyle="tonal"
-          type="button"
-          (click)="openConfirmationDialog()"
-        >
-          Open confirmation dialog
-        </button>
-      </div>
-      <p class="last-action">Last action: {{ lastAction() }}</p>
-    </mat-card>
 
-    <mat-card class="notes-card notes-card--compact" appearance="outlined">
-      <div class="card-header">
-        <div>
-          <p class="eyebrow">Routing rationale</p>
-          <h3>Why the structure looks like this</h3>
+      <div class="trust-item">
+        <div class="trust-icon-box">
+          <mat-icon>verified_user</mat-icon>
+        </div>
+        <div class="trust-info">
+          <h4>Secure Payments</h4>
+          <p>100% encrypted checkout security</p>
         </div>
       </div>
-      <mat-divider />
-      <ul>
-        <li>Each feature now has its own route file instead of one growing route list.</li>
-        <li>Sidebar navigation points to route-level placeholders that are ready for real feature work.</li>
-        <li>Product details already has its own dynamic route shape for future backend integration.</li>
-      </ul>
-    </mat-card>
+
+      <div class="trust-item">
+        <div class="trust-icon-box">
+          <mat-icon>swap_horiz</mat-icon>
+        </div>
+        <div class="trust-info">
+          <h4>Simple Returns</h4>
+          <p>30-day effortless return window</p>
+        </div>
+      </div>
+
+      <div class="trust-item">
+        <div class="trust-icon-box">
+          <mat-icon>support_agent</mat-icon>
+        </div>
+        <div class="trust-info">
+          <h4>24/7 Help Desk</h4>
+          <p>Dedicated customer support</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Status Footer -->
+    <div class="api-status-row">
+      @if (backendStatus().loading) {
+        <div class="api-status-pill api-status-pill--loading">
+          <span class="status-indicator-dot animate-pulse"></span>
+          <span>Checking store server connection...</span>
+        </div>
+      } @else if (backendStatus().error) {
+        <div class="api-status-pill api-status-pill--offline">
+          <span class="status-indicator-dot"></span>
+          <span>Offline mode (Server unreachable)</span>
+          <button (click)="retryAllLoading()" class="api-status-retry" aria-label="Retry server connection">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+      } @else if (backendStatus().data; as status) {
+        <div class="api-status-pill api-status-pill--online">
+          <span class="status-indicator-dot"></span>
+          <span>Store API Online</span>
+        </div>
+      }
+    </div>
   </section>
 </section>

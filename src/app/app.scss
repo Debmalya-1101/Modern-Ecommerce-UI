@@ -152,8 +152,8 @@
   grid-template-columns: auto 1fr auto;
   gap: 1.5rem;
   align-items: center;
-  min-height: 5.5rem;
-  padding: 0.9rem 1.5rem;
+  min-height: 4.5rem;
+  padding: 0.5rem 1.5rem;
   background: transparent;
 }
 
@@ -214,13 +214,34 @@
   flex-shrink: 0;
 }
 
+.brand-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(181, 95, 52, 0.15);
+  transition: transform 0.25s ease;
+
+  .brand-link:hover & {
+    transform: rotate(5deg) scale(1.05);
+  }
+}
+
 .brand-mark {
   display: grid;
   text-decoration: none;
   color: inherit;
 }
 
-.brand-mark--auth {
+.brand-link--auth {
   padding: 0.35rem 0;
 }
 
@@ -233,9 +254,16 @@
 }
 
 .brand-mark__title {
-  font-size: clamp(1.25rem, 2.4vw, 1.9rem);
-  font-weight: 700;
-  letter-spacing: -0.04em;
+  font-family: 'Outfit', 'Trebuchet MS', sans-serif;
+  font-size: clamp(1.4rem, 2.6vw, 1.95rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  background: linear-gradient(135deg, var(--color-neutral-900) 0%, var(--color-brand-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  line-height: 1.25;
+  padding-bottom: 0.1em;
 }
 
 .toolbar-search {
@@ -375,15 +403,41 @@
 .shell-footer {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
+  align-items: center;
+  gap: 1.5rem;
   padding: 1.5rem;
   border-top: 1px solid var(--shell-border);
   color: var(--shell-muted);
   font-size: 0.95rem;
 }
 
-.shell-footer p {
+.footer-copy {
   margin: 0;
+}
+
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+
+  &__link {
+    color: var(--shell-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      color: var(--shell-accent);
+      transform: translateY(-2px);
+    }
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      fill: currentColor;
+    }
+  }
 }
 
 @media (max-width: 768px) {
@@ -436,6 +490,91 @@
 
   .shell-footer {
     flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    text-align: center;
     padding-inline: 1rem;
+  }
+}
+
+.profile-menu-trigger.mdc-button {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--shell-text);
+  border: 1px solid transparent;
+  transition: background-color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background-color: rgba(87, 61, 44, 0.05);
+    border-color: rgba(87, 61, 44, 0.1);
+  }
+  
+  ::ng-deep .mdc-button__label {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+}
+
+.profile-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 50%;
+  background-color: var(--shell-accent-soft);
+  color: var(--shell-accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 1px solid rgba(181, 95, 52, 0.2);
+  order: 1 !important;
+}
+
+.profile-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--shell-text);
+  order: 2 !important;
+}
+
+.profile-arrow {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--shell-muted);
+  margin-left: 0.15rem;
+  order: 3 !important;
+}
+
+// Menu customization
+::ng-deep .mat-mdc-menu-panel.app-profile-menu {
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(80, 54, 36, 0.08);
+  border: 1px solid rgba(87, 61, 44, 0.1);
+  background-color: #ffffff;
+  padding: 0.35rem 0;
+
+  .mat-mdc-menu-item {
+    font-weight: 500;
+    color: var(--shell-text);
+    
+    mat-icon {
+      color: var(--shell-muted);
+      margin-right: 0.75rem;
+    }
+
+    &:hover {
+      background-color: rgba(181, 95, 52, 0.05);
+      color: var(--shell-accent);
+      
+      mat-icon {
+        color: var(--shell-accent);
+      }
+    }
   }
 }

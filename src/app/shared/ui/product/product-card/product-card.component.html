@@ -34,7 +34,9 @@
       }
     </div>
 
-    <h3>{{ product.name }}</h3>
+    <h3 class="product-card__title">
+      <span class="product-card__title-text">{{ product.name }}</span>
+    </h3>
 
     @if (product.shortDescription) {
       <p class="product-card__description">{{ product.shortDescription }}</p>

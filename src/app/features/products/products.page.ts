@@ -234,23 +234,23 @@ export class ProductsPage implements OnInit {
       .subscribe({
         next: (paginatedResponse) => {
           this.totalElements.set(paginatedResponse.totalElements);
-          // Map backend ProductListItem → ProductCardViewModel for the grid component.
-          // Fields not provided by the backend (reviewCount, imageLabel) use safe defaults.
           this.productState.set({
-            data: paginatedResponse.products.map((product) => ({
-              id: product.id,
-              name: product.name,
-              brand: product.brand,
-              category: product.categoryName,
-              price: product.price,
-              rating: product.rating,
-              imageUrl: product.imageUrl,     // Real image URL from the backend
-              reviewCount: product.ratingCount ?? 0,
-              imageLabel: product.name,       // Use product name as the image alt text
-              shortDescription: product.shortDescription,
-              badge: product.badge,
-              originalPrice: product.originalPrice,
-            })),
+            data: paginatedResponse.products.map((product) => {
+              return {
+                id: product.id,
+                name: product.name,
+                brand: product.brand,
+                category: product.categoryName,
+                price: product.price,
+                rating: product.rating,
+                imageUrl: product.imageUrl,
+                reviewCount: product.ratingCount ?? 0,
+                imageLabel: product.name,
+                shortDescription: product.shortDescription,
+                badge: undefined,
+                originalPrice: undefined,
+              };
+            }),
             error: null,
             loading: false,
           });

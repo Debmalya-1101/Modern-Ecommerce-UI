@@ -10,6 +10,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { filter } from 'rxjs';
 import { AuthService } from './core/services/auth.service';
 import { CartService } from './core/services/cart.service';
@@ -38,6 +39,7 @@ interface NavigationItem {
     MatToolbarModule,
     MatBadgeModule,
     MatIconModule,
+    MatMenuModule,
     ButtonStyleDirective,
     CartDrawerComponent
   ],
@@ -55,7 +57,7 @@ export class App {
   private readonly startsOnMobile = this.breakpointObserver.isMatched(this.mobileBreakpoint);
   protected readonly currentUrl = signal(this.router.url);
 
-  protected readonly title = 'Modern Commerce';
+  protected readonly title = 'Nexis Store';
   protected readonly isMobile = signal(this.startsOnMobile);
   protected readonly isSidebarOpen = signal(false); // Start with sidebar closed
   protected readonly searchQuery = signal(''); // Header search text
