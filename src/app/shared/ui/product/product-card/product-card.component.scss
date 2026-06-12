@@ -9,6 +9,7 @@
   gap: 1rem;
   height: 100%;
   padding: 1rem;
+  border-radius: var(--border-radius-md);
   overflow: hidden;
   border-color: rgba(87, 61, 44, 0.12);
   background:
@@ -34,7 +35,7 @@
 .product-card__media {
   position: relative;
   padding: 0.5rem;
-  border-radius: 1.1rem;
+  border-radius: var(--border-radius-lg);
   background: #ffffff;
   border: 1px solid rgba(87, 61, 44, 0.05);
   aspect-ratio: 1 / 1; /* Enforce square aspect ratio */
@@ -57,7 +58,7 @@
     background: rgba(255, 255, 255, 0.65);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    border-radius: 50%;
+    border-radius: var(--border-radius-circle);
     color: #8a776d;
     box-shadow: 0 4px 12px rgba(80, 54, 36, 0.06);
     transition: all 0.2s ease;

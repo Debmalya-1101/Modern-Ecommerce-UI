@@ -18,6 +18,7 @@
 .auth-card {
   position: relative;
   overflow: hidden;
+  border-radius: var(--border-radius-lg);
   border-color: rgba(87, 61, 44, 0.14);
   background: rgba(255, 252, 247, 0.96);
   box-shadow: 0 20px 48px rgba(80, 54, 36, 0.08);
@@ -133,7 +134,7 @@ h3 {
   gap: 0.25rem;
   padding: 1.15rem;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 1rem;
+  border-radius: var(--border-radius-lg);
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -187,7 +188,7 @@ h3 {
 .auth-success,
 .auth-error {
   padding: 0.95rem 1rem;
-  border-radius: 1rem;
+  border-radius: var(--border-radius-lg);
   line-height: 1.6;
 }
 
@@ -213,7 +214,7 @@ h3 {
 }
 
 .auth-form .mat-mdc-text-field-wrapper {
-  border-radius: 1rem;
+  border-radius: var(--border-radius-md);
   background: rgba(255, 253, 250, 0.98);
 }
 
@@ -278,7 +279,7 @@ h3 {
   gap: 0.55rem;
   min-width: 11rem;
   min-height: 3.15rem;
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   padding-inline: 1.25rem;
 }
 

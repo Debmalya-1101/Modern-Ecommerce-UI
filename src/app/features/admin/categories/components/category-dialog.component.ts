@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ButtonStyleDirective } from '../../../../shared/directives/button-style.directive';
 
 import { CategoryDTO } from '../../../../core/models/admin-category.model';
 
@@ -17,7 +18,8 @@ import { CategoryDTO } from '../../../../core/models/admin-category.model';
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    ButtonStyleDirective
   ],
   template: `
     <h2 mat-dialog-title class="dialog-title">{{ isEditMode ? 'Edit Category' : 'Create New Category' }}</h2>
@@ -31,8 +33,8 @@ import { CategoryDTO } from '../../../../core/models/admin-category.model';
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="dialog-actions">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button color="primary" [disabled]="categoryForm.invalid" (click)="onSubmit()">
+      <button mat-button appButtonStyle="secondary" mat-dialog-close>Cancel</button>
+      <button mat-flat-button appButtonStyle="primary" [disabled]="categoryForm.invalid" (click)="onSubmit()">
         {{ isEditMode ? 'Save Changes' : 'Create Category' }}
       </button>
     </mat-dialog-actions>

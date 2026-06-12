@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { Subject, takeUntil, finalize } from 'rxjs';
+import { ButtonStyleDirective } from '../../../../../shared/directives/button-style.directive';
 
 import { AdminProductDTO } from '../../../../../core/models/admin-product.model';
 import { AdminCategoriesService } from '../../../../../core/services/admin-categories.service';
@@ -34,7 +35,8 @@ type ScrapeMode = 'manual' | 'amazon' | 'flipkart';
     MatButtonToggleModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatRadioModule
+    MatRadioModule,
+    ButtonStyleDirective
   ],
   template: `
     <div class="dialog-header">
@@ -194,13 +196,13 @@ type ScrapeMode = 'manual' | 'amazon' | 'flipkart';
     </mat-dialog-content>
     
     <mat-dialog-actions align="end" class="dialog-actions">
-      <button mat-button mat-dialog-close [disabled]="isScraping">Cancel</button>
+      <button mat-button appButtonStyle="secondary" mat-dialog-close [disabled]="isScraping">Cancel</button>
       
-      <button *ngIf="scrapeMode === 'manual'" mat-flat-button color="primary" [disabled]="productForm.invalid || isScraping" (click)="onSubmit()">
+      <button *ngIf="scrapeMode === 'manual'" mat-flat-button appButtonStyle="primary" [disabled]="productForm.invalid || isScraping" (click)="onSubmit()">
         {{ isEditMode ? 'Save Changes' : 'Create Product' }}
       </button>
 
-      <button *ngIf="scrapeMode !== 'manual'" mat-flat-button color="primary" [disabled]="scrapeForm.invalid || isScraping" (click)="onScrapeSubmit()">
+      <button *ngIf="scrapeMode !== 'manual'" mat-flat-button appButtonStyle="primary" [disabled]="scrapeForm.invalid || isScraping" (click)="onScrapeSubmit()">
         <mat-icon>cloud_download</mat-icon>
         Import Product(s)
       </button>
@@ -222,7 +224,7 @@ type ScrapeMode = 'manual' | 'amazon' | 'flipkart';
       justify-content: center;
     }
     .modern-toggle-group {
-      border-radius: 8px;
+      border-radius: var(--border-radius-sm);
       overflow: hidden;
     }
     .dialog-content-wrapper {
@@ -252,7 +254,7 @@ type ScrapeMode = 'manual' | 'amazon' | 'flipkart';
     .attributes-section {
       background: #f8fafc;
       padding: 1rem;
-      border-radius: 8px;
+      border-radius: var(--border-radius-sm);
       border: 1px solid #e2e8f0;
       margin-bottom: 0.5rem;
     }
@@ -277,7 +279,7 @@ type ScrapeMode = 'manual' | 'amazon' | 'flipkart';
       background: #e0f2fe;
       color: #0369a1;
       padding: 1rem;
-      border-radius: 8px;
+      border-radius: var(--border-radius-sm);
       align-items: flex-start;
       margin-bottom: 0.5rem;
     }
@@ -289,7 +291,7 @@ type ScrapeMode = 'manual' | 'amazon' | 'flipkart';
     .category-selection-area {
       background: #f8fafc;
       padding: 1rem;
-      border-radius: 8px;
+      border-radius: var(--border-radius-sm);
       border: 1px solid #e2e8f0;
       display: flex;
       flex-direction: column;
@@ -310,12 +312,12 @@ type ScrapeMode = 'manual' | 'amazon' | 'flipkart';
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 4px;
+      border-radius: var(--border-radius-xs);
     }
     .loading-card {
       background: white;
       padding: 2rem;
-      border-radius: 12px;
+      border-radius: var(--border-radius-md);
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;

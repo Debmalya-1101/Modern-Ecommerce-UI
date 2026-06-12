@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ButtonStyleDirective } from '../../../../shared/directives/button-style.directive';
 
 import { AppHttpError } from '../../../../core/models/api.model';
 import { ReviewDTO } from '../../../../core/models/review.model';
@@ -29,7 +30,8 @@ export interface ReviewDialogData {
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ButtonStyleDirective
   ],
   templateUrl: './review-dialog.component.html',
   styleUrls: ['./review-dialog.component.scss']

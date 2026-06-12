@@ -143,7 +143,7 @@ export class AdminDashboardPage implements OnInit {
               ...results.analytics,
               ordersByStatus: results.analytics.ordersByStatus || [],
               monthlySalesGraph: results.analytics.monthlySalesGraph || [],
-              topSellingProducts: results.analytics.topSellingProducts || []
+              topSellingProducts: (results.analytics.topSellingProducts || []).slice(0, 4)
             };
             this.recentOrders = results.orders?.content || [];
             this.lowStockProducts = results.products?.content || [];

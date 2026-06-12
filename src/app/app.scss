@@ -93,7 +93,7 @@
 }
 
 .active-link {
-  border-radius: 1rem;
+  border-radius: var(--border-radius-lg);
   background: var(--shell-accent-soft);
   box-shadow: inset 0 0 0 1px rgba(181, 95, 52, 0.08);
 }
@@ -225,7 +225,7 @@
 .brand-logo {
   width: 38px;
   height: 38px;
-  border-radius: 8px;
+  border-radius: var(--border-radius-sm);
   object-fit: cover;
   box-shadow: 0 4px 10px rgba(181, 95, 52, 0.15);
   transition: transform 0.25s ease;
@@ -273,7 +273,7 @@
   min-height: 3.35rem;
   padding: 0.35rem 0.35rem 0.35rem 1.1rem;
   border: 1px solid rgba(87, 61, 44, 0.14);
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   background: rgba(255, 252, 247, 0.95);
   box-shadow: 0 8px 22px rgba(80, 54, 36, 0.05);
   flex: 1;
@@ -329,7 +329,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.25rem;
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   flex-shrink: 0;
   transition: background-color 0.15s, color 0.15s;
 
@@ -347,7 +347,7 @@
 
 .toolbar-search__btn {
   flex-shrink: 0;
-  border-radius: 999px !important;
+  border-radius: var(--border-radius-pill) !important;
 }
 
 .toolbar-links {
@@ -502,7 +502,7 @@
   align-items: center;
   gap: 0.65rem;
   padding: 0.4rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--border-radius-pill);
   background-color: transparent;
   color: var(--shell-text);
   border: 1px solid transparent;
@@ -526,7 +526,7 @@
   justify-content: center;
   width: 1.85rem;
   height: 1.85rem;
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   background-color: var(--shell-accent-soft);
   color: var(--shell-accent);
   font-weight: 700;
@@ -553,7 +553,7 @@
 
 // Menu customization
 ::ng-deep .mat-mdc-menu-panel.app-profile-menu {
-  border-radius: 1rem;
+  border-radius: var(--border-radius-lg);
   box-shadow: 0 10px 25px rgba(80, 54, 36, 0.08);
   border: 1px solid rgba(87, 61, 44, 0.1);
   background-color: #ffffff;

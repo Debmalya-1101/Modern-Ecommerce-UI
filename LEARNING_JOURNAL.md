@@ -4851,5 +4851,113 @@ What I learned:
 - Storing high-priority items in independent signals simplifies sorting and state merging using computed expressions.
 - Background crawling is a powerful way to enrich specific UI actions before pages are loaded by the user.
 
+## Feature Update: Global UI Polish, Layout Alignment, and Design Token Standardization
 
+What was added:
+- Created global border-radius tokens in `src/styles.scss` using CSS variables (`--border-radius-xs` = 4px, `--border-radius-sm` = 8px, `--border-radius-md` = 12px, `--border-radius-lg` = 16px, `--border-radius-xl` = 20px, `--border-radius-pill` = 999px, `--border-radius-circle` = 50%).
+- Replaced all hardcoded border-radiuses across all stylesheets (storefront home, product card, product details, checkout, auth) and layout views with unified token variables.
+- Standardized outlines for form fields globally using the Angular Material CSS custom property `--mdc-outlined-text-field-container-shape`.
+- Fixed layout column alignment bugs in the admin dashboard widgets tables.
+- Adjusted sidebar and table content side-paddings in admin tables (products, orders, categories) to align vertically with toolbars.
+- Restructured all admin/user dialog buttons (product details wishlist button, product import, attribute key, categories, and reviews dialogs) to use the `ButtonStyleDirective` (`appButtonStyle`) to enforce unified pill-shaped action buttons.
+- Refactored notification snackbars in the admin panel to use the shared `SnackbarService` instead of direct `MatSnackBar` calls.
 
+Why it was added:
+- Inconsistent border-radiuses (varying from 4px to 1.5rem to 999px) and custom outline wrapper overrides looked disjointed and non-standard.
+- Columns in admin dashboard tables did not line up because cell headers were missing matching paddings and offsets.
+- Action buttons in modal dialogs did not follow storefront aesthetics, showing square or default Material shapes.
+- Admin snackbars missed the brand's custom styling and animations because they bypassed the mapping inside `SnackbarService`.
+
+Angular concept behind it:
+- **Global Theme & CSS Custom Property Overrides**: Angular Material (using MDC components) defines standard shapes and properties using variables. Overriding `--mdc-outlined-text-field-container-shape` globally modifies all text fields across encapsulated components without hacky `::ng-deep` wrappers or class targets.
+- **Unified Style Directives (`ButtonStyleDirective`)**: A directive that binds visual variant classes (`shared-button`, `shared-button--primary`, etc.) dynamically using `@HostBinding` makes code highly modular. Any standalone component (including dialog dialogs) can import the directive and gain standardized styles without custom stylesheets.
+
+Simple example:
+```html
+<!-- Standalone dialog component template -->
+<mat-dialog-actions align="end">
+  <button mat-button appButtonStyle="secondary" mat-dialog-close>Cancel</button>
+  <button mat-flat-button appButtonStyle="primary" (click)="onSubmit()">Save</button>
+</mat-dialog-actions>
+```
+```typescript
+// Component metadata
+@Component({
+  standalone: true,
+  imports: [MatDialogModule, MatButtonModule, ButtonStyleDirective],
+  // ...
+})
+export class CustomDialogComponent {}
+```
+
+What I learned:
+- To achieve a premium design feel, all corner shapes, padding grids, and button variants must adhere to a strict design system (tokens).
+- Angular Material custom CSS properties are the cleanest way to override default framework styling across encapsulated boundaries.
+- Reusable style directives are critical for maintaining visual consistency inside programmatic UI structures like dialog overlays.
+
+## Feature Update: UI Polish & Alignment Refinement (Phase 2)
+
+What was added:
+- Global Outline Cap Rounding: Added specialized selectors in `src/styles.scss` targeting `.mdc-notched-outline__leading` and `.mdc-notched-outline__trailing` to apply rounded corners (`var(--border-radius-md)`) specifically to the outline caps.
+- Auth Input Wrapper Realignment: Standardized the background container border-radius of auth input wrappers to match outline shapes.
+- Admin Widget Spacing & Table Container: Styled widget card content containers globally under `.widget-card` to use `padding: 0 1.5rem 1.5rem 1.5rem !important;` to ensure widget tables sit cleanly inside cards. Additionally, styled `.table-container` with background-color `#ffffff`, `var(--border-radius-sm)` (8px) rounding, a subtle border, and shadow. Made table and row backgrounds transparent to enforce rounded container background flow.
+- Table Cell Edge Indentation: Removed `padding-left: 0` / `padding-right: 0` on first/last column cells and replaced them with `1.25rem` padding to prevent textual data from touching card borders.
+- Star Icon Vertial Alignment: Adjusted `.star-icon` in dashboard widgets and `.rating-badge mat-icon` in analytics tables to use `display: inline-flex; align-items: center; justify-content: center;` and reduced their size to `14px` to achieve perfect vertical centering.
+
+Why it was added:
+- Even when `--mdc-outlined-text-field-container-shape` is set, MDC draws borders on separate nested outline elements (`__leading` and `__trailing`) which fallback to standard corners under certain conditions, causing outlines to look square.
+- Tables inside dashboard widget cards touched the card's visual borders because card content container padding was set to 0. Additionally, the white background area of the table was sharp (no border radius) and text touched the edges of the white background because cell edge paddings were zeroed out.
+- Rating star icons inside table cells and rating badges were misaligned vertically relative to text line metrics because of default block/inline block layout flows.
+
+Angular concept behind it:
+- **MDC Notched Outline Elements**: Outlined Material form fields don't use standard borders on the outer wrapper; instead, they construct three separate SVG/border segments (`__leading`, `__notch`, `__trailing`). To style outline borders correctly, overrides must target these specific elements.
+- **Deep Component Style Overrides (`::ng-deep`)**: Angular uses View Encapsulation to scope styles to individual components. When overriding styles of nested components (like MatTable inside MatCard), using the `::ng-deep` shadow-piercing combinator is necessary to override native styling.
+
+Simple example:
+```scss
+/* Style table container as a rounded white box wrapper */
+.table-container {
+  border-radius: var(--border-radius-sm);
+  background: #ffffff;
+  border: 1px solid rgba(87, 61, 44, 0.08);
+  
+  table {
+    background: transparent !important;
+    
+    td.mat-mdc-cell:first-child {
+      padding-left: 1.25rem; /* Indented from container edge */
+    }
+  }
+}
+```
+
+What I learned:
+- Material Outlined text fields rely on separate notched outline segments, meaning simple wrappers rounding isn't enough; caps must be explicitly rounded.
+- Scoped component styling in Angular must be overridden using `::ng-deep` when styling third-party components that do not provide custom properties.
+- Vertical alignment of icons with textual data is best solved using `display: inline-flex` on the icon and `align-items: center` on the parent container.
+- Table containers using `overflow-x: auto` should have white backgrounds and border-radiuses directly applied to form a clean inner box wrapper, while using cell edge padding to prevent text from touching container borders.
+
+## Feature Update: Top Selling Products Slicing & Dashboard Row Height Alignment
+
+What was added:
+- Sliced the `topSellingProducts` array to contain only the top 4 products inside `admin-dashboard.page.ts`.
+
+Why it was added:
+- On the admin dashboard page, the "Top Selling Products" card and the "Quick Actions" card are displayed side-by-side in the same grid row.
+- Before this change, the "Top Selling Products" card loaded all 10 products, resulting in a very tall container. This forced the "Quick Actions" card to stretch to the same excessive height, leaving large, empty, and awkward spaces between the 4 actions icons.
+- Limiting the display to 4 items reduces the card height so that both cards in the row look compact and vertically aligned.
+
+Angular concept behind it:
+- **Filtering / Slicing Shared API Payloads**: When dashboard analytics endpoints are shared between detailed report pages and summary dashboard widgets, it is common to load the full set of items (e.g., 10 items) from the service. Slicing the array directly inside the dashboard page component allows us to reuse the same backend query service (`getDashboardAnalytics()`) while displaying a smaller preview subset without duplicate endpoints.
+
+Simple example:
+```typescript
+this.analyticsData = {
+  ...results.analytics,
+  topSellingProducts: (results.analytics.topSellingProducts || []).slice(0, 4)
+};
+```
+
+What I learned:
+- Summary widgets in grid rows should limit their item counts to keep the grid layout well-proportioned and visually balanced.
+- Modifying shared API response data in local component state is a lightweight way to customize specific layouts without bloating backend routes or service layer methods.

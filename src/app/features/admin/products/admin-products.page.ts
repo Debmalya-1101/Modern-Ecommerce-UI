@@ -12,7 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -24,6 +24,7 @@ import { AdminProductDTO } from '../../../core/models/admin-product.model';
 import { ConfirmDeleteDialogComponent } from './components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { StockDialogComponent } from './components/stock-dialog/stock-dialog.component';
 import { ProductDialogComponent } from './components/product-dialog/product-dialog.component';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
 
 @Component({
   selector: 'app-admin-products',
@@ -53,7 +54,7 @@ import { ProductDialogComponent } from './components/product-dialog/product-dial
 export class AdminProductsPage implements OnInit {
   private productsService = inject(AdminProductsService);
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
+  private snackBar = inject(SnackbarService);
   
   private importSub?: Subscription;
 
@@ -203,10 +204,10 @@ export class AdminProductsPage implements OnInit {
   }
 
   private showSuccess(message: string) {
-    this.snackBar.open(message, 'Close', { duration: 3000, panelClass: ['success-snackbar'] });
+    this.snackBar.success(message);
   }
 
   private showError(message: string) {
-    this.snackBar.open(message, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+    this.snackBar.error(message);
   }
 }

@@ -6,6 +6,7 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { ButtonStyleDirective } from '../../../../shared/directives/button-style.directive';
 
 import { AdminAttributeKeyDTO } from '../../../../core/models/admin-category.model';
 
@@ -19,7 +20,8 @@ import { AdminAttributeKeyDTO } from '../../../../core/models/admin-category.mod
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    ButtonStyleDirective
   ],
   template: `
     <h2 mat-dialog-title class="dialog-title">{{ isEditMode ? 'Edit Attribute Key' : 'Create Attribute Key' }}</h2>
@@ -42,8 +44,8 @@ import { AdminAttributeKeyDTO } from '../../../../core/models/admin-category.mod
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end" class="dialog-actions">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button color="primary" [disabled]="attributeForm.invalid" (click)="onSubmit()">
+      <button mat-button appButtonStyle="secondary" mat-dialog-close>Cancel</button>
+      <button mat-flat-button appButtonStyle="primary" [disabled]="attributeForm.invalid" (click)="onSubmit()">
         {{ isEditMode ? 'Save Changes' : 'Add Key' }}
       </button>
     </mat-dialog-actions>

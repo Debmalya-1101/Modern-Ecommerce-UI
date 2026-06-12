@@ -13,6 +13,7 @@
   border-color: rgba(87, 61, 44, 0.14);
   background: rgba(255, 252, 247, 0.96);
   box-shadow: 0 14px 32px rgba(80, 54, 36, 0.07);
+  border-radius: var(--border-radius-lg);
 }
 
 .back-navigation {
@@ -136,7 +137,7 @@ h3,
   transform: translateY(-50%);
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(87, 61, 44, 0.15);
   color: #2d241f;
@@ -188,7 +189,7 @@ h3,
 .slider-dot {
   width: 0.55rem;
   height: 0.55rem;
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   background: rgba(80, 54, 36, 0.25);
   border: none;
   padding: 0;
@@ -203,7 +204,7 @@ h3,
   &--active {
     background: #b55f34;
     width: 1.35rem;
-    border-radius: 4px;
+    border-radius: var(--border-radius-xs);
   }
 }
 
@@ -294,7 +295,7 @@ h3,
     flex-direction: column;
     gap: 0.15rem;
     padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
+    border-radius: var(--border-radius-sm);
     background: rgba(245, 236, 227, 0.6);
     
     span {
@@ -360,7 +361,7 @@ h3,
   display: flex;
   align-items: center;
   border: 1px solid rgba(87, 61, 44, 0.12);
-  border-radius: 0.5rem;
+  border-radius: var(--border-radius-sm);
   background: rgba(255, 255, 255, 0.75);
   
   &.disabled {
@@ -412,6 +413,7 @@ h3,
     border: 1px solid rgba(80, 54, 36, 0.15);
     background: transparent;
     color: #8a776d;
+    border-radius: var(--border-radius-circle);
     transition: all 0.2s ease;
 
     mat-icon {

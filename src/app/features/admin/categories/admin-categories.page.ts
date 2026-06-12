@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 
@@ -16,6 +16,7 @@ import { CategoryDTO, AdminAttributeKeyDTO } from '../../../core/models/admin-ca
 import { CategoryDialogComponent } from './components/category-dialog.component';
 import { AttributeKeyDialogComponent } from './components/attribute-key-dialog.component';
 import { ConfirmDeleteDialogComponent } from '../products/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
 
 @Component({
   selector: 'app-admin-categories',
@@ -45,7 +46,7 @@ import { ConfirmDeleteDialogComponent } from '../products/components/confirm-del
 export class AdminCategoriesPage implements OnInit {
   private categoriesService = inject(AdminCategoriesService);
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
+  private snackBar = inject(SnackbarService);
 
   displayedColumns: string[] = ['name', 'attributesCount', 'actions'];
   dataSource = new MatTableDataSource<CategoryDTO>([]);
@@ -173,10 +174,10 @@ export class AdminCategoriesPage implements OnInit {
   }
 
   private showSuccess(message: string) {
-    this.snackBar.open(message, 'Close', { duration: 3000, panelClass: ['success-snackbar'] });
+    this.snackBar.success(message);
   }
 
   private showError(message: string) {
-    this.snackBar.open(message, 'Close', { duration: 4000, panelClass: ['error-snackbar'] });
+    this.snackBar.error(message);
   }
 }

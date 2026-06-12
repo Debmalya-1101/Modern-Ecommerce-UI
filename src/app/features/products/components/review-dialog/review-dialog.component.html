@@ -51,10 +51,10 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close [disabled]="isSubmitting()">Cancel</button>
+  <button mat-button appButtonStyle="secondary" mat-dialog-close [disabled]="isSubmitting()">Cancel</button>
   <button
     mat-flat-button
-    color="primary"
+    appButtonStyle="primary"
     type="submit"
     form="review-form"
     [disabled]="isSubmitting() || reviewForm.invalid"

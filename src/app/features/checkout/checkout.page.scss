@@ -27,7 +27,7 @@
 .checkout-form-section {
   background: var(--shell-surface);
   padding: 2.5rem;
-  border-radius: 16px;
+  border-radius: var(--border-radius-lg);
   border: 1px solid var(--shell-border);
   box-shadow: var(--shell-shadow);
 
@@ -53,7 +53,7 @@
     // Custom form field styles to match premium theme
     ::ng-deep {
       .mat-mdc-text-field-wrapper {
-        border-radius: 12px;
+        border-radius: var(--border-radius-md);
         background: rgba(255, 255, 255, 0.6) !important;
         transition: background-color 200ms ease, box-shadow 200ms ease;
 
@@ -105,7 +105,7 @@
 .checkout-summary-section {
   background: var(--shell-surface);
   padding: 2.5rem;
-  border-radius: 16px;
+  border-radius: var(--border-radius-lg);
   border: 1px solid var(--shell-border);
   box-shadow: var(--shell-shadow);
   position: sticky;
@@ -163,7 +163,7 @@
     width: 70px;
     height: 70px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: var(--border-radius-sm);
     border: 1px solid var(--shell-border);
     background: #ffffff;
   }
@@ -223,7 +223,7 @@
     height: 3.5rem;
     font-size: 1.125rem;
     font-weight: 600;
-    border-radius: 999px !important;
+    border-radius: var(--border-radius-pill) !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -235,7 +235,7 @@
   text-align: center;
   padding: 5rem 2rem;
   background: var(--shell-surface);
-  border-radius: 16px;
+  border-radius: var(--border-radius-lg);
   border: 1px solid var(--shell-border);
   box-shadow: var(--shell-shadow);
 
@@ -264,7 +264,7 @@
   button {
     height: 3.25rem;
     padding-inline: 2.5rem;
-    border-radius: 999px !important;
+    border-radius: var(--border-radius-pill) !important;
     font-weight: 600;
   }
 }
