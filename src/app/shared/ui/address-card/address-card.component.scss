@@ -1,0 +1,13 @@
+// Styling handled mostly by Tailwind CSS
+:host {
+  display: block;
+}
+
+mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

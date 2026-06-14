@@ -1,0 +1,83 @@
+<div 
+  (click)="onSelect()"
+  class="relative flex flex-col justify-between p-5 rounded-2xl border transition-all duration-300 bg-white h-full"
+  [ngClass]="{
+    'cursor-pointer hover:shadow-md hover:border-amber-600': selectable,
+    'border-amber-600 ring-2 ring-amber-100 bg-amber-50/20': selectable && selected,
+    'border-neutral-200 hover:border-neutral-300': !selected,
+    'border-neutral-200': !selectable
+  }"
+>
+  <!-- Default Badge / Select Indicator -->
+  <div class="flex justify-between items-start mb-3">
+    <div class="flex flex-col gap-1">
+      <span class="font-semibold text-neutral-800 text-base flex items-center gap-2">
+        {{ address.contactName }}
+        @if (address.isDefault) {
+          <span class="bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-0.5 rounded-full border border-amber-200">
+            Default
+          </span>
+        }
+      </span>
+      <span class="text-sm text-neutral-500 flex items-center gap-1.5 mt-0.5">
+        <mat-icon class="scale-75 text-neutral-400">phone</mat-icon>
+        {{ address.mobileNumber }}
+      </span>
+    </div>
+    
+    @if (selectable) {
+      <div 
+        class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors duration-200"
+        [ngClass]="{
+          'border-amber-600 bg-amber-600 text-white': selected,
+          'border-neutral-300 bg-white': !selected
+        }"
+      >
+        @if (selected) {
+          <mat-icon class="scale-75 font-bold">check</mat-icon>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Address Details -->
+  <div class="text-sm text-neutral-600 space-y-1 pr-6 flex-grow">
+    <p class="leading-relaxed">{{ address.addressLine }}</p>
+    <p>{{ address.city }}, {{ address.state }} - <span class="font-medium text-neutral-700">{{ address.postalCode }}</span></p>
+    <p class="text-xs text-neutral-400 uppercase tracking-wider font-semibold">{{ address.country }}</p>
+  </div>
+
+  <!-- Actions Panel -->
+  @if (!selectable) {
+    <div class="flex items-center justify-end gap-1 mt-4 pt-3 border-t border-neutral-100">
+      @if (!address.isDefault) {
+        <button 
+          mat-button 
+          color="accent" 
+          class="text-xs scale-90"
+          (click)="onSetDefault($event)"
+        >
+          Set as Default
+        </button>
+      }
+      <button 
+        mat-icon-button 
+        color="primary"
+        class="scale-90"
+        aria-label="Edit address"
+        (click)="onEdit($event)"
+      >
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button 
+        mat-icon-button 
+        color="warn"
+        class="scale-90"
+        aria-label="Delete address"
+        (click)="onDelete($event)"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  }
+</div>

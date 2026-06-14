@@ -4961,3 +4961,148 @@ this.analyticsData = {
 What I learned:
 - Summary widgets in grid rows should limit their item counts to keep the grid layout well-proportioned and visually balanced.
 - Modifying shared API response data in local component state is a lightweight way to customize specific layouts without bloating backend routes or service layer methods.
+
+## Feature Update: Address Management Integration
+
+What was added:
+- Created the Address model (`Address` interface) and endpoints in `api-endpoints.constants.ts`.
+- Implemented `AddressesApiService` using RxJS for network requests (`GET`, `POST`, `PUT`, `DELETE`, `/default`).
+- Implemented `AddressService` using Angular Signals to manage addresses state reactively.
+- Built reusable standalone UI components: `AddressCardComponent` (styled with Tailwind CSS) and `AddressFormComponent` (a Reactive Form with validator patterns).
+- Updated the User Profile page to fetch, display, and manage (add/edit/delete/set default) addresses using an Angular Material Dialog modal.
+- Integrated saved addresses into the Checkout flow, letting users pick from saved addresses (which overrides manual forms) or fallback to manual entry.
+
+Why it was added:
+- To allow users to manage their billing/shipping profiles in a real-world fashion.
+- To improve checkout UX by allowing one-click checkout using saved addresses while retaining manual address input fallback.
+- To demonstrate form validation on the frontend for fields like mobile numbers (10 digits) and postal codes (6 digits).
+
+Angular concept behind it:
+- **Angular Signals (`signal`, `computed`, `effect`)**: Centralized reactivity for address data across the app (re-fetches dynamically on auth changes).
+- **Reactive Forms & Form Validation**: `FormGroup`, `Validators.pattern`, and dynamic validator attachment (`clearValidators()`, `setValidators()`, `updateValueAndValidity()`) to switch validation states on selection.
+- **Material Dialog (`MatDialog`)**: Displaying forms in a floating modal to improve user focus and keep pages clean.
+- **Smart vs. Dumb Components**: `AddressCardComponent` is a presentation (dumb) component, while pages act as smart controllers.
+- **Tailwind CSS Integration**: Using Tailwind for responsive grids and hover animations.
+
+Simple example:
+```typescript
+// Toggling validators dynamically in Checkout based on address selection
+private updateFormValidators(id: number | -1): void {
+  const controls = ['name', 'email', 'phoneNo', 'address'];
+  if (id !== -1) {
+    controls.forEach(c => {
+      this.checkoutForm.get(c)?.clearValidators();
+      this.checkoutForm.get(c)?.updateValueAndValidity();
+    });
+  } else {
+    this.checkoutForm.get('name')?.setValidators([Validators.required]);
+    // Rest of validators...
+    controls.forEach(c => this.checkoutForm.get(c)?.updateValueAndValidity());
+  }
+}
+```
+
+What I learned:
+- How to dynamically reset and re-apply validations on Angular Reactive Forms when toggling between manual entry and pre-saved templates.
+- Integrating Tailwind CSS directly into SCSS files using `@import` for a utility-first workflow inside Angular.
+- Wire state updates optimistically or sequentially with signals so changes instantly propagate to all pages.
+
+## Feature Update: Address Selection and Layout Polish
+
+What was added:
+- Resolved TypeScript compiler type-safety issue (`TS2322`) in `checkout.page.ts` where `number | null` could not be assigned to `number | undefined` on the API payload request.
+- Fixed the "Enter Manually" option by changing the `selectedAddressId` signal's state type to `number | -1 | undefined` (initialized to `undefined`), allowing validators to correctly switch and form submissions to work.
+- Configured checkout auto-selection effect to fall back to `-1` (manual entry) when the user has no saved addresses and loading completes.
+- Changed layout dynamically: when the user has 2 or fewer addresses, they are laid out in a responsive CSS Grid (`grid-cols-1 sm:grid-cols-2`). When they have more than 2 addresses, they are laid out in a horizontal scroll container (`address-scroll-container`).
+- Ensured equal height for all address cards by wrapping cards in `flex flex-col h-full` layouts and adding `class="h-full"` directly to the host components.
+- Added custom webkit scrollbar styling for the horizontal scrollbar matching the premium brand.
+
+Why it was added:
+- The app could not compile due to strict type checks on the order request object structure.
+- Address boxes looked uneven because they had different numbers of text lines (badges, defaults, names) and the host Angular components didn't stretch to fill the grid item wrapper heights.
+- If a user had only 2 addresses, showing them in a scrolling container looked awkward on desktop as they didn't expand to balance the screen width.
+
+Angular concept behind it:
+- **Host Styling and Flex Layout Stretch**: Custom Angular components are inline by default. Even if internal elements have `h-full` (height 100%), they won't stretch unless the host element itself has `display: block` (or similar) and is styled to occupy `100%` height of its parent container.
+- **Handling Undefined in Signals & APIs**: Representing empty/initial state as `undefined` matches optional properties (`?`) in TypeScript model definitions, avoiding explicit type casting or unsafe operations when mapping template variables to API payload properties.
+
+Simple example:
+```html
+<!-- Wrapper is forced to height of the grid cell, card host is h-full, inner content is h-full -->
+<div class="grid grid-cols-2 gap-4">
+  <div class="flex flex-col h-full">
+    <app-address-card class="h-full" [address]="addr"></app-address-card>
+  </div>
+</div>
+```
+
+What I learned:
+- Grid layout cells stretch to the height of the tallest item in the row, but children (especially custom elements) must be explicitly configured with `h-full` to leverage this stretched container height.
+- Initializing select states to `undefined` instead of `null` is a simple and typesafe way to conform to optional field interfaces in model objects.
+- Using conditional template sections allows building clean adaptive layouts (grid vs. horizontal scroller) without duplicating business event handlers.
+
+## Feature Update: Address Creation Modal in Checkout Flow
+
+What was added:
+- Replaced the local checkout manual form fields with a modal click-through flow.
+- When the user clicks "Use New Address / Enter Manually", they are presented with the reusable `AddressFormComponent` inside an Angular Material `MatDialog` modal.
+- Once submitted, the address is saved to the backend via `addAddress()` and upon return, the newly created address is automatically selected as the active delivery destination.
+- Cleaned up all manual form setup, validators, and component imports (`FormBuilder`, `FormGroup`, `Validators`, `MatFormFieldModule`, `MatInputModule`) from `checkout.page.ts`.
+
+Why it was added:
+- Moving address creation to a modal dialog eliminates duplicated form layout styling and validator logic in the checkout page, simplifying page code and improving user experience.
+
+Angular concept behind it:
+- **Dialog Data Returning (`MatDialogRef.afterClosed()`)**: The dialog component closes by returning form values. We subscribe to `afterClosed()` in the calling component, trigger the backend creation service, and use the returned database-generated model properties (like `id`) reactively.
+
+Simple example:
+```typescript
+this.dialog.open(AddressFormComponent).afterClosed().subscribe(result => {
+  if (result) {
+    this.addressService.addAddress(result).subscribe(newAddress => {
+      this.selectedAddressId.set(newAddress.id);
+    });
+  }
+});
+```
+
+What I learned:
+- Moving form input completely to dialogue boxes lets pages stay focused on composition and layout, avoiding complex dynamic validation structures.
+- Angular standalone routing and child imports clean up effortlessly when component forms are delegated to dialogues.
+
+## Feature Update: CSS Grid Column Containment for Horizontal Scrolling
+
+What was added:
+- Fixed a layout breakage on checkout where having more than 2 saved addresses stretched the entire left grid column container beyond the viewport and pushed the right order summary column away.
+- Resolved this by adding `min-width: 0;` to the `.checkout-form-section` class and `width: 100%; min-width: 0;` to the `.address-scroll-container` class.
+
+Why it was added:
+- In CSS Grid and CSS Flexbox layouts, grid items default to `min-width: auto`, which prevents them from shrinking below the width of their inner content (in this case, the un-shrinkable horizontal scrolling cards).
+- This causes the parent grid column to grow and stretch the entire page instead of forcing the child container to scroll.
+
+Angular concept behind it:
+- **CSS Grid Containment**: To implement horizontal scrollbars on flex containers nested within CSS Grid layout cells, you must explicitly set `min-width: 0` on the parent grid items. This overrides the default `min-width: auto` and instructs the browser to constrain the grid cell size to its allocated column size, allowing child elements with `overflow-x: auto` to scroll correctly.
+
+Simple example:
+```scss
+/* Parent grid cell */
+.grid-item {
+  min-width: 0; /* Overrides default 'auto' size calculation */
+}
+
+/* Child scrolling container */
+.scroll-container {
+  display: flex;
+  overflow-x: auto;
+  width: 100%;
+}
+```
+
+What I learned:
+- Web browsers use content min-width calculations to automatically stretch grid and flex layout parent nodes.
+- Setting `min-width: 0` on a grid item is a critical utility pattern when nesting scrolling content to contain browser content layout calculations.
+- Reusing adaptive scroll styles across the application ensures design system integrity and consistent user experience across profile and checkout sections.
+
+
+
+

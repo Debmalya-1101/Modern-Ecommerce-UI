@@ -46,7 +46,8 @@ export interface OrderDetail {
 
 export interface CheckoutRequest {
   name: string;
-  phoneNo: string;
+  phoneNo: string | number;
   email: string;
   address: string;
+  addressId?: number;
 }

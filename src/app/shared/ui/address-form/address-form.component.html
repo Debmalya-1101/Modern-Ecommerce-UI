@@ -1,0 +1,109 @@
+<div class="p-1">
+  <div class="flex items-center justify-between border-b border-neutral-100 pb-4 mb-5">
+    <h2 class="text-xl font-bold text-neutral-800 flex items-center gap-2">
+      <mat-icon class="text-amber-600">location_on</mat-icon>
+      {{ isEditMode ? 'Edit Address' : 'Add New Address' }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()" aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="addressForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <!-- Contact Info Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="w-full">
+        <mat-label>Contact Name</mat-label>
+        <input matInput formControlName="contactName" placeholder="e.g. John Doe">
+        @if (addressForm.get('contactName')?.hasError('required')) {
+          <mat-error>Contact name is required</mat-error>
+        }
+        @if (addressForm.get('contactName')?.hasError('minlength')) {
+          <mat-error>Min length is 3 characters</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="w-full">
+        <mat-label>Mobile Number</mat-label>
+        <input matInput formControlName="mobileNumber" placeholder="10-digit number" type="tel">
+        <span matPrefix class="pl-2 pr-1 text-neutral-500 font-medium">+91 &nbsp;</span>
+        @if (addressForm.get('mobileNumber')?.hasError('required')) {
+          <mat-error>Mobile number is required</mat-error>
+        }
+        @if (addressForm.get('mobileNumber')?.hasError('pattern')) {
+          <mat-error>Please enter a valid 10-digit mobile number</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Address Line -->
+    <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="w-full">
+      <mat-label>Address (House No, Building, Street, Area)</mat-label>
+      <textarea matInput formControlName="addressLine" placeholder="e.g. Flat 402, Sunshine Heights, MG Road" rows="3"></textarea>
+      @if (addressForm.get('addressLine')?.hasError('required')) {
+        <mat-error>Address is required</mat-error>
+      }
+      @if (addressForm.get('addressLine')?.hasError('minlength')) {
+        <mat-error>Please enter a detailed address (min 10 characters)</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- City & State Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="w-full">
+        <mat-label>City / District</mat-label>
+        <input matInput formControlName="city" placeholder="e.g. Bengaluru">
+        @if (addressForm.get('city')?.hasError('required')) {
+          <mat-error>City is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="w-full">
+        <mat-label>State</mat-label>
+        <input matInput formControlName="state" placeholder="e.g. Karnataka">
+        @if (addressForm.get('state')?.hasError('required')) {
+          <mat-error>State is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Pin Code & Country Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="w-full">
+        <mat-label>Postal Code (PIN)</mat-label>
+        <input matInput formControlName="postalCode" placeholder="6-digit code" type="text" maxLength="6">
+        @if (addressForm.get('postalCode')?.hasError('required')) {
+          <mat-error>Postal code is required</mat-error>
+        }
+        @if (addressForm.get('postalCode')?.hasError('pattern')) {
+          <mat-error>Please enter a valid 6-digit postal code</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" floatLabel="always" subscriptSizing="dynamic" class="w-full">
+        <mat-label>Country</mat-label>
+        <input matInput formControlName="country" placeholder="Country">
+        @if (addressForm.get('country')?.hasError('required')) {
+          <mat-error>Country is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Default Checkbox -->
+    <div class="py-2">
+      <mat-checkbox formControlName="isDefault" color="primary">
+        Set as default billing and shipping address
+      </mat-checkbox>
+    </div>
+
+    <!-- Dialog Actions -->
+    <div class="flex items-center justify-end gap-3 border-t border-neutral-100 pt-5 mt-2">
+      <button mat-stroked-button appButtonStyle="secondary" type="button" (click)="onCancel()">
+        Cancel
+      </button>
+      <button mat-flat-button appButtonStyle="primary" type="submit">
+        {{ isEditMode ? 'Save Changes' : 'Add Address' }}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 550px;
+  background-color: var(--color-surface-soft, #fffaf5);
+}
+
+mat-form-field {
+  width: 100%;
+}

@@ -1,4 +1,7 @@
 @use '@angular/material' as mat;
+/* Rebuild trigger: Tailwind CSS integration */
+@import "tailwindcss";
+
 
 :root {
   --color-brand-500: #b55f34;
@@ -165,3 +168,14 @@ a {
     border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0 !important;
   }
 }
+
+/* Premium Custom Dialog Panel Overrides */
+.app-dialog-container {
+  .mat-mdc-dialog-surface {
+    border-radius: var(--border-radius-xl) !important;
+    background-color: var(--color-surface-soft, #fffaf5) !important;
+    padding: 1.75rem !important;
+    box-shadow: 0 24px 48px rgba(87, 61, 44, 0.16) !important;
+  }
+}
+

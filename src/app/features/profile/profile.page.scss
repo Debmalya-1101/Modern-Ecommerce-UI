@@ -235,3 +235,30 @@
     padding: 1rem;
   }
 }
+
+.address-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  scroll-behavior: smooth;
+  width: 100%;
+  min-width: 0;
+
+  /* Custom scrollbar for premium touch */
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(87, 61, 44, 0.15);
+    border-radius: 3px;
+    
+    &:hover {
+      background: rgba(87, 61, 44, 0.3);
+    }
+  }
+}

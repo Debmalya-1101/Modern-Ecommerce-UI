@@ -12,54 +12,80 @@
     </div>
   } @else {
     <div class="checkout-grid">
-      <!-- Left Column: Form -->
+      <!-- Left Column: Address Selection & Form -->
       <div class="checkout-form-section">
-        <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
-          <h2>Customer Information</h2>
+        <!-- Address Selection -->
+        <div class="mb-6">
+          <h2 class="!m-0 !font-semibold text-lg text-neutral-800 mb-3">Select Shipping Address</h2>
           
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Full Name</mat-label>
-              <input matInput formControlName="name" placeholder="John Doe">
-              @if (checkoutForm.get('name')?.hasError('required') && checkoutForm.get('name')?.touched) {
-                <mat-error>Name is required</mat-error>
-              }
-            </mat-form-field>
+          @if (addressesLoading()) {
+            <div class="flex justify-center p-6 bg-white/40 rounded-2xl border border-neutral-100">
+              <mat-spinner diameter="30"></mat-spinner>
+            </div>
+          } @else {
+            @if (addresses().length <= 2) {
+              <!-- 2 or fewer addresses: grid layout (no horizontal scroll) -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                @for (addr of addresses(); track addr.id) {
+                  <div class="flex flex-col h-full">
+                    <app-address-card 
+                      class="h-full"
+                      [address]="addr"
+                      [selectable]="true"
+                      [selected]="selectedAddressId() === addr.id"
+                      (select)="selectAddress(addr.id!)"
+                    ></app-address-card>
+                  </div>
+                }
+              </div>
+            } @else {
+              <!-- More than 2 addresses: horizontal scroll container -->
+              <div class="address-scroll-container">
+                @for (addr of addresses(); track addr.id) {
+                  <div class="min-w-[280px] sm:min-w-[320px] flex-shrink-0 flex-grow flex flex-col">
+                    <app-address-card 
+                      class="h-full"
+                      [address]="addr"
+                      [selectable]="true"
+                      [selected]="selectedAddressId() === addr.id"
+                      (select)="selectAddress(addr.id!)"
+                    ></app-address-card>
+                  </div>
+                }
+              </div>
+            }
 
-            <mat-form-field appearance="outline">
-              <mat-label>Email Address</mat-label>
-              <input matInput type="email" formControlName="email" placeholder="john@example.com">
-              @if (checkoutForm.get('email')?.hasError('required') && checkoutForm.get('email')?.touched) {
-                <mat-error>Email is required</mat-error>
-              } @else if (checkoutForm.get('email')?.hasError('email') && checkoutForm.get('email')?.touched) {
-                <mat-error>Please enter a valid email address</mat-error>
-              }
-            </mat-form-field>
+            <!-- Add New / Manual Option (Full Width Banner) -->
+            <div 
+              (click)="openAddAddressDialog()"
+              class="flex items-center gap-4 p-4 rounded-2xl border border-dashed border-neutral-300 hover:border-amber-600 cursor-pointer transition-all duration-200 bg-white/50 mb-6"
+            >
+              <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+                <mat-icon class="scale-110">add_location_alt</mat-icon>
+              </div>
+              <div class="flex-grow">
+                <h4 class="font-semibold text-neutral-800 text-sm m-0">Use New Address / Enter Manually</h4>
+                <p class="text-xs text-neutral-500 m-0 mt-0.5">Select this option to ship to a new destination not saved in your profile.</p>
+              </div>
+              <div class="w-6 h-6 rounded-full border border-neutral-300 bg-white flex items-center justify-center shrink-0">
+                <mat-icon class="scale-75 text-neutral-400">add</mat-icon>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Selected Address Summary -->
+        @if (addresses().find(a => a.id === selectedAddressId()); as selectedAddr) {
+          <div class="bg-amber-50/30 p-5 rounded-2xl border border-amber-200/50 flex items-start gap-3">
+            <mat-icon class="text-amber-600 mt-0.5">check_circle</mat-icon>
+            <div class="text-neutral-700 text-sm">
+              <p class="font-bold text-neutral-800 text-base mb-1">Delivering to: {{ selectedAddr.contactName }}</p>
+              <p class="leading-relaxed">{{ selectedAddr.addressLine }}</p>
+              <p>{{ selectedAddr.city }}, {{ selectedAddr.state }} - <span class="font-medium text-neutral-800">{{ selectedAddr.postalCode }}</span></p>
+              <p class="text-neutral-500 text-xs mt-2 font-medium">Contact Number: +91 {{ selectedAddr.mobileNumber }}</p>
+            </div>
           </div>
-
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Phone Number</mat-label>
-            <input matInput type="tel" formControlName="phoneNo" placeholder="9876543210">
-            @if (checkoutForm.get('phoneNo')?.hasError('required') && checkoutForm.get('phoneNo')?.touched) {
-              <mat-error>Phone number is required</mat-error>
-            } @else if (checkoutForm.get('phoneNo')?.hasError('pattern') && checkoutForm.get('phoneNo')?.touched) {
-              <mat-error>Please enter a valid 10-digit phone number</mat-error>
-            }
-          </mat-form-field>
-
-          <h2 class="mt-6">Shipping Address</h2>
-          
-          <mat-form-field appearance="outline" class="w-full">
-            <mat-label>Address</mat-label>
-            <textarea matInput formControlName="address" rows="3" placeholder="123 Main St, City, State, ZIP"></textarea>
-            @if (checkoutForm.get('address')?.hasError('required') && checkoutForm.get('address')?.touched) {
-              <mat-error>Address is required</mat-error>
-            } @else if (checkoutForm.get('address')?.hasError('minlength') && checkoutForm.get('address')?.touched) {
-              <mat-error>Address must be at least 10 characters long</mat-error>
-            }
-          </mat-form-field>
-
-        </form>
+        }
       </div>
 
       <!-- Right Column: Order Summary -->
@@ -96,7 +122,7 @@
 
         <div class="checkout-action">
           <button mat-flat-button class="shared-button shared-button--primary submit-btn" 
-                  [disabled]="checkoutForm.invalid || isSubmitting()"
+                  [disabled]="!selectedAddressId() || isSubmitting()"
                   (click)="onSubmit()">
             @if (isSubmitting()) {
               <mat-spinner diameter="24" color="accent" class="inline-block"></mat-spinner>

@@ -30,6 +30,11 @@ export const API_ENDPOINTS = {
     confirm: '/api/payments/confirm',
     retry: '/api/payments/retry'
   },
+  addresses: {
+    root: '/api/addresses',
+    detail: (id: number | string) => `/api/addresses/${id}`,
+    default: (id: number | string) => `/api/addresses/${id}/default`
+  },
   reviews: {
     root: '/api/reviews',
     detail: (reviewId: number | string) => `/api/reviews/${reviewId}`,
