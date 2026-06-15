@@ -14,10 +14,12 @@ import { AdminAnalyticsService } from '../../../core/services/admin-analytics.se
 import { AdminOrdersService } from '../../../core/services/admin-orders.service';
 import { AdminProductsService } from '../../../core/services/admin-products.service';
 import { AdminCategoriesService } from '../../../core/services/admin-categories.service';
+import { AdminInventoryService } from '../../../core/services/admin-inventory.service';
 
 import { DashboardAnalyticsDTO } from '../../../core/models/admin-analytics.model';
 import { AdminOrder } from '../../../core/models/admin-order.model';
 import { AdminProductDTO } from '../../../core/models/admin-product.model';
+import { InventoryAnalyticsDashboardDTO } from '../../../core/models/admin-inventory.model';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -44,12 +46,14 @@ export class AdminDashboardPage implements OnInit {
   private ordersService = inject(AdminOrdersService);
   private productsService = inject(AdminProductsService);
   private categoriesService = inject(AdminCategoriesService);
+  private inventoryService = inject(AdminInventoryService);
   private cdr = inject(ChangeDetectorRef);
 
   isLoading = true;
   hasError = false;
 
   analyticsData: DashboardAnalyticsDTO | null = null;
+  inventoryData: InventoryAnalyticsDashboardDTO | null = null;
   recentOrders: AdminOrder[] = [];
   lowStockProducts: AdminProductDTO[] = [];
   totalCategories = 0;
@@ -119,6 +123,17 @@ export class AdminDashboardPage implements OnInit {
             console.warn('AdminDashboardPage: Catching Categories API error, returning empty array:', err);
             return of([]);
           })
+        ),
+        inventory: this.inventoryService.getInventoryAnalytics().pipe(
+          tap({
+            next: (val) => console.log('AdminDashboardPage: Inventory API emitted data:', val),
+            error: (err) => console.error('AdminDashboardPage: Inventory API error:', err),
+            complete: () => console.log('AdminDashboardPage: Inventory API completed')
+          }),
+          catchError((err) => {
+            console.warn('AdminDashboardPage: Catching Inventory API error, returning null:', err);
+            return of(null);
+          })
         )
       })
       .pipe(
@@ -148,6 +163,7 @@ export class AdminDashboardPage implements OnInit {
             this.recentOrders = results.orders?.content || [];
             this.lowStockProducts = results.products?.content || [];
             this.totalCategories = results.categories?.length || 0;
+            this.inventoryData = results.inventory;
 
             // Compute metrics
             if (this.analyticsData.totalOrders > 0) {

@@ -1,0 +1,163 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-text">
+      <h1>Inventory Management</h1>
+      <p>Monitor stock levels, value, and product performance.</p>
+    </div>
+  </div>
+
+  @if (isLoadingAnalytics()) {
+    <div class="loading-analytics">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (analytics()) {
+    <div class="analytics-grid">
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-header">
+            <div class="kpi-title">Total Inventory Value</div>
+            <div class="kpi-icon-wrapper primary-light">
+              <mat-icon>account_balance_wallet</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-value">{{ (analytics()!.valuation.totalAvailableValue + analytics()!.valuation.totalReservedValue) | currency:'INR' }}</div>
+          <div class="kpi-subtext">
+            <span>Available: {{ analytics()!.valuation.totalAvailableValue | currency:'INR' }}</span>
+            <span class="bullet-separator">&bull;</span>
+            <span>Reserved: {{ analytics()!.valuation.totalReservedValue | currency:'INR' }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-header">
+            <div class="kpi-title">Stock Alerts</div>
+            <div class="kpi-icon-wrapper warn-light">
+              <mat-icon>warning</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-value">{{ analytics()!.lowStockCount + analytics()!.outOfStockCount }}</div>
+          <div class="kpi-subtext">
+            <span class="text-warn">{{ analytics()!.outOfStockCount }} Out of Stock</span>
+            <span class="bullet-separator">&bull;</span>
+            <span class="text-accent">{{ analytics()!.lowStockCount }} Low Stock</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <div class="kpi-header">
+            <div class="kpi-title">Top Moving Product</div>
+            <div class="kpi-icon-wrapper accent-light">
+              <mat-icon>trending_up</mat-icon>
+            </div>
+          </div>
+          <div class="kpi-value truncate" [title]="analytics()!.fastMovingProducts[0]?.productName || 'N/A'">
+            {{ analytics()!.fastMovingProducts[0]?.productName || 'N/A' }}
+          </div>
+          <div class="kpi-subtext">
+            Sold: {{ analytics()!.fastMovingProducts[0]?.netUnitsSold || 0 }} units
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-toolbar">
+        <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+          <mat-icon matPrefix color="primary">search</mat-icon>
+          <mat-label>Search inventory by product name or ID...</mat-label>
+          <input matInput [formControl]="searchControl" placeholder="E.g. iPhone 15 or 12">
+        </mat-form-field>
+      </div>
+
+      <div class="table-container">
+        <div class="loading-shade" *ngIf="isLoadingList()">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+
+        <table mat-table [dataSource]="dataSource" class="inventory-table">
+          <ng-container matColumnDef="productName">
+            <th mat-header-cell *matHeaderCellDef> Product </th>
+            <td mat-cell *matCellDef="let element"> 
+              <div class="product-info-cell">
+                <div class="product-icon-avatar">
+                  <mat-icon>inventory_2</mat-icon>
+                </div>
+                <div class="product-meta">
+                  <span class="product-id">#{{ element.productId }}</span>
+                  <span class="product-name">{{ element.productName }}</span>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="availableQuantity">
+            <th mat-header-cell *matHeaderCellDef class="text-right"> Available </th>
+            <td mat-cell *matCellDef="let element" class="font-medium text-right"> {{element.availableQuantity}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="reservedQuantity">
+            <th mat-header-cell *matHeaderCellDef class="text-right"> Reserved </th>
+            <td mat-cell *matCellDef="let element" class="text-sub text-right"> {{element.reservedQuantity}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="reorderLevel">
+            <th mat-header-cell *matHeaderCellDef class="text-right"> Reorder Level </th>
+            <td mat-cell *matCellDef="let element" class="text-sub text-right"> {{element.reorderLevel}} </td>
+          </ng-container>
+          
+          <ng-container matColumnDef="totalQuantity">
+            <th mat-header-cell *matHeaderCellDef class="text-right"> Total </th>
+            <td mat-cell *matCellDef="let element" class="font-medium text-right"> {{element.totalQuantity}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef class="text-center"> Status </th>
+            <td mat-cell *matCellDef="let element" class="text-center">
+              <div class="status-chip" [ngClass]="'status-' + getStockStatus(element)">
+                {{ getStockStatus(element) === 'in-stock' ? 'In Stock' : (getStockStatus(element) === 'out-of-stock' ? 'Out of Stock' : 'Low Stock') }}
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="text-right"> Actions </th>
+            <td mat-cell *matCellDef="let element" class="text-right">
+              <a mat-icon-button color="primary" [routerLink]="['/admin/inventory', element.productId]" matTooltip="View details & transactions" class="action-btn">
+                <mat-icon>chevron_right</mat-icon>
+              </a>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="inventory-row"></tr>
+          
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell empty-state" colspan="7">
+              <div class="empty-state-content">
+                <div class="empty-icon-wrapper">
+                  <mat-icon>warehouse</mat-icon>
+                </div>
+                <h3>No inventory found</h3>
+                <p>We couldn't find anything matching your search.</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <mat-paginator 
+        class="modern-paginator"
+        [length]="totalElements()" 
+        [pageSize]="pageSize()" 
+        [pageSizeOptions]="[10, 25, 50]" 
+        (page)="onPageChange($event)">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

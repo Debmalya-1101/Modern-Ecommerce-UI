@@ -5103,6 +5103,166 @@ What I learned:
 - Setting `min-width: 0` on a grid item is a critical utility pattern when nesting scrolling content to contain browser content layout calculations.
 - Reusing adaptive scroll styles across the application ensures design system integrity and consistent user experience across profile and checkout sections.
 
+## Feature Update: Admin Inventory Management
 
+What was added:
+- Detailed API DTOs for stock, transactions, adjustments, and analytics in `admin-inventory.model.ts`
+- An `AdminInventoryService` to handle all backend communications (CRUD, analytics, adjustments).
+- An Inventory List Page (`admin-inventory-list.page`) showing a summary analytics section at the top and a detailed table of inventory items.
+- An Inventory Detail Page (`admin-inventory-detail.page`) showing product-specific stock levels, an adjustments modal, and paginated transaction history.
+- An updated Dashboard Widget in `admin-dashboard.page` that rolls up inventory alerts (Low Stock, Out of Stock, Total Value) in one cohesive "Inventory Overview".
+
+Why it was added:
+- Inventory tracking is a core requirement for any e-commerce admin panel.
+- This creates a dedicated sub-feature module for Inventory rather than cluttering the Products section, matching enterprise-relevant architecture.
+
+Angular concept behind it:
+- **Feature-Based Routing**: By splitting Inventory into its own `admin-inventory.routes.ts`, we keep the route maps clean and lazy-loadable.
+- **Component Communication via Dialogs**: Using `@angular/material/dialog` to handle manual stock adjustments out of the main page flow.
+
+Simple example:
+
+```ts
+// Using MatDialog to gather a stock adjustment
+openAdjustmentDialog() {
+  const dialogRef = this.dialog.open(AdjustmentDialogComponent, {
+    data: { productName: 'Ergonomic Chair' },
+    width: '500px'
+  });
+
+  dialogRef.afterClosed().subscribe(request => {
+    if (request) {
+      // call service to save adjustment
+    }
+  });
+}
+```
+
+What I learned:
+- Breaking a feature down into a list view, a detail view, and focused sub-components (like the adjustment dialog) prevents any single Angular component from becoming overly massive.
+- `forkJoin` inside the Dashboard helps aggregate multiple API requests, like `getInventoryAnalytics()` alongside `getOrders()` and `getDashboardAnalytics()`, so the user only sees one seamless loading state.
+- Combining Angular Material's grid system with distinct visual cues (such as colored chip backgrounds and icons for stock statuses) significantly boosts the "WOW factor" of a data-heavy enterprise UI.
+
+
+
+
+
+
+---
+
+## 2026-06-15: Customizing Angular Material Tables and Styling Overrides
+
+For developers with a strong backend background, styling component libraries like Angular Material can sometimes feel tricky due to View Encapsulation. Here is what we did to achieve a premium, custom UI layout.
+
+### Concepts
+
+1. **Angular Material Table Customizations**:
+   - Out-of-the-box Material tables can look very plain. To premiumize them, we increase cell padding, use a custom background for header rows (such as `--color-surface-soft`), right-align numeric cells to improve scanability, and add CSS transition states for row hovers (`transform: translateX` for buttons, background tint).
+   - Alignment matches: Aligning header text (`class="text-right"`) with cell content text is essential for visual cleaness.
+
+2. **View Encapsulation and CSS Scoping**:
+   - Angular components default to `Emulated` view encapsulation, scoping styles using custom element attributes.
+   - For global visual styling elements (like dialog inputs or paginators) that are rendered in overlay containers outside the component's host element, we target them via global stylesheets (like `styles.scss`) or use `:host ::ng-deep` for overrides.
+
+3. **Tone-on-Tone Custom Badges**:
+   - Instead of default primary/accent colors, we used custom, semi-transparent CSS color tokens (e.g., `rgba(success, 0.1)`) matching the background, and saturated colors for text/icons, which makes cards look sophisticated and modern.
+
+### Simple Example: Styling custom cells and aligning them
+
+In HTML:
+```html
+<table mat-table [dataSource]="dataSource" class="custom-table">
+  <!-- Numeric column (aligned right) -->
+  <ng-container matColumnDef="available">
+    <th mat-header-cell *matHeaderCellDef class="text-right"> Available Stock </th>
+    <td mat-cell *matCellDef="let element" class="text-right font-medium"> {{ element.availableQuantity }} </td>
+  </ng-container>
+  
+  <!-- Status Badge column -->
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef class="text-center"> Status </th>
+    <td mat-cell *matCellDef="let element" class="text-center">
+      <span class="status-badge badge-success">In Stock</span>
+    </td>
+  </ng-container>
+</table>
+```
+
+In SCSS:
+```scss
+.custom-table {
+  width: 100%;
+  
+  th.mat-header-cell {
+    font-weight: 700;
+    color: var(--color-neutral-600);
+    background-color: var(--color-surface-soft);
+  }
+
+  td.mat-cell {
+    padding: 1rem 1.5rem;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
+
+  .status-badge {
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--border-radius-pill);
+    font-size: 0.75rem;
+    font-weight: 700;
+    
+    &.badge-success {
+      background-color: var(--color-success-050);
+      color: var(--color-success-700);
+    }
+  }
+}
+```
+
+## State-Based Inventory Quantity Notation & Backend Database Constraints
+
+### 1. Unique Constraints with Multi-Item Orders
+In order/inventory management databases, we often enforce integrity by preventing duplicate transactions. However, if a constraint like `uk_inv_tx_ref` is declared too narrowly (e.g., only on `reference_type`, `reference_id`, and `transaction_type`), it will throw errors when checkout contains multiple items (multiple calls to `reserveStock` for the same order).
+
+**Correction:**
+The unique constraint must include `inventory_id` (or `product_id`) to allow recording individual reservation events for different products under the same order reference.
+
+```sql
+-- Too narrow constraint (fails on multi-item orders):
+-- UNIQUE (reference_type, reference_id, transaction_type)
+
+-- Correct constraint:
+ALTER TABLE inventory_transactions ADD CONSTRAINT uk_inv_tx_ref UNIQUE (inventory_id, reference_type, reference_id, transaction_type);
+```
+
+### 2. State-Based Quantity Notation (Physical vs. Allocation Changes)
+In audit ledgers, showing signed changes (`+` / `-`) for every transaction can cause confusion. For example, showing `-1` for a `RESERVE` (allocating stock) followed by `-1` for a `CONSUME` (deducting physical stock) makes it look like 2 items were removed instead of 1.
+
+**Standard Approach:**
+- **Physical stock changes** (`RESTOCK`, `CONSUME`, `CANCEL_RESTOCK`): Use explicit signs (`+` or `-`) since they increase or decrease the overall physical inventory.
+- **Allocation/Bucket changes** (`RESERVE`, `RELEASE`): Use neutral, unsigned absolute values (e.g., `1` with a "Reserve" or "Release" badge) because they simply move quantity between stock states (`Available` <-> `Reserved`) without changing the total count.
+
+**Angular helper implementation:**
+```typescript
+isAllocation(type: string): boolean {
+  return ['RESERVE', 'RELEASE', 'RETURN_DAMAGED'].includes(type);
+}
+
+getDisplayQuantity(element: InventoryTransactionDTO): number {
+  if (this.isAllocation(element.transactionType)) {
+    return element.quantity; // Neutral absolute value (e.g., 1)
+  }
+  if (element.transactionType === 'CONSUME') {
+    return -Math.abs(element.quantity); // Deducted physical stock (-1)
+  }
+  return element.quantity; // Stored adjustment/restock value (+/-)
+}
+```
 
 

@@ -1,0 +1,138 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-text">
+      <a mat-button class="back-link" routerLink="/admin/inventory">
+        <mat-icon>arrow_back</mat-icon> Back to Inventory
+      </a>
+      @if (inventory()) {
+        <h1>{{ inventory()!.productName }}</h1>
+        <p class="subtitle">Manage stock levels and audit transaction history for Product <span class="badge-id">#{{ inventory()!.productId }}</span></p>
+      }
+    </div>
+    <button mat-flat-button class="shared-button shared-button--primary action-btn" (click)="openAdjustmentDialog()" [disabled]="!inventory()">
+      <mat-icon>tune</mat-icon> Adjust Stock
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (inventory()) {
+    <div class="stock-overview">
+      <mat-card class="stock-card highlight-card">
+        <mat-card-content>
+          <div class="stock-label">Available to Sell</div>
+          <div class="stock-value main-value">{{ inventory()!.availableQuantity }}</div>
+          <mat-progress-bar mode="determinate" [value]="(inventory()!.availableQuantity / (inventory()!.totalQuantity || 1)) * 100" class="stock-progress"></mat-progress-bar>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stock-card">
+        <mat-card-content>
+          <div class="stock-label">Reserved (In Orders)</div>
+          <div class="stock-value text-accent">{{ inventory()!.reservedQuantity }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stock-card">
+        <mat-card-content>
+          <div class="stock-label">Total Physical Stock</div>
+          <div class="stock-value">{{ inventory()!.totalQuantity }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stock-card">
+        <mat-card-content>
+          <div class="stock-label">Reorder Level</div>
+          <div class="stock-value text-warn">{{ inventory()!.reorderLevel }}</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <mat-card class="table-card">
+      <mat-card-content>
+        <div class="section-header">
+          <h2>Inventory Audit Ledger</h2>
+          <p class="section-subtitle">A complete transaction history logs all stock updates</p>
+        </div>
+
+        <div class="table-container">
+          <div class="loading-shade" *ngIf="isLoadingTransactions()">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+
+          <table mat-table [dataSource]="dataSource" class="transactions-table">
+            <ng-container matColumnDef="createdAt">
+              <th mat-header-cell *matHeaderCellDef> Date </th>
+              <td mat-cell *matCellDef="let element" class="text-sub"> 
+                {{ element.createdAt | date:'medium' }} 
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="transactionType">
+              <th mat-header-cell *matHeaderCellDef> Type </th>
+              <td mat-cell *matCellDef="let element">
+                <div class="type-cell" [ngClass]="getTransactionColor(element.transactionType)">
+                  <mat-icon>{{ getTransactionIcon(element.transactionType) }}</mat-icon>
+                  <span>{{ element.transactionType }}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef class="text-right"> Quantity </th>
+              <td mat-cell *matCellDef="let element" class="font-medium text-right" [ngClass]="getQuantityClass(element)">
+                <span>{{ getQuantityPrefix(element) }}</span>{{ getDisplayQuantity(element) }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="referenceType">
+              <th mat-header-cell *matHeaderCellDef> Reference </th>
+              <td mat-cell *matCellDef="let element" class="text-sub"> 
+                <span class="ref-type-badge">{{ element.referenceType }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="referenceId">
+              <th mat-header-cell *matHeaderCellDef> Ref ID </th>
+              <td mat-cell *matCellDef="let element" class="font-medium text-main monospace-text"> 
+                {{ element.referenceId }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="notes">
+              <th mat-header-cell *matHeaderCellDef> Notes </th>
+              <td mat-cell *matCellDef="let element" class="text-sub notes-cell" [matTooltip]="element.notes"> 
+                {{ element.notes }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="transaction-row"></tr>
+            
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell empty-state" colspan="6">
+                <div class="empty-state-content">
+                  <div class="empty-icon-wrapper">
+                    <mat-icon>history</mat-icon>
+                  </div>
+                  <h3>No transactions found</h3>
+                  <p>There is no stock activity recorded for this product yet.</p>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <mat-paginator 
+          class="modern-paginator"
+          [length]="totalTransactions()" 
+          [pageSize]="pageSize()" 
+          [pageSizeOptions]="[10, 25, 50]" 
+          (page)="onPageChange($event)">
+        </mat-paginator>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

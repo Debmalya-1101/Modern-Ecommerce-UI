@@ -60,6 +60,7 @@ export class AdminLayoutComponent {
     { label: 'Dashboard', path: '/admin/dashboard', icon: 'dashboard' },
     { label: 'Orders', path: '/admin/orders', icon: 'shopping_cart' },
     { label: 'Products', path: '/admin/products', icon: 'inventory_2' },
+    { label: 'Inventory', path: '/admin/inventory', icon: 'warehouse' },
     { label: 'Categories', path: '/admin/categories', icon: 'category' },
     { label: 'Analytics', path: '/admin/analytics', icon: 'bar_chart' }
   ];
