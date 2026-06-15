@@ -5266,3 +5266,85 @@ getDisplayQuantity(element: InventoryTransactionDTO): number {
 ```
 
 
+
+## Resolving JPA N+1 Query Problem using @BatchSize
+
+**Concept:**
+The N+1 Query Problem occurs when an ORM (like Hibernate) executes 1 query to retrieve the parent entities, and then N additional queries to retrieve the lazy-loaded child entities for each parent. This leads to massive performance degradation due to network latency, especially when using cloud databases.
+
+**The Issue in Our Application:**
+When fetching a page of 100 Orders, we had 1 query to fetch the orders. However, when mapping them to DTOs, the code accessed order.getItems(), item.getProduct(), and order.getUser(). Because these relationships were lazily loaded, Hibernate fired an individual query for every single order's items, products, and users. This resulted in over 300 sequential database queries for a single API call, causing timeouts.
+
+**Example of the Problem:**
+`java
+// Executes 1 query to fetch 100 orders
+Page<Order> orders = orderRepository.findAll(pageable); 
+
+for(Order order : orders) {
+    // Executes 1 query per order! (100 total queries)
+    List<OrderItem> items = order.getItems(); 
+}
+`
+
+**The Solution (@BatchSize):**
+We solved this by using the @org.hibernate.annotations.BatchSize(size = 100) annotation on the collections and entities. 
+
+This annotation tells Hibernate to group lazy-loading requests. When the code accesses the items for the *first* order, Hibernate checks the session, finds up to 100 uninitialized order item collections, and fetches all of them in a **single query** using a SQL IN clause (WHERE order_id IN (?, ?, ...)).
+
+**Example of the Fix:**
+`java
+// In Order.java
+@org.hibernate.annotations.BatchSize(size = 100)
+@OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+private List<OrderItem> items = new ArrayList<>();
+`
+
+**Result:**
+The total number of queries dropped from 300+ down to exactly 4 queries. The execution time went from 15+ seconds down to a few milliseconds.
+
+
+
+## Angular Material Pagination with Signals
+
+When adding pagination to a list that fetches data from the backend, we use the MatPaginatorModule from Angular Material alongside our new Signal-based state.
+
+### How it works:
+
+1. **State Management**: We store pagination state (pageIndex, pageSize, totalElements) using Angular Signals.
+2. **Paginator UI**: We use <mat-paginator> in the template and bind it to our signals.
+3. **Event Handling**: We listen to (page) events from the paginator. When the user changes the page or items per page, we update our signals and trigger a new API call.
+
+### Example:
+
+``typescript
+// 1. Define state signals
+readonly totalElements = signal<number>(0);
+readonly pageSize = signal<number>(10);
+readonly pageIndex = signal<number>(0);
+
+// 2. Fetch data using current signal values
+loadData() {
+  this.apiService.getData(this.pageIndex(), this.pageSize()).subscribe(response => {
+    this.items.set(response.content);
+    this.totalElements.set(response.totalElements);
+  });
+}
+
+// 3. Handle paginator events
+onPageChange(event: PageEvent) {
+  this.pageIndex.set(event.pageIndex);
+  this.pageSize.set(event.pageSize);
+  this.loadData();
+}
+``
+
+``html
+<!-- 4. Bind in template -->
+<mat-paginator 
+  [length]="totalElements()"
+  [pageSize]="pageSize()"
+  [pageIndex]="pageIndex()"
+  [pageSizeOptions]="[5, 10, 25, 50]"
+  (page)="onPageChange($event)">
+</mat-paginator>
+``

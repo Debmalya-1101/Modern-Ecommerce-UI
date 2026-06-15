@@ -405,4 +405,14 @@
       }
     }
   }
+
+  .paginator-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-end;
+    background: var(--shell-surface);
+    border-radius: 16px;
+    border: 1px solid var(--shell-border);
+    padding: 0.5rem;
+  }
 }
