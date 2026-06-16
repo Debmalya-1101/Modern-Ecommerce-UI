@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatMenuModule } from '@angular/material/menu';
@@ -36,7 +36,6 @@ import { OrderConfirmDialogComponent } from './components/order-confirm-dialog/o
     MatIconModule,
     MatTooltipModule,
     MatDialogModule,
-    MatSnackBarModule,
     MatChipsModule,
     MatProgressSpinnerModule,
     MatMenuModule,
@@ -62,7 +61,7 @@ export class AdminOrdersPage implements OnInit {
 
   private adminOrdersService = inject(AdminOrdersService);
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
+  private snackBar = inject(SnackbarService);
 
   ngOnInit(): void {
     this.loadOrders();
@@ -82,7 +81,7 @@ export class AdminOrdersPage implements OnInit {
       },
       error: (error: any) => {
         console.error('Error loading orders', error);
-        this.snackBar.open('Failed to load orders', 'Close', { duration: 3000 });
+        this.snackBar.error('Failed to load orders');
         this.loading = false;
       }
     });
@@ -128,12 +127,12 @@ export class AdminOrdersPage implements OnInit {
       if (result) {
         this.adminOrdersService.updateOrderStatus(order.orderId, newStatus).subscribe({
           next: () => {
-            this.snackBar.open('Order status updated successfully', 'Close', { duration: 3000 });
+            this.snackBar.success('Order status updated successfully');
             this.loadOrders();
           },
           error: (error: any) => {
             console.error('Error updating order status', error);
-            this.snackBar.open('Failed to update order status', 'Close', { duration: 3000 });
+            this.snackBar.error('Failed to update order status');
           }
         });
       }

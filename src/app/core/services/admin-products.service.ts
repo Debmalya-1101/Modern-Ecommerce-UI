@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of, throwError, Subject, delay, shareReplay, finalize } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { SnackbarService } from '../../shared/services/snackbar.service';
 
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
@@ -11,7 +11,7 @@ import { AdminProductDTO, CreateProductDTO, ProductPaginationResponseDTO, Update
 })
 export class AdminProductsService {
   private apiService = inject(ApiService);
-  private snackBar = inject(MatSnackBar);
+  private snackbarService = inject(SnackbarService);
 
   private productImportedSource = new Subject<void>();
   productImported$ = this.productImportedSource.asObservable();
@@ -200,13 +200,13 @@ export class AdminProductsService {
       next: (results) => {
         const successCount = results.filter(r => r.status === 'SUCCESS').length;
         if (successCount > 0) {
-          this.snackBar.open(`Successfully imported ${successCount} product(s) from Amazon!`, 'Close', { duration: 5000, panelClass: ['success-snackbar'] });
+          this.snackbarService.success(`Successfully imported ${successCount} product(s) from Amazon!`);
           this.productImportedSource.next();
         } else {
-          this.snackBar.open('Amazon import completed with no successful products.', 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+          this.snackbarService.error('Amazon import completed with no successful products.');
         }
       },
-      error: () => this.snackBar.open('Failed to import product from Amazon.', 'Close', { duration: 5000, panelClass: ['error-snackbar'] })
+      error: () => this.snackbarService.error('Failed to import product from Amazon.')
     });
 
     this.activeScrapes.set(key, apiCall$);
@@ -259,13 +259,13 @@ export class AdminProductsService {
       next: (results) => {
         const successCount = results.filter(r => r.status === 'SUCCESS').length;
         if (successCount > 0) {
-          this.snackBar.open(`Successfully imported ${successCount} product(s) from Flipkart!`, 'Close', { duration: 5000, panelClass: ['success-snackbar'] });
+          this.snackbarService.success(`Successfully imported ${successCount} product(s) from Flipkart!`);
           this.productImportedSource.next();
         } else {
-          this.snackBar.open('Flipkart import completed with no successful products.', 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+          this.snackbarService.error('Flipkart import completed with no successful products.');
         }
       },
-      error: () => this.snackBar.open('Failed to import product from Flipkart.', 'Close', { duration: 5000, panelClass: ['error-snackbar'] })
+      error: () => this.snackbarService.error('Failed to import product from Flipkart.')
     });
 
     this.activeScrapes.set(key, apiCall$);

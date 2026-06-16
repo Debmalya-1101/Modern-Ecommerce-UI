@@ -2527,7 +2527,7 @@ It also adds a reusable stock indicator component, which is a good pattern when 
 
 **Date:** 2026-06-06
 **Feature:** Replace all mock product data with real Spring Boot backend calls
-**Status:** ✅ Complete
+**Status:** â Complete
 
 ### What Was Done
 
@@ -2541,10 +2541,10 @@ A common backend-developer question when learning frontend is: "Why do I need tw
 
 The answer is that **what the backend sends** and **what the UI needs** are often different shapes.
 
-**DTO (Data Transfer Object)** — what the backend actually returns:
+**DTO (Data Transfer Object)** â what the backend actually returns:
 
 ```ts
-// ProductListDTO — exact shape from GET /api/products
+// ProductListDTO â exact shape from GET /api/products
 export interface ProductListDTO {
   id: number;
   name: string;
@@ -2557,10 +2557,10 @@ export interface ProductListDTO {
 }
 ```
 
-**View Model** — what the Angular product card component expects to render:
+**View Model** â what the Angular product card component expects to render:
 
 ```ts
-// ProductCardViewModel — what the product grid needs
+// ProductCardViewModel â what the product grid needs
 export interface ProductCardViewModel {
   id: number;
   name: string;
@@ -2568,15 +2568,15 @@ export interface ProductCardViewModel {
   category: string;
   price: number;
   rating: number;
-  reviewCount: number;   // ← backend doesn't send this
-  imageLabel: string;    // ← backend doesn't send this
+  reviewCount: number;   // â backend doesn't send this
+  imageLabel: string;    // â backend doesn't send this
 }
 ```
 
-The service maps DTO → View Model. The component never sees the raw DTO.
+The service maps DTO â View Model. The component never sees the raw DTO.
 
 ```ts
-// In the service — private mapper
+// In the service â private mapper
 private mapToProductListItem(dto: ProductListDTO): ProductListItem {
   return {
     id: dto.id,
@@ -2587,12 +2587,12 @@ private mapToProductListItem(dto: ProductListDTO): ProductListItem {
     active: dto.active,
     brand: dto.brand,
     categoryName: dto.categoryName,
-    // Fields not in backend are omitted — they are optional in the model
+    // Fields not in backend are omitted â they are optional in the model
   };
 }
 ```
 
-And in the page component — another layer of mapping from `ProductListItem` → `ProductCardViewModel`:
+And in the page component â another layer of mapping from `ProductListItem` â `ProductCardViewModel`:
 
 ```ts
 data: products.map((product) => ({
@@ -2602,7 +2602,7 @@ data: products.map((product) => ({
   category: product.categoryName,
   price: product.price,
   rating: product.rating,
-  reviewCount: 0,            // Safe default — not in backend
+  reviewCount: 0,            // Safe default â not in backend
   imageLabel: product.name,  // Derived from product name
 })),
 ```
@@ -2611,7 +2611,7 @@ Each layer has one responsibility: the service knows about HTTP and DTOs, the pa
 
 ---
 
-### Concept 2: PageResponse — How Paginated APIs Work
+### Concept 2: PageResponse â How Paginated APIs Work
 
 The product list endpoint doesn't return a plain array. It returns a **paginated wrapper**:
 
@@ -2640,12 +2640,12 @@ getProducts(query?: ProductCatalogQuery): Observable<ProductListItem[]> {
     .get<PageResponse<ProductListDTO>>(API_ENDPOINTS.products.list, params, { trackLoading: true })
     .pipe(
       map((response) => response.content.map((dto) => this.mapToProductListItem(dto)))
-      //              ↑ unwrap the array    ↑ convert each DTO to frontend model
+      //              â unwrap the array    â convert each DTO to frontend model
     );
 }
 ```
 
-The `PageResponse<T>` interface is generic — the same wrapper shape is used for products, orders, admin tables, etc. The `T` just changes.
+The `PageResponse<T>` interface is generic â the same wrapper shape is used for products, orders, admin tables, etc. The `T` just changes.
 
 `totalElements` and `totalPages` are not used yet, but they will be needed when pagination controls (page 1, page 2...) are added later.
 
@@ -2654,10 +2654,10 @@ The `PageResponse<T>` interface is generic — the same wrapper shape is used fo
 ### Concept 3: Optional Fields and the `?` Operator
 
 The backend public product API does not return several fields that the mock data invented:
-- `reviewCount` — not in list or detail DTOs
-- `badge` — no concept of badge in the backend
-- `stockStatus` / `stockLabel` — only in admin DTOs
-- `originalPrice` — no discount concept yet
+- `reviewCount` â not in list or detail DTOs
+- `badge` â no concept of badge in the backend
+- `stockStatus` / `stockLabel` â only in admin DTOs
+- `originalPrice` â no discount concept yet
 
 The solution is to mark these fields as **optional** in TypeScript using `?`:
 
@@ -2666,9 +2666,9 @@ export interface ProductDetail {
   id: number;
   name: string;
   // ...required fields always present...
-  stockStatus?: ProductStockStatus;  // ← optional, backend doesn't send this
-  stockLabel?: string;               // ← optional, backend doesn't send this
-  reviewCount?: number;              // ← optional, backend doesn't send this
+  stockStatus?: ProductStockStatus;  // â optional, backend doesn't send this
+  stockLabel?: string;               // â optional, backend doesn't send this
+  reviewCount?: number;              // â optional, backend doesn't send this
 }
 ```
 
@@ -2699,17 +2699,17 @@ This is safer than using `||` because `||` also replaces `0` and `false`, which 
 
 A filter like "show Electronics in category, sorted by price" could be stored two ways:
 
-1. In a component signal only → **lost on browser refresh**
-2. In the URL (`/products?category=Electronics`) → **survives refresh**
+1. In a component signal only â **lost on browser refresh**
+2. In the URL (`/products?category=Electronics`) â **survives refresh**
 
 This project stores filters in the URL. The flow works like this:
 
 ```text
 User changes a filter
-  → updateCatalogFilters() updates URL query params via Router.navigate()
-  → Angular Router emits a new queryParamMap
-  → ngOnInit subscription reads the params and calls loadProducts()
-  → Products load with the correct filter
+  â updateCatalogFilters() updates URL query params via Router.navigate()
+  â Angular Router emits a new queryParamMap
+  â ngOnInit subscription reads the params and calls loadProducts()
+  â Products load with the correct filter
 ```
 
 ```ts
@@ -2740,7 +2740,7 @@ private updateCatalogFilters(changes: Partial<CatalogFilters>): void {
 
 Setting a query param to `null` removes it from the URL cleanly. So `/products?category=all` becomes `/products`.
 
-Browser back and forward also work because Angular Router manages URL history — clicking back restores the previous query params and re-triggers the subscription.
+Browser back and forward also work because Angular Router manages URL history â clicking back restores the previous query params and re-triggers the subscription.
 
 ---
 
@@ -2753,14 +2753,14 @@ The product catalog needs to load two things on init:
 The `ApiLoadingService.track()` method is what triggers the loading skeleton. `trackLoading: false` bypasses it:
 
 ```ts
-// Loads products — shows the skeleton spinner
+// Loads products â shows the skeleton spinner
 getProducts(): Observable<ProductListItem[]> {
   return this.apiService.get(..., { trackLoading: true });
 }
 
-// Loads categories — runs silently in the background
+// Loads categories â runs silently in the background
 getCatalogCategories(): Observable<string[]> {
-  return this.apiService.get(..., { trackLoading: false }); // ← no spinner
+  return this.apiService.get(..., { trackLoading: false }); // â no spinner
 }
 ```
 
@@ -2768,8 +2768,8 @@ In the page:
 
 ```ts
 ngOnInit(): void {
-  this.loadCategories(); // ← silent, background call
-  this.route.queryParamMap.subscribe(...); // ← triggers product grid load
+  this.loadCategories(); // â silent, background call
+  this.route.queryParamMap.subscribe(...); // â triggers product grid load
 }
 
 private loadCategories(): void {
@@ -2778,7 +2778,7 @@ private loadCategories(): void {
     .subscribe({
       next: (categories) => this.categoryOptions.set(categories),
       error: () => {
-        // Fail silently — categories missing is acceptable, products missing is not
+        // Fail silently â categories missing is acceptable, products missing is not
       },
     });
 }
@@ -2793,7 +2793,7 @@ The key rule: **critical UI blocking operations** use `trackLoading: true`. **No
 | File | Summary |
 |---|---|
 | `core/models/product.model.ts` | Added `ProductListDTO` + `ProductDetailDTO` matching the backend. Made UI-only fields optional. |
-| `core/services/products-api.service.ts` | Full rewrite — 300 lines of mock data removed, replaced with real HTTP calls. |
+| `core/services/products-api.service.ts` | Full rewrite â 300 lines of mock data removed, replaced with real HTTP calls. |
 | `features/products/products.page.ts` | Removed `previewState` (mock-only). Async category loading. Cleaner filter handling. |
 | `features/products/products.page.html` | Removed dev-only Preview State dropdown and Badge chips. Updated copy. |
 | `features/products/product-details.page.ts` | Updated `galleryLabels` fallback to use `product.name`. |
@@ -2801,10 +2801,10 @@ The key rule: **critical UI blocking operations** use `trackLoading: true`. **No
 
 ### What is Next
 
-- **Pagination** — `totalPages` and `totalElements` are returned by the backend. A paginator component will let users browse beyond the first 24 results.
-- **Real images** — `imageUrl` is returned from the backend. The image placeholder can be replaced with a real `<img>` tag.
-- **Sort + price filter** — backend supports `?sortBy=price&order=asc&minPrice=1000`. UI controls for these come next.
-- **Cart integration** — the "Add to Cart" button currently shows a snackbar. Next session wires it to `POST /api/cart/add`.
+- **Pagination** â `totalPages` and `totalElements` are returned by the backend. A paginator component will let users browse beyond the first 24 results.
+- **Real images** â `imageUrl` is returned from the backend. The image placeholder can be replaced with a real `<img>` tag.
+- **Sort + price filter** â backend supports `?sortBy=price&order=asc&minPrice=1000`. UI controls for these come next.
+- **Cart integration** â the "Add to Cart" button currently shows a snackbar. Next session wires it to `POST /api/cart/add`.
 
 ---
 
@@ -2907,7 +2907,7 @@ This runs silently in the background (`trackLoading: false`), meaning the main p
 
 **Date:** 2026-06-06
 **Feature:** Design Client-Side Cart State Management, Components, and Routing
-**Status:** 📋 Design Phase Complete
+**Status:** ð Design Phase Complete
 
 ### What Was Done
 
@@ -2959,7 +2959,7 @@ If the cart items don't change, calling `itemCount()` returns the cached number 
 
 ### Concept 3: Immediate Updates & Optimistic UI
 
-When a user clicks "+" to increase an item quantity, they expect the number to change *immediately*. Waiting for a backend API call (which might take 200–500ms) makes the app feel sluggish.
+When a user clicks "+" to increase an item quantity, they expect the number to change *immediately*. Waiting for a backend API call (which might take 200â500ms) makes the app feel sluggish.
 
 **Optimistic UI** means updating the local UI state *before* the server confirms the change, assuming the server operation will succeed.
 
@@ -3102,7 +3102,7 @@ This runs silently in the background (`trackLoading: false`), meaning the main p
 
 **Date:** 2026-06-06
 **Feature:** Design Client-Side Cart State Management, Components, and Routing
-**Status:** 📋 Design Phase Complete
+**Status:** ð Design Phase Complete
 
 ### What Was Done
 
@@ -3154,7 +3154,7 @@ If the cart items don't change, calling `itemCount()` returns the cached number 
 
 ### Concept 3: Immediate Updates & Optimistic UI
 
-When a user clicks "+" to increase an item quantity, they expect the number to change *immediately*. Waiting for a backend API call (which might take 200–500ms) makes the app feel sluggish.
+When a user clicks "+" to increase an item quantity, they expect the number to change *immediately*. Waiting for a backend API call (which might take 200â500ms) makes the app feel sluggish.
 
 **Optimistic UI** means updating the local UI state *before* the server confirms the change, assuming the server operation will succeed.
 
@@ -3438,7 +3438,7 @@ By changing `.cart-list` and `.cart-drawer__items` to use standard block layout 
 
 ### Consistent Application Currency
 
-We aligned the Cart layout's currency formatters with the central application configuration (`APP_CONSTANTS.currencyCode`), reverting hardcoded `USD` displays back to `INR` (`₹`) and removing template divisions by 100 which incorrectly assumed price inputs were in cents.
+We aligned the Cart layout's currency formatters with the central application configuration (`APP_CONSTANTS.currencyCode`), reverting hardcoded `USD` displays back to `INR` (`â¹`) and removing template divisions by 100 which incorrectly assumed price inputs were in cents.
 
 ## Sass Import Duplication Gotcha in Scoped Component Styles
 
@@ -3511,7 +3511,7 @@ Why this is useful:
 ### What I Learned From This Step
 - Form building is very declarative and structured using `FormBuilder`.
 - Combining `ReactiveFormsModule` with Angular Material makes displaying errors clean and accessible.
-- A checkout flow needs optimistic/pessimistic UI handling—showing a loading spinner inside the submit button while the backend API (`post`) does its job prevents duplicate submissions.
+- A checkout flow needs optimistic/pessimistic UI handlingâshowing a loading spinner inside the submit button while the backend API (`post`) does its job prevents duplicate submissions.
 
 ## Feature Update: Checkout UI & Currency Enhancements
 
@@ -3522,7 +3522,7 @@ What was added:
 - Theme integration mapping: using `--shell-surface`, `--shell-border`, and `--shell-accent` for consistent form focus states.
 
 Why it was added:
-- The app operates in INR (₹) whereas checkout prices were hardcoded to USD ($).
+- The app operates in INR (â¹) whereas checkout prices were hardcoded to USD ($).
 - Forms look flat and basic by default because Angular Material form fields default to a fixed inline width; stretching them to the full width of cards gives a modern, premium e-commerce look.
 - Distributing whitespace more evenly creates a balanced visual layout that does not feel sparse.
 
@@ -3975,7 +3975,7 @@ We attached an `AuthGuard` (`auth.guard.ts`) to the `/profile` route configurati
 **Concept**: To provide a seamless user experience, logging in should return users back to the page they were previously browsing (the "current page") instead of dumping them onto a generic landing page like the User Profile on every login.
 
 **How we did it**:
-In our application shell template ([app.html](file:///c:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/src/app/app.html)) and typescript layout ([app.ts](file:///c:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/src/app/app.ts)), we updated the login action links to dynamically attach a `redirectTo` query parameter set to the current URL—but only if the user isn't already on an authentication-related route:
+In our application shell template ([app.html](file:///c:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/src/app/app.html)) and typescript layout ([app.ts](file:///c:/Users/debma/My-Space/Codes/Shopping-cart-2025/Shopping-Cart-FE-2026/modern-ecommerce-ui/src/app/app.ts)), we updated the login action links to dynamically attach a `redirectTo` query parameter set to the current URLâbut only if the user isn't already on an authentication-related route:
 ```html
 <a
   mat-stroked-button
@@ -4125,7 +4125,7 @@ updateStock(id: number, stock: number): Observable<string | AdminProductDTO> {
 **Date:** June 2026
 
 **Concept:** 
-Building a reliable order management interface utilizing Angular Material tables, contextual dialogs, and strictly typed state transitions (e.g., `PLACED` → `SHIPPED` → `DELIVERED`).
+Building a reliable order management interface utilizing Angular Material tables, contextual dialogs, and strictly typed state transitions (e.g., `PLACED` â `SHIPPED` â `DELIVERED`).
 
 **Why it's important:** 
 Order fulfillment is a core e-commerce workflow. Providing a clear, robust interface to monitor orders, view line-item details, and safely progress order statuses prevents fulfillment errors. Implementing constraints (like disabling actions for delivered orders) directly in the UI enhances usability.
@@ -5622,7 +5622,7 @@ gOnInit on the PaymentProcessingPage.
 
 Why it was added:
 - Previously, the Razorpay <script> tag was only injected into the DOM when the user explicitly clicked the "Pay" button.
-- Because downloading external scripts takes time, clicking "Pay" felt unresponsive�the user was forced to wait for the network request to finish before the modal could actually open.
+- Because downloading external scripts takes time, clicking "Pay" felt unresponsivethe user was forced to wait for the network request to finish before the modal could actually open.
 - By caching the Promise, we can safely trigger the script download in the background as soon as the user arrives on the payment page, while guaranteeing we don't accidentally inject duplicate script tags if they click "Pay" before the background download finishes.
 
 ## What I Learned From This Step
@@ -5653,3 +5653,16 @@ gSrc)**: Replaced native <img> tags. By explicitly providing width and height at
 3. **Promise Caching for Scripts**: Improved the third-party Razorpay SDK loading strategy. By caching the script injection Promise in the Angular service, we can safely background-preload the SDK during 
 gOnInit without risking duplicate injections if the user clicks interactively.
 4. **Endpoint Segregation**: Stopped consuming heavy PageResponse<ProductListDTO> payloads just to build UI dropdowns. We replaced them with dedicated lightweight string-array APIs (/api/products/categories, /api/products/brands), greatly dropping the JS parsing load on the browser thread.
+
+## Dynamic Snackbar UI
+
+We replaced the default Angular Material text-only snackbars with a highly customized component that renders different styles, icons, and colors based on the scenario (success, info, warning, danger). 
+
+### How it works
+1. **Custom Component (`app-custom-snackbar`)**: Built a standalone component that uses Tailwind to render `mat-icon` and layout, receiving `{ message, type, action }` via `MAT_SNACK_BAR_DATA`.
+2. **Wrapper Service (`SnackbarService`)**: Extended the service to invoke `snackBar.openFromComponent()` instead of `open()`. We expose `.success()`, `.error()`, etc., wrapping the logic completely.
+3. **MDC Theming (`styles.scss`)**: We bind `--mdc-snackbar-container-color` inside specific panel classes to change the background according to type.
+
+### Example
+Instead of injecting `MatSnackBar` directly in our services (like AdminProductsService), we inject `SnackbarService` and simply call:
+`this.snackbarService.success('Successfully imported 10 products!');`
