@@ -162,6 +162,13 @@
                 <span>{{ getPaymentStatusLabel(order()!.paymentStatus) }}</span>
               </span>
             </div>
+            
+            @if (order()!.paymentStatus === 'INITIATED' || order()!.paymentStatus === 'FAILED') {
+              <button mat-flat-button color="primary" class="pay-now-btn" [routerLink]="['/payment', order()!.orderId]">
+                <mat-icon>payment</mat-icon>
+                {{ order()!.paymentStatus === 'FAILED' ? 'Retry Payment' : 'Complete Payment' }}
+              </button>
+            }
           </div>
         </mat-card-content>
       </mat-card>

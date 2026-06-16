@@ -12,15 +12,10 @@ export interface PaymentConfirmRequest {
   paymentToken: string;
   paymentReferenceId: string;
   success: boolean;
+  razorpayPaymentId?: string;
+  razorpaySignature?: string;
 }
 
 export interface RetryPaymentRequest {
   orderId: number;
-}
-
-export interface CreditCardDetails {
-  cardNumber: string;
-  cardHolderName: string;
-  expiryDate: string;
-  cvv: string;
 }

@@ -1,0 +1,43 @@
+<div class="pending-container">
+  <mat-card class="pending-card">
+    <div class="pending-header">
+      <div class="warning-circle">
+        <mat-icon>schedule</mat-icon>
+      </div>
+      <h1>Payment Pending</h1>
+      <p>Your order is reserved, but payment was not completed.</p>
+    </div>
+
+    <mat-card-content>
+      <mat-divider></mat-divider>
+      
+      <div class="receipt-details">
+        <div class="detail-row" *ngIf="orderId">
+          <span>Order Number</span>
+          <strong>#{{ orderId }}</strong>
+        </div>
+        <div class="detail-row" *ngIf="amount">
+          <span>Amount Due</span>
+          <strong class="amount">{{ amount | currency:currencyCode }}</strong>
+        </div>
+        <div class="detail-row">
+          <span>Status</span>
+          <span class="status-badge pending">Pending</span>
+        </div>
+      </div>
+      
+      <mat-divider></mat-divider>
+      
+      <p class="notice-text">Please complete your payment soon to avoid automatic cancellation.</p>
+    </mat-card-content>
+
+    <mat-card-actions class="action-buttons">
+      <button mat-flat-button color="primary" (click)="onCompletePayment()">
+        Complete Payment
+      </button>
+      <a mat-stroked-button color="primary" [routerLink]="orderId ? ['/orders', orderId] : ['/orders']">
+        View Order Details
+      </a>
+    </mat-card-actions>
+  </mat-card>
+</div>

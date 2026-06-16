@@ -12,6 +12,11 @@ export const PAYMENT_ROUTES: Routes = [
       import('./payment-failure.page').then((m) => m.PaymentFailurePage)
   },
   {
+    path: 'pending',
+    loadComponent: () =>
+      import('./payment-pending.page').then((m) => m.PaymentPendingPage)
+  },
+  {
     path: ':orderId',
     loadComponent: () =>
       import('./payment-processing.page').then((m) => m.PaymentProcessingPage)

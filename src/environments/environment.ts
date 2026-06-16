@@ -3,5 +3,6 @@ import { AppEnvironment } from './environment.model';
 export const environment: AppEnvironment = {
   production: false,
   apiBaseUrl: 'http://localhost:8080',
-  tokenStorageKey: 'modern-commerce-token'
+  tokenStorageKey: 'modern-commerce-token',
+  razorpayKeyId: 'rzp_test_T1vzqSilDkrVwC'
 };
