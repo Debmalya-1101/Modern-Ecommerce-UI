@@ -79,7 +79,7 @@
              [queryParams]="{ category: category }" 
              class="category-card">
             <div class="category-img-wrapper">
-              <img [src]="getCategoryImg(category)" [alt]="category" class="category-img" />
+              <img [ngSrc]="getCategoryImg(category)" [alt]="category" class="category-img" width="72" height="72" />
             </div>
             <span class="category-name">{{ category }}</span>
           </a>

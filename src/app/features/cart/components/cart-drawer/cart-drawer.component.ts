@@ -10,6 +10,7 @@ import { CartItemComponent } from '../cart-item/cart-item.component';
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state.component';
 import { ButtonStyleDirective } from '../../../../shared/directives/button-style.directive';
 import { APP_CONSTANTS } from '../../../../core/config/app.constants';
+import { LoadingSpinnerComponent } from '../../../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-cart-drawer',
@@ -21,7 +22,8 @@ import { APP_CONSTANTS } from '../../../../core/config/app.constants';
     MatDividerModule,
     CartItemComponent,
     EmptyStateComponent,
-    ButtonStyleDirective
+    ButtonStyleDirective,
+    LoadingSpinnerComponent
   ],
   templateUrl: './cart-drawer.component.html',
   styleUrl: './cart-drawer.component.scss'
@@ -32,6 +34,7 @@ export class CartDrawerComponent {
   public readonly cartItems = this.cartService.items;
   public readonly isEmpty = this.cartService.isEmpty;
   public readonly total = this.cartService.total;
+  public readonly isAddingToCart = this.cartService.isAddingToCart;
   protected readonly currencyCode = APP_CONSTANTS.currencyCode;
 
   protected closeDrawer(): void {

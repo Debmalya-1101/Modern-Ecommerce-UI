@@ -32,6 +32,11 @@
             (removeItem)="handleRemoveItem($event)"
           />
         }
+        @if (isAddingToCart()) {
+          <div class="cart-drawer__loading-item" style="display: flex; justify-content: center; padding: 2rem 0;">
+            <app-loading-spinner label="Adding item..." [diameter]="24" />
+          </div>
+        }
       </div>
 
       <div class="cart-drawer__footer">

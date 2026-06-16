@@ -37,7 +37,7 @@ declare var Razorpay: any;
   providedIn: 'root'
 })
 export class RazorpayService {
-  private scriptLoaded = false;
+  private loadScriptPromise: Promise<void> | null = null;
   private readonly scriptUrl = 'https://checkout.razorpay.com/v1/checkout.js';
 
   constructor(
@@ -45,28 +45,37 @@ export class RazorpayService {
     private ngZone: NgZone
   ) {}
 
+  preload(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadScript().catch(() => {
+        // Silently catch preload errors, allow it to retry on actual click
+        this.loadScriptPromise = null;
+      });
+    }
+  }
+
   private loadScript(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       return Promise.reject('Razorpay is only available in browser');
     }
 
-    if (this.scriptLoaded) {
-      return Promise.resolve();
+    if (this.loadScriptPromise) {
+      return this.loadScriptPromise;
     }
 
-    return new Promise((resolve, reject) => {
+    this.loadScriptPromise = new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = this.scriptUrl;
       script.async = true;
-      script.onload = () => {
-        this.scriptLoaded = true;
-        resolve();
-      };
+      script.onload = () => resolve();
       script.onerror = () => {
+        this.loadScriptPromise = null; // allow retry
         reject('Failed to load Razorpay checkout script');
       };
       document.body.appendChild(script);
     });
+
+    return this.loadScriptPromise;
   }
 
   openCheckout(options: {

@@ -134,27 +134,18 @@ export class ProductsApiService {
   /**
    * Fetches a list of distinct category names available in the catalog.
    *
-   * The backend has no dedicated /categories endpoint, so we load a broad
-   * sample of products and extract the unique category names from them.
+   * Calls the dedicated /api/products/categories endpoint which returns
+   * a lightweight array of strings, avoiding heavy product object downloads.
    *
    * trackLoading is false here so this background call does not trigger
    * the global loading spinner used by the product grid.
    */
   getCatalogCategories(): Observable<string[]> {
-    return this.apiService
-      .get<PageResponse<ProductListDTO>>(
-        API_ENDPOINTS.products.list,
-        { page: 0, size: 100 },
-        { trackLoading: false }
-      )
-      .pipe(
-        map((response) => {
-          // Extract category names and deduplicate
-          const allCategories = response.content.map((product) => product.categoryName);
-          const uniqueCategories = [...new Set(allCategories)];
-          return uniqueCategories.sort((a, b) => a.localeCompare(b));
-        })
-      );
+    return this.apiService.get<string[]>(
+      API_ENDPOINTS.products.categories,
+      undefined,
+      { trackLoading: false }
+    );
   }
 
   /**
@@ -167,22 +158,11 @@ export class ProductsApiService {
    * the global loading spinner used by the product grid.
    */
   getCatalogBrands(): Observable<string[]> {
-    return this.apiService
-      .get<PageResponse<ProductListDTO>>(
-        API_ENDPOINTS.products.list,
-        { page: 0, size: 100 },
-        { trackLoading: false }
-      )
-      .pipe(
-        map((response) => {
-          // Extract brand names and deduplicate, ignoring empty brands
-          const allBrands = response.content
-            .map((product) => product.brand)
-            .filter((brand) => !!brand);
-          const uniqueBrands = [...new Set(allBrands)];
-          return uniqueBrands.sort((a, b) => a.localeCompare(b));
-        })
-      );
+    return this.apiService.get<string[]>(
+      API_ENDPOINTS.products.brands,
+      undefined,
+      { trackLoading: false }
+    );
   }
 
   // ---------------------------------------------------------------------------

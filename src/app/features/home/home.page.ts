@@ -1,4 +1,5 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -35,7 +36,8 @@ import { ProductCardViewModel } from '../../shared/ui/product/product-ui.model';
     EmptyStateComponent,
     ErrorStateComponent,
     ProductGridComponent,
-    ProductSkeletonLoadingComponent
+    ProductSkeletonLoadingComponent,
+    NgOptimizedImage
   ],
   templateUrl: './home.page.html',
   styleUrl: './home.page.scss'

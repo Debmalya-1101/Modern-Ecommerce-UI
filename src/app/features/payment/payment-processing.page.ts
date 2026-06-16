@@ -56,6 +56,8 @@ export class PaymentProcessingPage implements OnInit {
       if (idParam) {
         this.orderId = +idParam;
         this.initializePaymentFlow(this.orderId);
+        // Eagerly preload Razorpay SDK so it's ready when user clicks Pay
+        this.razorpayService.preload();
       } else {
         this.snackbar.error('Invalid order ID.');
         this.router.navigate(['/']);

@@ -6,7 +6,9 @@ export const API_ENDPOINTS = {
   },
   products: {
     list: '/api/products',
-    detail: (id: number | string) => `/api/products/${id}`
+    detail: (id: number | string) => `/api/products/${id}`,
+    categories: '/api/products/categories',
+    brands: '/api/products/brands'
   },
   cart: {
     root: '/api/cart',

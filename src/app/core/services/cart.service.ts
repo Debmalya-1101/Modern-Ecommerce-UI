@@ -21,6 +21,7 @@ export class CartService {
   private readonly _updatingItemIds = signal<Set<number>>(new Set());
   private readonly _isDrawerOpen = signal<boolean>(false);
   private readonly _savedItems = signal<CartItem[]>([]);
+  private readonly _isAddingToCart = signal<boolean>(false);
 
   // Public readonly state
   public readonly cart = this._cart.asReadonly();
@@ -29,6 +30,7 @@ export class CartService {
   public readonly updatingItemIds = this._updatingItemIds.asReadonly();
   public readonly isDrawerOpen = this._isDrawerOpen.asReadonly();
   public readonly savedItems = this._savedItems.asReadonly();
+  public readonly isAddingToCart = this._isAddingToCart.asReadonly();
 
   // Derived computed signals
   public readonly items = computed(() => this.cart().items);
@@ -36,7 +38,7 @@ export class CartService {
   public readonly itemCount = computed(() =>
     this.cart().items.reduce((sum, item) => sum + item.quantity, 0)
   );
-  public readonly isEmpty = computed(() => this.cart().items.length === 0);
+  public readonly isEmpty = computed(() => this.cart().items.length === 0 && !this.isAddingToCart());
 
   public isItemUpdating(itemId: number) {
     return computed(() => this.updatingItemIds().has(itemId));
@@ -82,13 +84,19 @@ export class CartService {
       return;
     }
 
+    this._isAddingToCart.set(true);
+    this.openDrawer();
+
     this.cartApi.addToCart(productId, quantity).subscribe({
       next: (updatedCart) => {
         this._cart.set(updatedCart);
+        this._isAddingToCart.set(false);
         this.snackbar.success('Item added to cart.');
-        this.openDrawer();
       },
-      error: () => this.snackbar.error('Could not add item to cart.')
+      error: () => {
+        this._isAddingToCart.set(false);
+        this.snackbar.error('Could not add item to cart.');
+      }
     });
   }
 

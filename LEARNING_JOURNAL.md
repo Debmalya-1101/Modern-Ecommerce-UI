@@ -5412,3 +5412,244 @@ constructor() {
 - Improves security by not relying solely on user-modifiable query params.
 - Simplifies components since they don't have to re-fetch identical data from the backend if it was already known in the previous view.
 
+
+## Feature Update: Resolving N+1 Database Queries
+
+What was added:
+- @EntityGraph annotation was added to the CartRepository.
+- This ensures the Cart, its items, and the associated products are fetched in a single database query.
+
+Why it was added:
+- The previous implementation suffered from the "N+1 query problem", where Hibernate executed one query for the Cart, and then N additional queries for each Product inside the cart during DTO mapping.
+- Moving the database to TiDB Cloud introduced higher network latency (e.g., 20-50ms per query), which amplified these extra queries into multi-second delays for the user.
+
+### N+1 Query Problem Explained Simply
+
+An N+1 problem occurs when an ORM (like Hibernate) executes one initial query to load a parent entity, and then executes N additional queries to load its lazy-loaded children.
+
+Simple idea:
+- You ask for 1 shopping cart. (1 query)
+- The cart has 10 items.
+- You ask for the name of the product for each item.
+- Hibernate executes 10 more queries, one for each product. (10 queries)
+- Total queries: 11 instead of 1.
+
+Where this appeared in the project:
+- Inside CartServiceImpl, mapping the Cart to a CartDTO required reading item.getProduct().getName(). This triggered the lazy load for every item.
+
+### @EntityGraph Explained Simply
+
+@EntityGraph is a Spring Data JPA feature that overrides the default FetchType.LAZY behavior for a specific repository method. It tells Hibernate to use a SQL JOIN to fetch the specified relationships immediately.
+
+Small example:
+
+`java
+@EntityGraph(attributePaths = {"items", "items.product"})
+Optional<Cart> findByUser(AppUser user);
+`
+
+What this means:
+- When calling indByUser, Hibernate will write a LEFT OUTER JOIN to fetch the items list and the product for each item.
+- Everything is returned in exactly 1 database round-trip.
+
+Why this matters:
+- Cloud databases (like TiDB, AWS Aurora, etc.) have higher network latency than local databases.
+- Reducing 25 queries to 1 query can drop API response times from 1000ms down to 40ms.
+
+## What I Learned From This Step
+
+- Lazy loading is a safe default, but it becomes a severe bottleneck when looping over collections to build DTOs.
+- @EntityGraph is a clean, declarative way to solve N+1 problems in Spring Boot without writing custom JPQL.
+- Cloud database migrations often reveal hidden ORM inefficiencies because network latency acts as a multiplier.
+
+## Feature Update: Resolving Category Over-fetching
+
+What was added:
+- A custom @Query was added to ProductRepository to select only distinct category names.
+- A new dedicated endpoint GET /api/products/categories was exposed in ProductController.
+- The frontend ProductsApiService was updated to fetch from this lightweight endpoint instead of downloading full product records.
+
+Why it was added:
+- Previously, the frontend downloaded 100 complete ProductListDTO objects (about 30KB of JSON) and triggered 100 database queries on the backend just to extract 6 category names.
+- This heavy payload and the associated N+1 queries severely degraded Home Page load times.
+
+### Over-fetching Explained Simply
+
+Over-fetching happens when an API returns far more data than the client actually needs for a specific screen. 
+
+Simple idea:
+- You want a list of category names (e.g., "Electronics", "Clothing").
+- Instead of asking the database for just the names, you ask the database for 100 products.
+- The database returns the product name, description, price, image URL, category, brand, and rating.
+- The frontend receives all of this data, loops through it to find the categories, and throws the rest away.
+
+Where this appeared in the project:
+- getCatalogCategories() was calling the main /api/products list endpoint, which was designed for the product grid, not for simple category extraction.
+
+### Targeted API Endpoints Explained Simply
+
+A targeted endpoint serves exactly the data shape the client needs for a specific UI component.
+
+Small example:
+
+`java
+@GetMapping("/categories")
+public List<String> getCatalogCategories() {
+    return productService.getDistinctCategoryNames();
+}
+`
+
+What this means:
+- The backend uses the database to do the heavy lifting (the DISTINCT keyword in SQL).
+- The controller returns a tiny JSON array: ["Electronics", "Clothing"].
+- The frontend no longer has to deduplicate or parse massive objects.
+
+## What I Learned From This Step
+
+- Reusing a heavy, generalized API endpoint (like a product search) for a simple UI requirement (like a dropdown list) often leads to massive performance penalties.
+- Databases are extremely efficient at grouping and filtering (e.g., DISTINCT); letting the database do the work is much faster than downloading all rows and deduplicating in memory.
+- Adding a lightweight, targeted endpoint is a simple and effective way to fix payload bloat without changing the overall architecture.
+
+## Feature Update: Optimistic Add To Cart UX
+
+What was added:
+- A new isAddingToCart Signal in CartService.
+- Reordered ddToCart to immediately open the cart drawer *before* calling the backend.
+- A <app-loading-spinner> was added to the cart drawer, which is visible while the API request is in flight.
+
+Why it was added:
+- Previously, when adding a new item, the application would freeze and wait for the backend to respond before opening the drawer.
+- Users interpreted this 200-500ms delay as unresponsiveness or a missed click.
+
+### Optimistic Visual Feedback Explained Simply
+
+"Optimistic Updates" usually mean updating the data *as if* the server already responded successfully (like immediately bumping the cart quantity from 1 to 2). 
+
+However, when you add a *brand new* item, you don't always have all the data required to fake the response (like the item's name, price, or image). 
+
+When you can't fake the data, you can fake the *interaction*. 
+Instead of making the user wait to see the drawer, you instantly show them the drawer opening, and then show a tiny loading spinner inside the drawer.
+
+To the user, this feels just as fast as a true optimistic update because the *button click* produced an immediate visual result.
+
+## What I Learned From This Step
+
+- "Instant feel" in UX isn't always about processing data faster. It is often about providing immediate visual feedback that acknowledges user input.
+- You do not need complex state management libraries or offline caching to create a responsive UI; simple loading signals (isAddingToCart) combined with immediate component rendering (opening the drawer early) can completely mask network latency.
+- Carefully updating derived/computed states (like isEmpty) ensures smooth transitions between states (empty -> loading -> populated) without jarring flashes of incorrect UI.
+
+## Feature Update: Backend Cart API Optimization
+
+What was added:
+- The @Transactional annotation was added to the CartServiceImpl class.
+- The ddToCart method was rewritten to check the in-memory cart items *before* querying the database for the Product.
+- The updateItem and emoveItem methods were rewritten to find the item to be removed directly from the existing in-memory cart collections, eliminating explicit calls to cartItemRepository.findById.
+
+Why it was added:
+- Without @Transactional, Spring Data JPA was opening and committing a brand new database transaction for every single repository call. This created massive network latency on cloud databases.
+- Redundant queries (fetching products for items already in the cart, or querying for cart items we just fetched 1 millisecond ago) were drastically slowing down the Add/Remove Cart endpoints.
+
+### Transactions and Network Latency Explained Simply
+
+Think of a database transaction like making a phone call to a warehouse.
+- **Without @Transactional**: You call the warehouse to say "get me user 5" and hang up. Then you call the warehouse to say "get me cart 10" and hang up. Then you call the warehouse to say "add an item" and hang up. Each phone call (network round trip) takes time.
+- **With @Transactional**: You make *one* phone call, tell the warehouse to do all three things, and then hang up once.
+
+In cloud applications, the time it takes to connect to the database over the network (latency) is often much slower than the time it takes the database to actually find the data. Grouping everything into one transaction drastically reduces the number of round trips.
+
+## What I Learned From This Step
+
+- **Always manage transaction boundaries:** Never let Spring default to auto-commit (one transaction per repository call) for complex business logic that modifies multiple tables.
+- **Trust the Session / L1 Cache:** If you just fetched a Cart and all of its items from the database (especially if using an @EntityGraph), you do not need to query the database again to find a specific item. Just use Java Streams to find it in the list you already have!
+- Redundant database queries are the "silent killers" of API performance. Refactoring the order of operations (e.g. checking the cart *before* fetching the product) can save significant overhead.
+
+## Feature Update: Category Image Optimization
+
+What was added:
+- We imported NgOptimizedImage from @angular/common into the HomePage component.
+- We replaced the native [src] binding on the category icons with [ngSrc] and explicitly defined width="72" and height="72".
+
+Why it was added:
+- The category images are dynamically rendered *after* an API call completes. This prevents the browser from discovering and downloading the images during initial page load.
+- Because native <img> tags lack explicit dimensions, they start as 0x0 blocks. When the image finally downloads, it forces the browser to recalculate the layout and push surrounding content down, causing a Cumulative Layout Shift (CLS).
+
+### Cumulative Layout Shift (CLS) Explained Simply
+
+Imagine you are trying to tap a button on your phone. Right as your finger touches the screen, an image finishes loading at the top of the page. The image pushes all the text and buttons down, causing you to accidentally tap the wrong button. This jarring movement is a Layout Shift.
+
+By simply telling the browser exactly how big the image will be (width="72" height="72") before the image even downloads, the browser reserves an empty box of the correct size. When the image finally downloads, it just fills the box without moving anything around it. NgOptimizedImage enforces this best practice and automatically handles lazy-loading.
+
+## What I Learned From This Step
+
+- **Always Provide Image Dimensions:** Even if CSS controls the final display size, providing the intrinsic or reserved width and height attributes is mandatory to pass Core Web Vitals (CLS).
+- **NgOptimizedImage is Powerful:** Replacing src with 
+gSrc provides massive out-of-the-box benefits, including automatic loading="lazy" for below-the-fold content, warnings if dimensions are missing, and LCP prioritization if needed.
+- APIs block DOM discovery. If an image is hidden behind an @if (data) block, its network request is delayed. You must compensate for this delay by ensuring the layout doesn't break when the delayed image finally arrives.
+
+## Feature Update: TiDB & ORM Optimizations
+
+What was added:
+- Added spring.jpa.properties.hibernate.default_batch_fetch_size=50 to pplication.properties.
+- Added JDBC statement batching (order_inserts, order_updates, jdbc.batch_size=50).
+- Configured HikariCP to pool connections optimally (maximum-pool-size=20) and to cache prepared statements (cachePrepStmts=true, ewriteBatchedStatements=true).
+
+Why it was added:
+- The application suffered from severe network latency penalties when communicating with the cloud-based TiDB database. 
+- Without batch fetching, Hibernate would issue 50 separate SELECT queries to load a lazy collection, requiring 50 separate network round trips.
+- Without prepared statement caching and batched inserts, TiDB was forced to re-parse SQL repeatedly, and the driver could not bundle inserts into a single network packet.
+
+### N+1 Problem and Batch Fetching Explained Simply
+
+Imagine you are at a library and need 50 specific books. 
+- **Without Batch Fetching (The N+1 Problem)**: You walk up to the librarian, ask for Book 1, wait, get the book, walk back to your desk. Then you walk back to the librarian, ask for Book 2, wait, get the book... You do this 50 times. The walking back and forth (network latency) takes hours, even though the librarian finds the books quickly.
+- **With Batch Fetching (Size 50)**: You walk up to the librarian, hand them a list of 50 books (IN (id1, id2... id50)), wait once, and carry all 50 books back.
+
+By configuring Hibernate to fetch in batches, we eliminate 98% of the network overhead when accessing related data, making the backend API significantly faster on a cloud architecture.
+
+## What I Learned From This Step
+
+- **Cloud Databases Punish Bad ORM Configs:** On a local database (localhost), network latency is ~0ms, so 100 queries might take 5ms. On a cloud database (TiDB, AWS RDS), network latency is ~40ms, so 100 queries take 4000ms. Proper ORM configuration is absolutely mandatory in the cloud.
+- **HikariCP is not "Magic" out of the box:** While HikariCP is fast, it defaults to avoiding features that consume memory (like Prepared Statement Caching). You must explicitly enable cachePrepStmts and ewriteBatchedStatements to unlock high-performance database communication.
+- **Trade-offs:** We set the batch fetch size to 50 instead of 100 to mitigate RAM usage on the server, which is an excellent trade-off balancing memory conservation with massive network latency reduction.
+
+## Feature Update: Razorpay SDK Optimization
+
+What was added:
+- Refactored azorpay.service.ts to cache the Promise returned by loadScript().
+- Exposed a public preload() method in the Razorpay service.
+- Called 	his.razorpayService.preload() inside 
+gOnInit on the PaymentProcessingPage.
+
+Why it was added:
+- Previously, the Razorpay <script> tag was only injected into the DOM when the user explicitly clicked the "Pay" button.
+- Because downloading external scripts takes time, clicking "Pay" felt unresponsive—the user was forced to wait for the network request to finish before the modal could actually open.
+- By caching the Promise, we can safely trigger the script download in the background as soon as the user arrives on the payment page, while guaranteeing we don't accidentally inject duplicate script tags if they click "Pay" before the background download finishes.
+
+## What I Learned From This Step
+- **Decouple Initialization from Interaction:** If a third-party SDK requires a network download to function, do not wait for the user to interact with a button to begin the download. Use the time the user spends reading the screen (the "think time") to eagerly fetch the SDK in the background.
+- **Promise Caching:** In JavaScript/TypeScript, saving a Promise to a variable (	his.loadScriptPromise = new Promise(...)) allows multiple consumers to await the exact same async operation without triggering the underlying logic (like appending DOM nodes) multiple times.
+
+## Feature Update: Brand Loading Optimization
+
+What was added:
+- Created a native indDistinctBrands() JPQL query in the backend ProductRepository.
+- Exposed this query through a new, lightweight GET /api/products/brands endpoint.
+- Refactored ProductsApiService.getCatalogBrands() on the frontend to call this endpoint directly, instead of paginating through 100 complete products.
+
+Why it was added:
+- The previous implementation was downloading an enormous amount of irrelevant product data over the network just to parse out unique string names. Over a cloud database like TiDB, this resulted in massive bandwidth waste, high memory consumption on the Spring Boot server, and sluggish UI filtering.
+- By delegating the DISTINCT operation to the SQL database engine and sending only the strings over the wire, we've reduced the network payload size dramatically and improved the responsiveness of the product sidebar.
+
+## What I Learned From This Step
+- **Identify Hidden Data Hoarding:** Always check how frontend dropdowns and filter sidebars are populated. If an API returns massive JSON trees, but the frontend only maps a single string property out of it, the API contract is fundamentally flawed.
+- **SQL Distinct vs. JS Sets:** It is computationally cheaper and exponentially faster to ask the SQL engine for SELECT DISTINCT brand than it is to download a thousand rows of data and use [...new Set(array)] in the browser. Let the database do what it was designed to do.
+
+## Frontend (Angular) Performance Recap
+
+Across the performance tuning sprint, we tackled several Angular-specific bottlenecks:
+1. **Optimistic UI State (isAddingToCart)**: Instead of locking the UI while waiting for the TiDB backend to respond, we instantly transition the UI into a loading state (opening drawers, showing spinners) to mask network latency and prevent rage-clicking.
+2. **NgOptimizedImage directive (
+gSrc)**: Replaced native <img> tags. By explicitly providing width and height attributes, we completely eliminated Cumulative Layout Shift (CLS) during the category image loading phase.
+3. **Promise Caching for Scripts**: Improved the third-party Razorpay SDK loading strategy. By caching the script injection Promise in the Angular service, we can safely background-preload the SDK during 
+gOnInit without risking duplicate injections if the user clicks interactively.
+4. **Endpoint Segregation**: Stopped consuming heavy PageResponse<ProductListDTO> payloads just to build UI dropdowns. We replaced them with dedicated lightweight string-array APIs (/api/products/categories, /api/products/brands), greatly dropping the JS parsing load on the browser thread.
