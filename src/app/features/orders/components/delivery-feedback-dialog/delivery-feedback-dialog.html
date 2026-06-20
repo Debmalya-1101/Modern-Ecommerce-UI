@@ -1,0 +1,42 @@
+<h2 mat-dialog-title>Rate Delivery</h2>
+
+<mat-dialog-content>
+  <div class="feedback-container">
+    <p>How was your delivery experience for Order #{{data.orderId}}?</p>
+    
+    <div class="rating-section">
+      <span class="rating-label">Rating: {{ rating }} / 5</span>
+      <mat-slider min="1" max="5" step="1" discrete>
+        <input matSliderThumb [(ngModel)]="rating">
+      </mat-slider>
+      <div class="stars">
+        @for (star of [1,2,3,4,5]; track star) {
+          <mat-icon [class.active]="star <= rating">star</mat-icon>
+        }
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Additional Comments (Optional)</mat-label>
+      <textarea matInput [(ngModel)]="comment" rows="4" placeholder="Tell us more about the delivery..."></textarea>
+    </mat-form-field>
+
+    @if (error) {
+      <div class="error-message">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" [disabled]="isSubmitting">Cancel</button>
+  <button mat-flat-button color="primary" (click)="submit()" [disabled]="isSubmitting">
+    @if (isSubmitting) {
+      Submitting...
+    } @else {
+      Submit Feedback
+    }
+  </button>
+</mat-dialog-actions>

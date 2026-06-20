@@ -1,0 +1,78 @@
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.metadata-section, .assignment-section {
+  h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .label {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.7;
+  }
+
+  .value {
+    font-weight: 500;
+    color: var(--text-color);
+  }
+}
+
+.failure-item {
+  grid-column: span 2;
+  
+  .value {
+    color: var(--warn-color);
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-color);
+  opacity: 0.8;
+}
+
+.empty-state {
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(244, 67, 54, 0.05);
+  border-radius: var(--border-radius-sm);
+  
+  p {
+    margin: 0 0 0.5rem 0;
+    font-weight: 500;
+    color: var(--warn-color);
+  }
+  
+  .help-text {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.7;
+  }
+}

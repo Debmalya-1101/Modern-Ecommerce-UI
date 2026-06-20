@@ -1,0 +1,200 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.dp-signup-page {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image Bar */
+.dp-image-container {
+  padding: 0 48px 24px 48px;
+}
+
+.dp-image-bar {
+  width: 100%;
+  aspect-ratio: 5 / 1;
+  background-image: url('/assets/images/delivery-banner-5-1.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(87, 61, 44, 0.14);
+  box-shadow: 0 20px 48px rgba(80, 54, 36, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 100%);
+  }
+
+  .image-overlay {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+    padding: 0 24px;
+
+    h1 {
+      font-size: clamp(1.5rem, 4vw, 3rem);
+      font-weight: 800;
+      margin: 0 0 12px 0;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    p {
+      font-size: clamp(0.9rem, 1.5vw, 1.25rem);
+      margin: 0;
+      opacity: 0.95;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+  }
+}
+
+/* Form Container */
+.dp-form-container {
+  padding: 0 48px 48px 48px;
+
+  .dp-form-card {
+    border-radius: 16px;
+    padding: 40px;
+    border: 1px solid rgba(87, 61, 44, 0.14);
+    background: rgba(255, 252, 247, 0.96);
+    box-shadow: 0 20px 48px rgba(80, 54, 36, 0.08);
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 40px;
+
+      h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0 0 8px 0;
+        color: #1a1a1a;
+      }
+
+      p {
+        color: #666;
+        margin: 0;
+        font-size: 1.1rem;
+      }
+    }
+
+    .dp-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 40px;
+      row-gap: 16px;
+
+      mat-form-field {
+        width: 100%;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+
+      /* Login form style match */
+      .mat-mdc-text-field-wrapper {
+        border-radius: 12px;
+        background: rgba(255, 253, 250, 0.98);
+      }
+
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: rgba(101, 76, 56, 0.18) !important;
+      }
+
+      .mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+      .mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+      .mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+        border-color: rgba(181, 95, 52, 0.65) !important;
+      }
+      
+      .mat-mdc-input-element::placeholder {
+        color: #9a877d;
+      }
+    }
+
+    .form-actions {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+
+      .register-btn {
+        padding: 0 40px;
+        height: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 30px; /* pill shape like login */
+        background: var(--primary-color, #8B4513);
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(139, 69, 19, 0.3);
+        }
+
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+          transform: none;
+        }
+      }
+    }
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+  .dp-image-container,
+  .dp-form-container {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .dp-image-bar {
+    aspect-ratio: auto;
+    height: 200px;
+  }
+
+  .dp-form-container .dp-form-card {
+    padding: 24px;
+
+    .dp-form-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .dp-image-container,
+  .dp-form-container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .dp-form-container .dp-form-card .form-actions .register-btn {
+    width: 100%;
+    padding: 0;
+    justify-content: center;
+  }
+}

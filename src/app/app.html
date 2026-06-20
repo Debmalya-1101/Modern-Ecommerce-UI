@@ -202,6 +202,9 @@
                   @if (isAdmin()) {
                     <a routerLink="/admin" routerLinkActive="desktop-nav__link--active" class="desktop-nav__link">Admin Panel</a>
                   }
+                  @if (isDeliveryPartner()) {
+                    <a routerLink="/delivery-partner/dashboard" routerLinkActive="desktop-nav__link--active" class="desktop-nav__link">Partner Dashboard</a>
+                  }
                 }
               </nav>
             }

@@ -1,0 +1,66 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-main">
+      <div class="title-area">
+        <h1>Shipment History</h1>
+      </div>
+      <p class="subtitle">Review your past deliveries.</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-loading-spinner label="Loading shipment history..." [diameter]="48"></app-loading-spinner>
+    </mat-card>
+  } @else if (error()) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-error-state [description]="error()!" (action)="loadHistoryShipments()"></app-error-state>
+    </mat-card>
+  } @else if (shipments().length === 0) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-empty-state 
+        title="No historical shipments" 
+        description="You have not completed or failed any deliveries yet.">
+      </app-empty-state>
+    </mat-card>
+  } @else {
+    <div class="shipment-cards">
+      @for (shipment of shipments(); track shipment.id) {
+        <mat-card class="shipment-card" appearance="outlined">
+          <div class="card-header">
+            <div class="shipment-meta">
+              <span class="tracking">{{ shipment.trackingNumber || 'Pending Tracking' }}</span>
+              <span class="order">Order #{{ shipment.orderId }}</span>
+            </div>
+            <mat-chip 
+              [color]="shipment.status === 'DELIVERED' ? 'primary' : 'warn'" 
+              highlighted>
+              {{ shipment.status }}
+            </mat-chip>
+          </div>
+          
+          <mat-card-content>
+            <div class="details-grid">
+              <div class="detail">
+                <span class="label">Last Updated</span>
+                <span class="value">{{ shipment.updatedAt | date:'medium' }}</span>
+              </div>
+              @if (shipment.failureReason) {
+                <div class="detail failure">
+                  <span class="label">Failure Reason</span>
+                  <span class="value">{{ shipment.failureReason }}</span>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions class="card-actions">
+            <button mat-button color="primary" [routerLink]="['/delivery-partner/shipments', shipment.id]">
+              View Details
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

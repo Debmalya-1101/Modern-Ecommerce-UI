@@ -76,6 +76,11 @@ export const routes: Routes = [
       import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES)
   },
   {
+    path: 'delivery-partner',
+    loadChildren: () =>
+      import('./features/delivery-partner/delivery-partner.routes').then((m) => m.DELIVERY_PARTNER_ROUTES)
+  },
+  {
     path: '**',
     redirectTo: ''
   }

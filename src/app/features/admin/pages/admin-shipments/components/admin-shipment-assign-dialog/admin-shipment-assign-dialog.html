@@ -1,0 +1,81 @@
+<h2 mat-dialog-title>Shipment Details & Assignment</h2>
+
+<mat-dialog-content>
+  <div class="dialog-container">
+    <div class="metadata-section">
+      <h3>Shipment Metadata</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Tracking Number</span>
+          <span class="value">{{ shipment.trackingNumber || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Order ID</span>
+          <span class="value">#{{ shipment.orderId }}</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Status</span>
+          <span class="value">
+            <mat-chip color="accent" highlighted>{{ shipment.status }}</mat-chip>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="label">Expected Delivery</span>
+          <span class="value">{{ shipment.expectedDeliveryDate | date:'mediumDate' }}</span>
+        </div>
+        @if (shipment.deliveryPartnerId) {
+          <div class="info-item">
+            <span class="label">Assigned Partner ID</span>
+            <span class="value">{{ shipment.deliveryPartnerId }}</span>
+          </div>
+        }
+        @if (shipment.failureReason) {
+          <div class="info-item failure-item">
+            <span class="label">Failure Reason</span>
+            <span class="value">{{ shipment.failureReason }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="assignment-section">
+      <h3>Assign To</h3>
+
+      @if (isLoading()) {
+        <div class="loading-state">
+          <mat-spinner diameter="32"></mat-spinner>
+          <span>Loading approved delivery partners...</span>
+        </div>
+      } @else if (availablePartners().length === 0) {
+        <div class="empty-state">
+          <p>No approved delivery partners found.</p>
+          <span class="help-text">You must approve a delivery partner before assigning shipments.</span>
+        </div>
+      } @else {
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Delivery Partner</mat-label>
+          <mat-select [(ngModel)]="selectedPartnerId" placeholder="Select a partner" required>
+            @for (partner of availablePartners(); track partner.id) {
+              <mat-option [value]="partner.id">
+                {{ partner.fullName }} ({{ partner.vehicleType }})
+              </mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      }
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cancel</button>
+  <button 
+    mat-flat-button 
+    color="primary" 
+    [disabled]="!selectedPartnerId || availablePartners().length === 0"
+    (click)="confirmAssignment()">
+    Assign Shipment
+  </button>
+</mat-dialog-actions>

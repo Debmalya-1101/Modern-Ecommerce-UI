@@ -62,7 +62,9 @@ export class AdminLayoutComponent {
     { label: 'Products', path: '/admin/products', icon: 'inventory_2' },
     { label: 'Inventory', path: '/admin/inventory', icon: 'warehouse' },
     { label: 'Categories', path: '/admin/categories', icon: 'category' },
-    { label: 'Analytics', path: '/admin/analytics', icon: 'bar_chart' }
+    { label: 'Analytics', path: '/admin/analytics', icon: 'bar_chart' },
+    { label: 'Delivery Partners', path: '/admin/delivery-partners', icon: 'people' },
+    { label: 'Shipments', path: '/admin/shipments', icon: 'local_shipping' }
   ];
 
   constructor() {

@@ -1,0 +1,102 @@
+<div class="page-container">
+  <div class="page-header">
+    <button mat-icon-button routerLink="/delivery-partner/dashboard" class="back-btn" aria-label="Back to dashboard">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-main">
+      <div class="title-area">
+        <h1>Shipment Details</h1>
+      </div>
+      @if (shipment()) {
+        <p class="subtitle">{{ shipment()!.trackingNumber }}</p>
+      }
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-loading-spinner label="Loading shipment details..." [diameter]="48"></app-loading-spinner>
+    </mat-card>
+  } @else if (error()) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-error-state 
+        [title]="errorTitle()!"
+        [description]="error()!">
+      </app-error-state>
+      @if (errorTitle() !== 'Access Denied' && errorTitle() !== 'Not Found' && errorTitle() !== 'Invalid ID') {
+        <div class="error-actions" style="display: flex; justify-content: center; margin-bottom: 2rem;">
+          <button mat-button color="primary" (click)="loadShipment(shipment()?.id!)">Retry</button>
+        </div>
+      }
+    </mat-card>
+  } @else if (shipment(); as s) {
+    <mat-card class="detail-card" appearance="outlined">
+      <mat-card-content>
+        
+        <div class="status-banner">
+          <mat-chip 
+            [color]="s.status === 'DELIVERED' ? 'primary' : s.status === 'FAILED' ? 'warn' : 'accent'" 
+            highlighted>
+            {{ s.status }}
+          </mat-chip>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Tracking Number</span>
+            <span class="value">{{ s.trackingNumber || 'Pending' }}</span>
+          </div>
+          
+          <div class="info-item">
+            <span class="label">Order ID</span>
+            <span class="value">#{{ s.orderId }}</span>
+          </div>
+          
+          <div class="info-item">
+            <span class="label">Expected Delivery</span>
+            <span class="value">{{ s.expectedDeliveryDate | date:'mediumDate' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Created At</span>
+            <span class="value">{{ s.createdAt | date:'medium' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="label">Last Updated</span>
+            <span class="value">{{ s.updatedAt | date:'medium' }}</span>
+          </div>
+
+          @if (s.failureReason) {
+            <div class="info-item failure-item">
+              <span class="label">Failure Reason</span>
+              <span class="value">{{ s.failureReason }}</span>
+            </div>
+          }
+        </div>
+
+      </mat-card-content>
+
+      <mat-card-actions class="card-actions">
+        @if (s.status === StatusEnum.ASSIGNED) {
+          <button mat-flat-button color="accent" (click)="updateStatus(StatusEnum.PICKED_UP)">
+            Mark Picked Up
+          </button>
+        } @else if (s.status === StatusEnum.PICKED_UP) {
+          <button mat-flat-button color="accent" (click)="updateStatus(StatusEnum.OUT_FOR_DELIVERY)">
+            Out For Delivery
+          </button>
+        } @else if (s.status === StatusEnum.OUT_FOR_DELIVERY) {
+          <button mat-flat-button color="primary" (click)="updateStatus(StatusEnum.DELIVERED)">
+            Mark Delivered
+          </button>
+          <button mat-stroked-button color="warn" (click)="markFailed()">
+            Mark Failed
+          </button>
+        } @else {
+          <span class="read-only-text">No further actions available.</span>
+        }
+      </mat-card-actions>
+    </mat-card>
+  }
+</div>

@@ -50,7 +50,15 @@ export class AuthService {
         ),
         tap(() => this.isReady.set(true)),
         catchError((error: AppHttpError) => {
-          this.authError.set(error.message);
+          if (error.status === 403) {
+            const isGenericForbidden = !error.message || error.message.toLowerCase() === 'forbidden';
+            const message = isGenericForbidden 
+              ? 'Your delivery partner account is pending approval, rejected, or suspended. Please contact the administrator.'
+              : error.message;
+            this.authError.set(message);
+          } else {
+            this.authError.set(error.message);
+          }
           return throwError(() => error);
         }),
         finalize(() => this.isLoading.set(false))

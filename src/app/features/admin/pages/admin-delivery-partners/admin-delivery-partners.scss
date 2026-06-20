@@ -1,0 +1,164 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  background: var(--surface-color, #ffffff);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+  .header-main {
+    .title-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--primary-color, #8B4513); /* fallback to standard brand color */
+        letter-spacing: -0.03em;
+        line-height: 1.2;
+      }
+    }
+
+    .subtitle {
+      margin: 0.5rem 0 0;
+      color: var(--text-color, #333);
+      opacity: 0.7;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+  }
+}
+
+.table-card {
+  padding: 0;
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+  overflow: hidden;
+  background: var(--surface-color, #ffffff);
+
+  .table-container {
+    overflow-x: auto;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+::ng-deep table.mat-mdc-table {
+  background: transparent !important;
+  
+  thead {
+    background: #f8f9fa;
+    
+    th.mat-mdc-header-cell {
+      color: #555;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1.2rem 1.5rem;
+      border-bottom: 2px solid #eaeaea;
+    }
+  }
+
+  tbody {
+    tr.mat-mdc-row {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      
+      &:hover {
+        background-color: #fffaf7 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.1);
+        
+        td.mat-mdc-cell {
+          border-bottom-color: transparent;
+        }
+      }
+      
+      td.mat-mdc-cell {
+        padding: 1.2rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        color: #444;
+        font-size: 1rem;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.partner-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  
+  strong {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+  }
+}
+
+.text-sm {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.text-muted {
+  color: #666;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.rating-cell {
+  background: #fff9e6;
+  padding: 6px 12px;
+  border-radius: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid #ffeeba;
+  
+  strong {
+    color: #d39e00;
+    font-weight: 700;
+  }
+}
+
+::ng-deep .mat-mdc-chip {
+  font-weight: 600 !important;
+  letter-spacing: 0.03em;
+}
+
+.action-btn {
+  border-radius: 30px !important;
+  padding: 0 24px !important;
+  height: 40px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  
+  &:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
+  }
+}

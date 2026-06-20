@@ -70,13 +70,19 @@ export class App {
     return url.startsWith('/login')
       || url.startsWith('/signup')
       || url.startsWith('/forgot-password')
-      || url.startsWith('/reset-password');
+      || url.startsWith('/reset-password')
+      || url.startsWith('/delivery-partner/signup');
   });
   protected readonly isAdminRoute = computed(() => this.currentUrl().startsWith('/admin'));
   protected readonly isLoginRoute = computed(() => this.currentUrl().startsWith('/login'));
-  protected readonly isSignupRoute = computed(() => this.currentUrl().startsWith('/signup'));
+  protected readonly isSignupRoute = computed(() => 
+    this.currentUrl().startsWith('/signup') || this.currentUrl().startsWith('/delivery-partner/signup')
+  );
   protected readonly isAdmin = computed(
     () => this.isAuthenticated() && this.session().user?.role === 'ROLE_ADMIN'
+  );
+  protected readonly isDeliveryPartner = computed(
+    () => this.isAuthenticated() && this.session().user?.role === 'ROLE_DELIVERY_PARTNER'
   );
   protected readonly currentUserLabel = computed(
     () => this.session().user?.username ?? 'Guest'
@@ -125,13 +131,23 @@ export class App {
 
   protected readonly filteredNavigationItems = computed(() => {
     const items = [...this.navigationItems];
-    if (this.isAuthenticated() && this.authService.hasRole('ROLE_ADMIN')) {
-      items.push({
-        label: 'Admin Panel',
-        path: '/admin',
-        description: 'Manage products and orders',
-        icon: 'admin_panel_settings'
-      });
+    if (this.isAuthenticated()) {
+      if (this.authService.hasRole('ROLE_ADMIN')) {
+        items.push({
+          label: 'Admin Panel',
+          path: '/admin',
+          description: 'Manage products and orders',
+          icon: 'admin_panel_settings'
+        });
+      }
+      if (this.authService.hasRole('ROLE_DELIVERY_PARTNER')) {
+        items.push({
+          label: 'Partner Dashboard',
+          path: '/delivery-partner/dashboard',
+          description: 'Manage your deliveries',
+          icon: 'local_shipping'
+        });
+      }
     }
     return items;
   });

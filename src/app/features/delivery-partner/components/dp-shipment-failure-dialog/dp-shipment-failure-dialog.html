@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Mark Shipment as Failed</h2>
+
+<mat-dialog-content>
+  <div class="dialog-container">
+    <p>Please provide a reason why shipment <strong>{{ data.trackingNumber }}</strong> could not be delivered.</p>
+    
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Failure Reason</mat-label>
+      <textarea 
+        matInput 
+        [(ngModel)]="failureReason" 
+        rows="3" 
+        placeholder="e.g. Customer unavailable, Address not found..."
+        required>
+      </textarea>
+      @if (!failureReason.trim()) {
+        <mat-error>A failure reason is required.</mat-error>
+      }
+    </mat-form-field>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cancel</button>
+  <button 
+    mat-flat-button 
+    color="warn" 
+    [disabled]="!failureReason.trim()"
+    (click)="submit()">
+    Confirm Failure
+  </button>
+</mat-dialog-actions>

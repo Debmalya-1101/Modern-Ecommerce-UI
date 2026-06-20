@@ -1,0 +1,113 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+
+  .back-btn {
+    margin-top: -4px; // Align visually
+  }
+
+  .header-main {
+    .title-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text-color);
+      }
+    }
+
+    .subtitle {
+      margin: 0.5rem 0 0;
+      color: var(--text-color);
+      opacity: 0.7;
+    }
+  }
+}
+
+.detail-card {
+  padding: 0;
+
+  mat-card-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .status-banner {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .label {
+        font-size: 0.85rem;
+        color: var(--text-color);
+        opacity: 0.7;
+      }
+
+      .value {
+        font-weight: 500;
+        color: var(--text-color);
+        font-size: 1.05rem;
+      }
+      
+      &.failure-item {
+        grid-column: 1 / -1; // span full width
+        
+        .value {
+          color: var(--warn-color);
+        }
+      }
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.02);
+
+    button {
+      margin: 0;
+    }
+    
+    .read-only-text {
+      color: var(--text-color);
+      opacity: 0.6;
+      font-style: italic;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .detail-card .card-actions {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}

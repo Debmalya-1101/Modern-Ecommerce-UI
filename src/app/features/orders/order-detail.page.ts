@@ -10,6 +10,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { OrdersApiService } from '../../core/services/orders-api.service';
 import { OrderDetail } from '../../core/models/order.model';
 import { APP_CONSTANTS } from '../../core/config/app.constants';
+import { MatDialog } from '@angular/material/dialog';
+import { DeliveryFeedbackDialogComponent } from './components/delivery-feedback-dialog/delivery-feedback-dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DeliveryFeedbackService } from '../../core/services/delivery-feedback.service';
+import { DeliveryFeedbackStatusDTO } from '../../core/models/delivery-feedback.model';
 
 @Component({
   selector: 'app-order-detail-page',
@@ -28,12 +33,19 @@ import { APP_CONSTANTS } from '../../core/config/app.constants';
 })
 export class OrderDetailPage implements OnInit {
   private readonly ordersApiService = inject(OrdersApiService);
+  private readonly feedbackService = inject(DeliveryFeedbackService);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
   
   readonly currencyCode = APP_CONSTANTS.currencyCode;
   readonly order = signal<OrderDetail | null>(null);
   readonly isLoading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
+  
+  readonly feedbackStatus = signal<DeliveryFeedbackStatusDTO | null>(null);
+  readonly isLoadingFeedback = signal<boolean>(false);
+  
   orderId: number | null = null;
 
   ngOnInit(): void {
@@ -59,11 +71,29 @@ export class OrderDetailPage implements OnInit {
       next: (order) => {
         this.order.set(order);
         this.isLoading.set(false);
+        
+        if (order.orderStatus === 'DELIVERED') {
+          this.loadFeedbackStatus(order.orderId);
+        }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error loading order details:', err);
         this.error.set('Failed to load order details. Please try again later.');
         this.isLoading.set(false);
+      }
+    });
+  }
+
+  loadFeedbackStatus(orderId: number): void {
+    this.isLoadingFeedback.set(true);
+    this.feedbackService.checkFeedbackStatus(orderId).subscribe({
+      next: (status) => {
+        this.feedbackStatus.set(status);
+        this.isLoadingFeedback.set(false);
+      },
+      error: (err: any) => {
+        console.error('Error loading feedback status:', err);
+        this.isLoadingFeedback.set(false);
       }
     });
   }
@@ -101,6 +131,22 @@ export class OrderDetailPage implements OnInit {
       case 'DELIVERED': return 3;
       default: return 1;
     }
+  }
+
+  openDeliveryFeedbackDialog(): void {
+    if (!this.orderId) return;
+
+    const dialogRef = this.dialog.open(DeliveryFeedbackDialogComponent, {
+      width: '400px',
+      data: { orderId: this.orderId }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.snackBar.open('Thank you for your feedback!', 'Close', { duration: 3000 });
+        this.loadFeedbackStatus(this.orderId!);
+      }
+    });
   }
 }
 

@@ -5666,3 +5666,175 @@ We replaced the default Angular Material text-only snackbars with a highly custo
 ### Example
 Instead of injecting `MatSnackBar` directly in our services (like AdminProductsService), we inject `SnackbarService` and simply call:
 `this.snackbarService.success('Successfully imported 10 products!');`
+
+## Feature Update: Shipment and Delivery Partner Foundation
+
+What was added:
+- Core models, API services, and routing for Delivery Partners, Shipments, and Delivery Feedback.
+- Route placeholders for `delivery-partner` functionality isolated from customer and admin flows.
+- Delivery Feedback Dialog component integrated into the customer's Order Details page.
+
+Why it was added:
+- Delivery partners need a dedicated workflow separate from customers and admins. Keeping routes and permissions segmented avoids polluting the main e-commerce experience.
+- Feedback capture is a crucial post-order experience. Instead of creating a whole new page just for rating an order, integrating it as a Material dialog on the Order Details page reduces friction and navigation steps.
+
+Angular concept behind it:
+- Lazy loaded feature modules: Routing the entire `delivery-partner` functionality separately allows smaller initial bundle sizes for customers.
+- Angular Material Dialogs: `MatDialog` creates interactive overlay experiences without leaving the current context.
+
+What I learned:
+- Route segregation based on user personas (Customer, Admin, Delivery Partner) is an effective way to keep an application scalable.
+- Using standalone components simplifies adding completely new feature branches without worrying about shared module conflicts.
+- For post-action workflows like leaving feedback, a well-integrated dialog provides a smoother UX than a standalone page redirect.
+
+## Feature Update: Delivery Partner Approval UX
+
+What was added:
+- A dedicated Delivery Partner signup form (`dp-signup.component`) separated from the main customer signup flow.
+- A dynamic login error interceptor in `auth.service.ts` to map `403 Forbidden` responses to a user-friendly pending/rejected/suspended message.
+- Admin screens (`admin-delivery-partners.component`) using `MatTable` to list and filter delivery partners by status.
+- A Material Dialog (`admin-dp-detail-dialog.component`) to view partner details and update their status without leaving the list context.
+
+Why it was added:
+- Separating signup flows prevents polluting the general customer auth experience with specialized fields like vehicle and license details.
+- Using a dialog for admin status updates allows fast, context-preserving workflows for the administrator.
+- Catching `403` errors specifically at the authentication layer keeps the component UI (`login.page`) clean while providing helpful feedback to the user regarding their account state.
+
+Angular concept behind it:
+- Interceptors & RxJS CatchError: Used the `catchError` pipe inside the `AuthService.login()` observable stream to gracefully map generic HTTP errors into semantic UI messages.
+- Reactive Forms Validation: Leveraged `Validators.pattern` and custom control mappings to ensure required data like 10-digit phone numbers and license strings were collected reliably before API submission.
+
+What I learned:
+- Material Dialogs are highly effective for "View/Manage" patterns in admin dashboards, replacing the need for deep navigation trees for simple status updates.
+- Centralizing specific API error interpretations (like mapping 403 to a "Pending Approval" message) inside a service reduces logic duplication across UI components.
+
+## Feature Update: Admin Shipment Management
+
+What was added:
+- An admin view (`admin-shipments.component`) displaying unassigned shipments fetched from the backend.
+- A shipment assignment dialog (`admin-shipment-assign-dialog.component`) to display shipment metadata and assign it to an approved delivery partner.
+- Integrated the `AdminDeliveryPartnersService` to fetch and filter for `APPROVED` partners specifically for the assignment dropdown.
+
+Why it was added:
+- Administrators need a dedicated interface to allocate pending shipments efficiently to vetted delivery personnel.
+- Limiting assignment to only `APPROVED` delivery partners enforces the business rule directly in the UI, avoiding unnecessary backend rejections.
+- Utilizing an assignment dialog keeps the admin on the unassigned shipments list, allowing rapid sequential assignment without page reloads.
+
+Angular concept behind it:
+- Cross-Service Integration: The dialog injects both the `AdminShipmentsService` (for the assignment action) and the `AdminDeliveryPartnersService` (to fetch available partners), showing how standalone components can compose multiple feature services.
+- Signal Updating: After a successful assignment, the component's `shipments` signal is directly mutated (`this.shipments.update(list => list.filter(...))`) to instantly drop the row from the table without requiring an extra network fetch.
+
+What I learned:
+- Aggressive frontend filtering (like removing the assigned shipment from the list signal immediately) creates a snappy, responsive UI compared to triggering a full list reload after every minor action.
+- Combining empty states, loaders, and disabled buttons prevents user errors and confusing states when prerequisite data (like approved delivery partners) is missing.
+
+## Feature Update: Delivery Partner Dashboard & Shipment Workflow
+
+What was added:
+- A Dashboard (`dp-dashboard.component`) displaying aggregate shipment metrics via clickable KPI cards.
+- An Active Shipments View (`dp-shipments-active.component`) utilizing a mobile-first card layout to list current assignments with quick-action status transition buttons.
+- A History View (`dp-shipments-history.component`) to display read-only terminal-state shipments (DELIVERED, FAILED).
+- A Detailed Shipment View (`dp-shipment-detail.component`) with comprehensive tracking metadata, status updates, and explicit `403/404` fallback UI handling.
+- A specialized Material Dialog (`dp-shipment-failure-dialog.component`) to force the collection of a mandatory string reason whenever a shipment is marked as `FAILED`.
+
+Why it was added:
+- The delivery partner persona inherently requires a simplified, mobile-friendly interface focused strictly on actionable logistics.
+- Embedding state transitions directly into the Active Shipments list drastically reduces navigation friction for users on the move.
+- Providing explicit error handling (403 Access Denied / 404 Not Found) ensures drivers aren't confused if they attempt to load an invalid or reassigned shipment URL directly.
+
+Angular concept behind it:
+- Component Reusability & Shared Logic: Both the Active list and the Detail component securely implement the exact same conditional status transition logic (e.g., showing `Mark Delivered` only when `OUT_FOR_DELIVERY`), sharing the `DeliveryPartnerShipmentsService` for state updates.
+- Centralized Material Dialog Data: Passing data strictly through `MAT_DIALOG_DATA` and ensuring clean `dialogRef.close(result)` returns guarantees that asynchronous interactions (like collecting failure reasons) behave deterministically before backend requests fire.
+
+What I learned:
+- In logistical applications where users are primarily mobile, prioritizing a Card layout with large hit-target action buttons (`mat-flat-button`) provides a much better UX than dense data tables.
+- Building defensive UIs (like requiring dialog inputs and handling HTTP 403 strictly on detail pages) prevents bad data states from ever reaching the Spring backend.
+
+### Feature: Delivery Feedback and Admin Visibility
+
+What was added:
+- Customer delivery feedback submission flow directly from Order Details.
+- Backend API integration to conditionally show/hide the Rate Delivery button based on existing feedback status.
+- Anonymized delivery partner feedback dashboard.
+- Admin delivery partner details expanded to include full feedback history.
+
+Why it was added:
+- To close the loop on delivery satisfaction without mixing delivery feedback with product reviews.
+- To allow delivery partners to track their own performance.
+- To give admins complete visibility into customer complaints and delivery quality.
+
+Angular concept behind it:
+- **forkJoin** (RxJS) for loading multiple API calls concurrently before rendering a view.
+- **mat-tab-group** for cleanly organizing dense data views (like partner details vs. feedback).
+
+What I learned:
+- It is better to rely on an explicit status API (e.g. \GET /api/delivery-feedback/order/{id}\) to control UI state (like hiding a feedback button) rather than assuming state locally or waiting for duplicate submission errors.
+- orkJoin is ideal for an Admin list view when you need to fetch a base list of entities, then immediately fetch related metadata (like ratings) and merge them before displaying the table.
+
+
+## Feature Update: Shipment and Delivery Frontend Integration
+
+What was added:
+- Role-based navigation guards for Delivery Partners (ROLE_DELIVERY_PARTNER).
+- Conditional UI navigation in the App Shell for Partner Dashboard.
+- Admin sidebar links for Delivery Partners and Shipments.
+
+Why it was added:
+- To protect sensitive routes from unauthorized access.
+- To provide seamless navigation for the new Delivery Partner and Admin Shipment features.
+- To finalize the integration of the Delivery module into the main application.
+
+What I Learned From This Step:
+- Using CanActivateFn with AuthService makes route protection straightforward and explicit.
+- Conditional rendering based on UserRole ensures a clean user experience by hiding inaccessible areas.
+
+## Feature Update: Auth Layout Scrollability and Card Centering Spacing Fix
+
+What was added:
+- Modified the `.auth-shell` container to have `height: 100dvh`, `overflow-y: auto`, and `display: flex; flex-direction: column;` styling.
+- Configured `.shell-main--auth` as a flexbox layout.
+- Applied `margin-block: auto` to `.shell-main__container--auth` to vertically and horizontally center the authentication layout/cards when viewport space permits.
+
+Why it was added:
+- Adding the Delivery Partner signup link increased the height of the signup card, causing it to overflow the screen height.
+- The previous layout had no container-level scrolling, meaning on smaller screens or taller cards, the bottom of the card was cut off and touched the absolute edge of the window.
+- The new styles prevent clipping and ensure that even on smaller viewports, the entire card is scrollable with elegant padding (top/bottom) preserved.
+
+What I Learned From This Step:
+- Custom scroll containers are crucial when the body has `overflow: hidden` to allow scrolling of overflowing pages like long signup forms.
+- Combining flexbox container layouts with `margin-block: auto` on a child container provides robust vertical centering that automatically aligns to the top (allowing normal scrolling) when content is taller than the viewport.
+
+## Bug Fix: Delivery Partner Signup DTO Field Mismatch
+
+What was added:
+- Updated the backend `DeliveryPartnerSignupRequest` DTO to support the frontend payload fields: `emailId`, `userName`, `vehicleRegistrationNumber`, and `drivingLicenseNumber`.
+- Updated the backend `DeliveryPartnerServiceImpl.java` to map these frontend fields with robust defaults for other backend-required, non-nullable database columns (specifically defaulting `dateOfBirth` to `2000-01-01`, `address` to `"Not Provided"`, and `idType` to `IdType.DRIVING_LICENSE`).
+
+Why it was added:
+- The frontend was sending `emailId` instead of `email`, `vehicleRegistrationNumber` instead of `vehicleNumber`, and `drivingLicenseNumber` instead of `idNumber`.
+- Additionally, the backend database schema requires non-null values for `dateOfBirth` and `address`, which aren't collected on the simplified frontend registration form.
+- The misalignment of fields and the null constraints triggered `400 Bad Request` database validation errors during registration.
+
+What I Learned From This Step:
+- Matching client-side DTO contracts exactly with the backend REST controller DTO definitions avoids data serialization issues and bad requests.
+- Providing defensive default mappings in implementation layers keeps frontend workflows simple and lightweight (preventing the need to build bloated forms for delivery drivers) while respecting database non-null constraints.
+
+## Feature Update: Customer Delivery Feedback Integration
+
+What was added:
+- Integrated the Customer Delivery Feedback frontend and Admin visibility screens.
+- Updated `FRONTEND_INTEGRATION.md` to document the comprehensive backend fixes implemented during the integration.
+- Verified end-to-end functionality of the Delivery Partner module, including signup and status updates.
+
+Why it was added:
+- Enables customers to rate deliveries after an order status reaches 'DELIVERED'.
+- Protects delivery partners' privacy by ensuring customer identities remain anonymized in partner views.
+- Provides admins with a comprehensive overview of partner ratings and detailed feedback.
+
+What I Learned From This Step:
+- Full-stack integration requires rigorous testing of database constraints, validations, and Enum sync.
+- Aligning frontend DTO structures precisely to backend field requirements eliminates data serialization bugs.
+- Flyway migrations are critical for enforcing data integrity, such as adding unique constraints to relational tables.
+
+
+

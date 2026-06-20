@@ -1,0 +1,130 @@
+<section class="dp-signup-page">
+
+
+  <!-- Image Bar -->
+  <div class="dp-image-container">
+    <div class="dp-image-bar">
+      <div class="image-overlay">
+        <h1>Deliver with Modern Commerce</h1>
+        <p>Join our delivery network, manage your shipments, and track your performance in real-time.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Section -->
+  <div class="dp-form-container">
+    <mat-card class="dp-form-card" appearance="outlined">
+      <div class="form-header">
+        <h2>Become a Delivery Partner</h2>
+        <p>Enter your details to register. Approval is required before you can start delivering.</p>
+      </div>
+
+      @if (error()) {
+        <div class="auth-error" role="alert" aria-live="assertive">
+          {{ error() }}
+        </div>
+      }
+
+      <form class="dp-form" [formGroup]="signupForm" (ngSubmit)="submitSignup()">
+        
+        <div class="dp-form-grid">
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Full Name</mat-label>
+            <input matInput formControlName="fullName" placeholder="Enter your full name" />
+            @if (showFieldError('fullName')) {
+              <mat-error>Full name is required (min 3 chars).</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email Address</mat-label>
+            <input matInput formControlName="email" type="email" placeholder="Enter your email" />
+            @if (showFieldError('email')) {
+              <mat-error>Valid email is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput formControlName="password" type="password" placeholder="Create a password" />
+            @if (showFieldError('password')) {
+              <mat-error>Password is required (min 6 chars).</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Phone Number</mat-label>
+            <input matInput formControlName="phoneNumber" placeholder="10-digit mobile number" />
+            @if (showFieldError('phoneNumber')) {
+              <mat-error>Valid 10-digit phone number is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date of Birth</mat-label>
+            <input matInput type="date" formControlName="dateOfBirth" />
+            @if (showFieldError('dateOfBirth')) {
+              <mat-error>Date of birth is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Vehicle Type</mat-label>
+            <mat-select formControlName="vehicleType">
+              @for (type of vehicleTypes; track type) {
+                <mat-option [value]="type">{{ type }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Vehicle Registration Number</mat-label>
+            <input matInput formControlName="vehicleNumber" placeholder="e.g. KA01AB1234" />
+            @if (showFieldError('vehicleNumber')) {
+              <mat-error>Valid vehicle registration is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>ID Type</mat-label>
+            <mat-select formControlName="idType">
+              @for (type of idTypes; track type) {
+                <mat-option [value]="type">{{ type }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>ID Number</mat-label>
+            <input matInput formControlName="idNumber" placeholder="Enter your ID number" />
+            @if (showFieldError('idNumber')) {
+              <mat-error>Valid ID number based on selected type is required.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Address</mat-label>
+            <textarea matInput formControlName="address" rows="1" placeholder="Enter your full address"></textarea>
+            @if (showFieldError('address')) {
+              <mat-error>Address is required.</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <div class="form-actions">
+          <button mat-flat-button color="primary" class="register-btn" type="submit" [disabled]="isSubmitting()">
+            @if (isSubmitting()) {
+              <mat-progress-spinner mode="indeterminate" [diameter]="20" color="accent" />
+              <span>Registering...</span>
+            } @else {
+              <span>Submit Application</span>
+            }
+          </button>
+        </div>
+
+      </form>
+    </mat-card>
+  </div>
+</section>

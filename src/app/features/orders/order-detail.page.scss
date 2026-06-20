@@ -179,6 +179,31 @@
         }
       }
     }
+    
+    .header-actions-right {
+      display: flex;
+      align-items: center;
+
+      .feedback-submitted-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        color: #b28900;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        
+        .star-icon {
+          color: #ffc107;
+          font-size: 1.2rem;
+          width: 1.2rem;
+          height: 1.2rem;
+        }
+      }
+    }
   }
 
   /* Visual Order Status Tracker (Compacted) */

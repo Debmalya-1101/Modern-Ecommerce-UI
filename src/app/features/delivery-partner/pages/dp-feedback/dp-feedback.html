@@ -1,0 +1,80 @@
+<div class="dp-feedback-container">
+  <div class="page-header">
+    <h1>Delivery Feedback</h1>
+    <p class="subtitle">View ratings and comments from your deliveries.</p>
+  </div>
+
+  @if (isLoading() && !summary()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading your feedback...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-state">
+      <mat-icon color="warn">error_outline</mat-icon>
+      <h2>Oops! Something went wrong.</h2>
+      <p>{{ error() }}</p>
+      <button mat-flat-button color="primary" (click)="loadData()">Try Again</button>
+    </div>
+  } @else {
+    <div class="content-grid">
+      <!-- Summary Card -->
+      <mat-card class="summary-card">
+        <mat-card-header>
+          <mat-card-title>Rating Summary</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="summary-details">
+            <div class="rating-large">
+              <span class="rating-number">{{ summary()?.averageRating | number:'1.1-1' }}</span>
+              <mat-icon class="star-large">star</mat-icon>
+            </div>
+            <p class="total-reviews">Based on {{ summary()?.totalReviews || 0 }} reviews</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Feedback List -->
+      <div class="feedback-list">
+        <h2>Recent Reviews</h2>
+        
+        @if (feedbackList().length === 0) {
+          <div class="empty-state">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            <h3>No feedback yet</h3>
+            <p>You haven't received any delivery feedback yet. Keep delivering to earn ratings!</p>
+          </div>
+        } @else {
+          <div class="cards-grid">
+            @for (feedback of feedbackList(); track feedback.id) {
+              <mat-card class="feedback-card">
+                <mat-card-content>
+                  <div class="feedback-header">
+                    <div class="stars">
+                      @for (star of generateStars(feedback.rating); track star) {
+                        <mat-icon [class.filled]="star <= feedback.rating" class="star-icon">star</mat-icon>
+                      }
+                    </div>
+                    <span class="date">{{ feedback.createdAt | date:'mediumDate' }}</span>
+                  </div>
+                  <div class="feedback-body">
+                    <p class="comment-text">
+                      @if (feedback.comment) {
+                        "{{ feedback.comment }}"
+                      } @else {
+                        <span class="no-comment">No comment provided</span>
+                      }
+                    </p>
+                  </div>
+                  <div class="feedback-footer">
+                    <span class="order-id">Order #{{ feedback.orderId }}</span>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

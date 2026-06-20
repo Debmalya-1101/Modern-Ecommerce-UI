@@ -21,7 +21,10 @@
 }
 
 .auth-shell {
-  min-height: 100dvh;
+  height: 100dvh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   background:
     radial-gradient(circle at top left, rgba(255, 224, 201, 0.62), transparent 24%),
     radial-gradient(circle at bottom right, rgba(255, 242, 229, 0.92), transparent 30%),
@@ -392,12 +395,15 @@
 }
 
 .shell-main--auth {
-  padding-top: 1rem;
-  padding-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1.5rem;
+  padding-bottom: 2.5rem;
 }
 
 .shell-main__container--auth {
   width: min(100%, 76rem);
+  margin-block: auto;
 }
 
 .shell-footer {

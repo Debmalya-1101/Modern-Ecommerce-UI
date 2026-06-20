@@ -1,0 +1,102 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-main">
+      <div class="title-area">
+        <h1>Delivery Partners</h1>
+      </div>
+      <p class="subtitle">Manage and approve delivery partner applications.</p>
+    </div>
+    
+    <div class="header-actions">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Filter Status</mat-label>
+        <mat-select [value]="statusFilter()" (selectionChange)="onFilterChange($event.value)">
+          <mat-option value="ALL">All Partners</mat-option>
+          <mat-option [value]="StatusEnum.PENDING">Pending</mat-option>
+          <mat-option [value]="StatusEnum.APPROVED">Approved</mat-option>
+          <mat-option [value]="StatusEnum.REJECTED">Rejected</mat-option>
+          <mat-option [value]="StatusEnum.SUSPENDED">Suspended</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-loading-spinner label="Loading partners..." [diameter]="48"></app-loading-spinner>
+    </mat-card>
+  } @else if (error()) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-error-state [description]="error()!" (action)="loadPartners()"></app-error-state>
+    </mat-card>
+  } @else if (filteredPartners().length === 0) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-empty-state 
+        title="No partners found" 
+        [description]="statusFilter() === 'ALL' ? 'There are no delivery partners in the system yet.' : 'There are no partners matching the selected status.'">
+      </app-empty-state>
+    </mat-card>
+  } @else {
+    <mat-card class="shared-card table-card" appearance="outlined">
+      <div class="table-container">
+        <table mat-table [dataSource]="filteredPartners()" class="full-width">
+          
+          <ng-container matColumnDef="fullName">
+            <th mat-header-cell *matHeaderCellDef> Partner Name </th>
+            <td mat-cell *matCellDef="let p">
+              <div class="partner-name">
+                <strong>{{ p.fullName }}</strong>
+                <span class="text-sm text-muted">
+                  <mat-icon style="font-size:14px; width:14px; height:14px;">phone</mat-icon> 
+                  {{ p.phoneNumber || 'N/A' }}
+                </span>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="emailId">
+            <th mat-header-cell *matHeaderCellDef> Email </th>
+            <td mat-cell *matCellDef="let p"> {{ p.email }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="vehicleType">
+            <th mat-header-cell *matHeaderCellDef> Vehicle </th>
+            <td mat-cell *matCellDef="let p"> {{ p.vehicleType }} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="rating">
+            <th mat-header-cell *matHeaderCellDef> Rating </th>
+            <td mat-cell *matCellDef="let p">
+              @if (p.ratingSummary) {
+                <div class="rating-cell" style="display: flex; align-items: center; gap: 4px;">
+                  <mat-icon style="color: #ffc107; font-size: 16px; width: 16px; height: 16px;">star</mat-icon>
+                  <strong>{{ p.ratingSummary.averageRating | number:'1.1-1' }}</strong>
+                  <span class="text-muted" style="font-size: 0.85em;">({{ p.ratingSummary.totalReviews }})</span>
+                </div>
+              } @else {
+                <span class="text-muted">No ratings</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let p">
+              <mat-chip [color]="getStatusColor(p.status)" highlighted>{{ p.status }}</mat-chip>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let p">
+                <button mat-flat-button color="primary" class="action-btn" (click)="viewPartnerDetails(p)">View / Manage</button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+        </table>
+      </div>
+    </mat-card>
+  }
+</div>

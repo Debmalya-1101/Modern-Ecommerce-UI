@@ -1,0 +1,98 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-main">
+      <div class="title-area">
+        <h1>Dashboard</h1>
+      </div>
+      <p class="subtitle">Overview of your deliveries.</p>
+    </div>
+    <div class="header-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <button mat-stroked-button color="primary" routerLink="/delivery-partner/shipments/history">
+        <mat-icon style="margin-right: 4px;">history</mat-icon>
+        History
+      </button>
+      <button mat-stroked-button color="primary" routerLink="/delivery-partner/feedback">
+        <mat-icon style="margin-right: 4px; color: #f5b041;">star</mat-icon>
+        My Ratings
+      </button>
+      <button mat-flat-button color="primary" routerLink="/delivery-partner/shipments/active">
+        <mat-icon style="margin-right: 4px;">local_shipping</mat-icon>
+        Active Shipments
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-loading-spinner label="Loading dashboard..." [diameter]="48"></app-loading-spinner>
+    </mat-card>
+  } @else if (error()) {
+    <mat-card class="shared-card" appearance="outlined">
+      <app-error-state [description]="error()!" (action)="loadDashboard()"></app-error-state>
+    </mat-card>
+  } @else if (dashboardData()) {
+    <div class="metrics-grid">
+      
+      <mat-card class="metric-card active" appearance="outlined" routerLink="/delivery-partner/shipments/active">
+        <mat-card-content>
+          <div class="metric-icon">
+            <mat-icon>assignment</mat-icon>
+          </div>
+          <div class="metric-info">
+            <span class="value">{{ dashboardData()!.totalAssigned }}</span>
+            <span class="label">Assigned</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card active" appearance="outlined" routerLink="/delivery-partner/shipments/active">
+        <mat-card-content>
+          <div class="metric-icon accent">
+            <mat-icon>local_shipping</mat-icon>
+          </div>
+          <div class="metric-info">
+            <span class="value">{{ dashboardData()!.totalPickedUp }}</span>
+            <span class="label">Picked Up</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card active" appearance="outlined" routerLink="/delivery-partner/shipments/active">
+        <mat-card-content>
+          <div class="metric-icon warning">
+            <mat-icon>directions_run</mat-icon>
+          </div>
+          <div class="metric-info">
+            <span class="value">{{ dashboardData()!.totalOutForDelivery }}</span>
+            <span class="label">Out for Delivery</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card history" appearance="outlined" routerLink="/delivery-partner/shipments/history">
+        <mat-card-content>
+          <div class="metric-icon success">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="metric-info">
+            <span class="value">{{ dashboardData()!.totalDelivered }}</span>
+            <span class="label">Delivered</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="metric-card history" appearance="outlined" routerLink="/delivery-partner/shipments/history">
+        <mat-card-content>
+          <div class="metric-icon danger">
+            <mat-icon>cancel</mat-icon>
+          </div>
+          <div class="metric-info">
+            <span class="value">{{ dashboardData()!.totalFailed }}</span>
+            <span class="label">Failed</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+    </div>
+  }
+</div>

@@ -25,7 +25,9 @@ export const API_ENDPOINTS = {
   orders: {
     root: '/api/orders',
     checkout: '/api/orders/checkout',
-    detail: (orderId: number | string) => `/api/orders/${orderId}`
+    detail: (orderId: number | string) => `/api/orders/${orderId}`,
+    deliveryFeedback: (orderId: number | string) => `/api/orders/${orderId}/delivery-feedback`,
+    deliveryFeedbackStatus: (orderId: number | string) => `/api/delivery-feedback/order/${orderId}`
   },
   payments: {
     initiate: (orderId: number | string) => `/api/payments/initiate/${orderId}`,
@@ -57,5 +59,34 @@ export const API_ENDPOINTS = {
     attributeKeyDetail: (keyId: number | string) => `/api/admin/attribute-keys/${keyId}`,
     scraperAmazon: '/api/admin/scraper/amazon',
     scraperFlipkart: '/api/admin/scraper/flipkart'
+  },
+  deliveryPartner: {
+    auth: {
+      signup: '/auth/delivery-partner/signup'
+    },
+    shipments: {
+      dashboard: '/api/delivery-partner/shipments/dashboard',
+      active: '/api/delivery-partner/shipments/active',
+      history: '/api/delivery-partner/shipments/history',
+      detail: (id: number | string) => `/api/delivery-partner/shipments/${id}`,
+      status: (id: number | string) => `/api/delivery-partner/shipments/${id}/status`
+    },
+    feedback: {
+      root: '/api/delivery-partner/feedback',
+      summary: '/api/delivery-partner/feedback/summary'
+    }
+  },
+  adminDelivery: {
+    partners: {
+      root: '/api/admin/delivery-partners',
+      detail: (id: number | string) => `/api/admin/delivery-partners/${id}`,
+      status: (id: number | string) => `/api/admin/delivery-partners/${id}/status`,
+      feedback: (id: number | string) => `/api/admin/delivery-partners/${id}/feedback`,
+      ratings: '/api/admin/delivery-partners/ratings'
+    },
+    shipments: {
+      unassigned: '/api/admin/shipments/unassigned',
+      assign: (shipmentId: number | string, partnerId: number | string) => `/api/admin/shipments/${shipmentId}/assign/${partnerId}`
+    }
   }
 } as const;
