@@ -1,6 +1,6 @@
 .profile-container {
-  max-width: 800px;
-  margin: 2rem auto;
+  max-width: 50rem;
+  margin: 1.5rem auto;
   padding: 0 1rem;
 }
 
@@ -16,7 +16,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem;
+  padding: 1.5rem;
   text-align: center;
   background-color: #fff9f9;
   border-color: #ffcdd2;
@@ -36,7 +36,7 @@
 
   p {
     color: #666;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
   }
 }
 
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 2rem;
+  padding: 1.5rem;
   background: linear-gradient(135deg, rgba(245, 236, 227, 0.8), rgba(255, 255, 255, 0.9));
   border-radius: 1.5rem;
   box-shadow: 0 4px 20px rgba(87, 61, 44, 0.05);
@@ -262,3 +262,5 @@
     }
   }
 }
+
+

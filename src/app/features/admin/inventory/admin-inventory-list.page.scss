@@ -4,9 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding-bottom: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding-bottom: 1.5rem;
   animation: fadeIn 0.4s ease-out;
 }
 
@@ -22,23 +20,29 @@
 }
 
 .page-header {
+  background: var(--surface-color, #ffffff);
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
 
   .header-text {
     h1 {
-      margin: 0 0 0.5rem 0;
-      font-size: 2rem;
+      margin: 0;
+      font-size: 1.85rem;
       font-weight: 800;
-      font-family: 'Outfit', sans-serif;
-      color: var(--color-neutral-900);
-      letter-spacing: -0.75px;
+      color: var(--primary-color, #8B4513);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
     }
     p {
-      margin: 0;
-      color: var(--color-neutral-600);
-      font-size: 0.95rem;
+      margin: 0.5rem 0 0;
+      color: var(--text-color, #333);
+      opacity: 0.7;
+      font-size: 1.05rem;
+      font-weight: 500;
     }
   }
 }
@@ -47,7 +51,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 3rem;
+  padding: 1.5rem;
 }
 
 .analytics-grid {
@@ -56,9 +60,12 @@
   gap: 1.5rem;
 
   .kpi-card {
-    border-radius: var(--border-radius-lg);
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+    
     background: #ffffff;
-    border: 1px solid rgba(87, 61, 44, 0.08);
+    
     box-shadow: 0 6px 20px rgba(87, 61, 44, 0.03);
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -80,6 +87,9 @@
       box-shadow: 0 12px 30px rgba(87, 61, 44, 0.08);
 
       &.kpi-card {
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
         &::after {
           background-color: var(--color-brand-500);
         }
@@ -104,13 +114,12 @@
     color: var(--color-neutral-600);
     text-transform: uppercase;
     letter-spacing: 0.75px;
-    font-family: 'Outfit', sans-serif;
   }
 
   .kpi-icon-wrapper {
     width: 44px;
     height: 44px;
-    border-radius: var(--border-radius-md);
+    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -147,7 +156,6 @@
     margin-bottom: 0.5rem;
     line-height: 1.1;
     letter-spacing: -0.5px;
-    font-family: 'Outfit', sans-serif;
 
     &.truncate {
       white-space: nowrap;
@@ -184,9 +192,12 @@
 }
 
 .table-card {
-  border-radius: var(--border-radius-lg);
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+  
   background: #ffffff;
-  border: 1px solid rgba(87, 61, 44, 0.08);
+  
   box-shadow: 0 6px 20px rgba(87, 61, 44, 0.03);
   overflow: hidden;
 
@@ -205,7 +216,7 @@
 
     ::ng-deep .mdc-text-field--outlined {
       background-color: var(--color-surface-soft);
-      border-radius: var(--border-radius-md);
+      
       transition: background-color 0.2s ease;
 
       &:hover {
@@ -250,7 +261,6 @@
     padding: 1.25rem 1.5rem;
     border-bottom: 2px solid var(--color-neutral-100);
     background-color: var(--color-surface-soft);
-    font-family: 'Outfit', sans-serif;
   }
 
   td.mat-cell {
@@ -289,7 +299,7 @@
   .product-icon-avatar {
     width: 40px;
     height: 40px;
-    border-radius: var(--border-radius-sm);
+    
     background-color: var(--color-brand-050);
     color: var(--color-brand-500);
     display: flex;
@@ -313,7 +323,6 @@
     font-size: 0.75rem;
     font-weight: 700;
     color: var(--color-brand-500);
-    font-family: monospace;
     letter-spacing: 0.5px;
   }
 
@@ -351,7 +360,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.35rem 0.85rem;
-  border-radius: var(--border-radius-pill);
+  
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -360,24 +369,24 @@
   &.status-in-stock {
     background-color: var(--color-success-050);
     color: var(--color-success-700);
-    border: 1px solid rgba(75, 106, 80, 0.15);
+    
   }
 
   &.status-low-stock {
     background-color: var(--color-warning-050);
     color: var(--color-warning-700);
-    border: 1px solid rgba(138, 100, 51, 0.15);
+    
   }
 
   &.status-out-of-stock {
     background-color: var(--color-danger-050);
     color: var(--color-danger-600);
-    border: 1px solid rgba(161, 70, 52, 0.15);
+    
   }
 }
 
 .empty-state {
-  padding: 5rem 2rem;
+  padding: 1.5rem 1.5rem;
   text-align: center;
   
   .empty-state-content {
@@ -393,7 +402,7 @@
     height: 70px;
     border-radius: 50%;
     background: var(--color-surface-soft);
-    border: 1px solid var(--color-neutral-100);
+    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -412,7 +421,6 @@
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--color-neutral-900);
-    font-family: 'Outfit', sans-serif;
   }
 
   p {
@@ -452,3 +460,6 @@
     }
   }
 }
+
+
+

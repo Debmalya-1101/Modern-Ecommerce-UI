@@ -1,7 +1,6 @@
-.orders-container {
-  max-width: 1200px; // widened from 1100px to span wider across desktop
+.orders-container { // widened from 1100px to span wider across desktop
   margin: 0 auto;
-  padding: 0.5rem 1rem 2.5rem 1rem; // reduced top padding from 1.25rem to 0.5rem, side padding from 1.5rem to 1rem
+  padding: 0.5rem 1rem 1.5rem 1rem; // reduced top padding from 1.25rem to 0.5rem, side padding from 1.5rem to 1rem
   min-height: 70vh;
 
   .page-header {
@@ -10,12 +9,12 @@
     text-align: center;
 
     h1 {
-      margin-top: 0; // remove browser default top margins
-      font-size: 2rem; // reduced from 2.25rem
-      font-weight: 850;
-      color: var(--shell-text);
-      margin-bottom: 0.25rem; // reduced from 0.5rem
+      margin: 0;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--primary-color, #8B4513);
       letter-spacing: -0.03em;
+      line-height: 1.2;
     }
 
     .subtitle {
@@ -32,7 +31,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4rem 2rem;
+    padding: 1.5rem 1.5rem;
     text-align: center;
     background: var(--shell-surface);
     border-radius: 16px;
@@ -57,7 +56,7 @@
 
     p {
       color: var(--shell-muted);
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
   }
 
@@ -350,8 +349,13 @@
       margin-bottom: 1.25rem;
       
       h1 {
-        font-size: 1.75rem; // reduced from 1.85rem
-      }
+      margin: 0;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--primary-color, #8B4513);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
     }
 
     .order-card-horizontal {
@@ -407,7 +411,7 @@
   }
 
   .paginator-container {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     display: flex;
     justify-content: flex-end;
     background: var(--shell-surface);
@@ -416,3 +420,6 @@
     padding: 0.5rem;
   }
 }
+
+
+

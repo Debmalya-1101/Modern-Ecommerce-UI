@@ -1,10 +1,8 @@
 .page-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  gap: 1.5rem;
+  padding: 0;
 }
 
 .page-header {
@@ -12,9 +10,9 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 1rem;
   background: var(--surface-color, #ffffff);
-  padding: 2rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 
@@ -26,7 +24,7 @@
 
       h1 {
         margin: 0;
-        font-size: 2.2rem;
+        font-size: 1.75rem;
         font-weight: 800;
         color: var(--primary-color, #8B4513); /* fallback to standard brand color */
         letter-spacing: -0.03em;
@@ -73,7 +71,7 @@
       font-size: 0.95rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      padding: 1.2rem 1.5rem;
+      padding: 1.5rem 1.5rem;
       border-bottom: 2px solid #eaeaea;
     }
   }
@@ -93,7 +91,7 @@
       }
       
       td.mat-mdc-cell {
-        padding: 1.2rem 1.5rem;
+        padding: 1.5rem 1.5rem;
         border-bottom: 1px solid #f0f0f0;
         color: #444;
         font-size: 1rem;
@@ -135,7 +133,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border: 1px solid #ffeeba;
+  border: none !important;
   
   strong {
     color: #d39e00;
@@ -162,3 +160,6 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1) !important;
   }
 }
+
+
+

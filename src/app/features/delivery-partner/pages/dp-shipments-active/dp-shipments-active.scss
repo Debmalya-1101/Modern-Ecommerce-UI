@@ -5,6 +5,10 @@
 }
 
 .page-header {
+  background: var(--surface-color, #ffffff);
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -18,12 +22,13 @@
       gap: 1rem;
 
       h1 {
-        margin: 0;
-        font-size: 2rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: var(--text-color);
-      }
+      margin: 0;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--primary-color, #8B4513);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+    }
     }
 
     .subtitle {
@@ -41,6 +46,9 @@
 }
 
 .shipment-card {
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
   padding: 0;
 
   .card-header {
@@ -126,3 +134,9 @@
     }
   }
 }
+
+
+
+
+
+

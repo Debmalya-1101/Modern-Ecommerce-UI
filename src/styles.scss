@@ -28,6 +28,11 @@
   --color-info-700: #4d3d34;
   --color-info-050: #efe4da;
 
+  /* Typography Tokens */
+  --font-primary: 'Outfit', 'Trebuchet MS', 'Inter', sans-serif;
+  --font-secondary: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+
   /* Border Radius Tokens */
   --border-radius-xs: 4px;
   --border-radius-sm: 8px;
@@ -62,10 +67,15 @@ body {
     linear-gradient(180deg, #fcf7f1 0%, #f2ebe2 100%);
   color: #2d241f;
   font: var(--mat-sys-body-medium);
+  font-family: var(--font-secondary);
 
   margin: 0;
   height: 100%;
   overflow: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-primary);
 }
 
 *,

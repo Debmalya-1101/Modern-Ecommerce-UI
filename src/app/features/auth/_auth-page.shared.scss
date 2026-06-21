@@ -27,13 +27,13 @@
 
 .auth-hero,
 .auth-card {
-  padding: clamp(1.35rem, 2.2vw, 2rem);
+  padding: clamp(1.35rem, 2.2vw, 1.5rem);
 }
 
 .auth-card--status {
   display: grid;
   place-items: center;
-  padding: 3rem 1.5rem;
+  padding: 1.5rem 1.5rem;
 }
 
 .eyebrow {
@@ -86,7 +86,7 @@ h3 {
   align-content: end;
   background: url('/auth_hero_showcase.png') center/cover no-repeat;
   color: #fff;
-  padding: clamp(1.35rem, 2.2vw, 2rem);
+  padding: clamp(1.35rem, 2.2vw, 1.5rem);
 }
 
 .auth-hero::before {
@@ -330,7 +330,7 @@ h3 {
 
   .auth-hero,
   .auth-card {
-    padding: 1.2rem;
+    padding: 1.5rem;
   }
 
   .auth-actions {
@@ -346,3 +346,5 @@ h3 {
     flex-direction: column;
   }
 }
+
+

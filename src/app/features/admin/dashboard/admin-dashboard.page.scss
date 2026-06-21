@@ -2,27 +2,35 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding-bottom: 2rem;
+  padding-bottom: 1.5rem;
 }
 
 .page-header {
+  background: var(--surface-color, #ffffff);
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 0.5rem;
+  
 
   .header-content {
     .page-title {
       margin: 0;
-      font-size: 1.75rem;
-      color: var(--color-neutral-900);
-      font-weight: 700;
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--primary-color, #8B4513);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
     }
     
     .page-subtitle {
       margin: 0.5rem 0 0;
-      color: var(--color-neutral-600);
-      font-size: 0.95rem;
+      color: var(--text-color, #333);
+      opacity: 0.7;
+      font-size: 1.05rem;
+      font-weight: 500;
     }
   }
 }
@@ -58,7 +66,7 @@
 }
 
 .kpi-card {
-  border-radius: var(--border-radius-md);
+  border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   
@@ -85,7 +93,7 @@
   .kpi-icon-wrapper {
     width: 40px;
     height: 40px;
-    border-radius: var(--border-radius-sm);
+    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -143,7 +151,7 @@
 }
 
 .status-card {
-  border-radius: var(--border-radius-md);
+  border-radius: 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
   
   .status-content {
@@ -195,7 +203,7 @@
 }
 
 .widget-card {
-  border-radius: var(--border-radius-md);
+  border-radius: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
@@ -235,8 +243,8 @@
 // Tables inside widgets
 .table-container {
   overflow-x: auto;
-  border-radius: var(--border-radius-sm);
-  border: 1px solid rgba(87, 61, 44, 0.08);
+  border-radius: 20px;
+  border: none !important;
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(80, 54, 36, 0.02);
   
@@ -328,7 +336,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1rem;
+  padding: 1.5rem 1rem;
   text-align: center;
   color: var(--color-neutral-500);
   
@@ -359,7 +367,7 @@
     justify-content: center;
     gap: 0.75rem;
     padding: 1.5rem 1rem;
-    border-radius: var(--border-radius-md);
+    border-radius: 20px;
     background-color: var(--color-neutral-50);
     text-decoration: none;
     color: var(--color-neutral-800);
@@ -375,7 +383,7 @@
     .shortcut-icon-wrapper {
       width: 48px;
       height: 48px;
-      border-radius: var(--border-radius-circle);
+      border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -434,3 +442,9 @@
     }
   }
 }
+
+
+
+
+
+

@@ -1,12 +1,12 @@
 .payment-container {
-  max-width: 1000px;
+  max-width: 62.5rem;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
 }
 
 .payment-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
   
   h1 {
     font-size: 2.5rem;
@@ -43,7 +43,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   min-height: 300px;
 }
 
@@ -135,7 +135,7 @@
     align-items: center;
     gap: 0.5rem;
     justify-content: center;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     color: var(--mat-sys-tertiary);
     font-size: 0.85rem;
     
@@ -220,3 +220,5 @@
     background: rgba(18, 18, 18, 0.9);
   }
 }
+
+

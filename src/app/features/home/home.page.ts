@@ -62,25 +62,46 @@ export class HomePage implements OnInit {
 
   protected readonly carouselSlides = signal([
     {
-      image: '/hero_tech_banner.png',
+      image: '/hero_headphones_banner.png',
       title: 'Immersive Soundscapes',
       subtitle: 'Discover noise-canceling headphones, wireless earbuds, and premium audio gear for pure sound.',
       ctaText: 'Shop Headphones',
       category: 'Headphones'
     },
     {
-      image: '/hero_fashion_banner.png',
+      image: '/hero_smartwatches_banner.png',
       title: 'The Essence of Minimalism',
       subtitle: 'Curated premium coordinates and active style items. Track your day with smart wearable devices.',
       ctaText: 'Shop Smartwatches',
       category: 'Smartwatches'
     },
     {
-      image: '/hero_decor_banner.png',
+      image: '/hero_televisions_banner.png',
       title: 'Modern Living Comforts',
       subtitle: 'Upgrade your living space with smart televisions, home theater systems, and cozy minimalist styling.',
       ctaText: 'Shop Televisions',
       category: 'Televisions'
+    },
+    {
+      image: '/hero_laptops_banner.png',
+      title: 'Ultimate Productivity',
+      subtitle: 'Powerful modern laptops and elegant workstations for professionals and creatives.',
+      ctaText: 'Shop Laptops',
+      category: 'Laptops'
+    },
+    {
+      image: '/hero_smartphones_banner.png',
+      title: 'Seamless Connectivity',
+      subtitle: 'Experience the latest in mobile technology with our curated smartphone collection.',
+      ctaText: 'Shop Smartphones',
+      category: 'Smartphones'
+    },
+    {
+      image: '/hero_speakers_banner.png',
+      title: 'Room-Filling Audio',
+      subtitle: 'Elevate your space with premium speakers and high-fidelity sound systems.',
+      ctaText: 'Shop Speakers',
+      category: 'Speakers'
     }
   ]);
 

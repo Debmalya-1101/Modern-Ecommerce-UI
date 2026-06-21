@@ -1,16 +1,21 @@
-<mat-card class="state-card" appearance="outlined">
-  <p class="state-label">Empty state</p>
-  <h3>{{ title }}</h3>
-  <p>{{ description }}</p>
+<mat-card class="state-card">
+  <div class="empty-content">
+    <div class="icon-wrapper">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <h3>{{ title }}</h3>
+    <p>{{ description }}</p>
 
-  @if (actionLabel) {
-    <button
-      mat-stroked-button
-      appButtonStyle="secondary"
-      type="button"
-      (click)="handleAction()"
-    >
-      {{ actionLabel }}
-    </button>
-  }
+    @if (actionLabel) {
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        class="action-btn"
+        (click)="handleAction()"
+      >
+        {{ actionLabel }}
+      </button>
+    }
+  </div>
 </mat-card>

@@ -78,7 +78,7 @@
 .slide-overlay {
   position: relative;
   z-index: 2;
-  padding: 4rem;
+  padding: 1.5rem 1.5rem 1.5rem;
   width: 100%;
   display: flex;
   align-items: center;
@@ -101,7 +101,6 @@
 }
 
 .slide-title {
-  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   font-size: 2.8rem;
   font-weight: 800;
   line-height: 1.15;
@@ -114,7 +113,7 @@
   font-size: 1.05rem;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.88);
-  margin: 0 0 2rem;
+  margin: 0 0 1.5rem;
 }
 
 /* Carousel Controls */
@@ -185,18 +184,17 @@
 
 /* 2. Generic Sections */
 .section-container {
-  margin-top: 3.5rem;
+  margin-top: 1.5rem;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .section-title {
-  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
   font-size: 1.75rem;
   font-weight: 700;
   color: #2d241f;
@@ -242,7 +240,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1.5rem;
+  padding: 1.5rem 1.5rem;
   border-radius: var(--border-radius-lg);
   text-decoration: none;
   background: rgba(255, 252, 247, 0.85);
@@ -332,7 +330,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  padding: 3rem;
+  padding: 1.5rem;
   background-size: cover;
   background-position: center;
   border: 1px solid rgba(87, 61, 44, 0.05);
@@ -355,11 +353,11 @@
   }
 
   &--tech {
-    background-image: linear-gradient(135deg, rgba(29, 23, 20, 0.92) 0%, rgba(100, 83, 72, 0.75) 100%), url('/hero_tech_banner.png');
+    background-image: linear-gradient(135deg, rgba(29, 23, 20, 0.92) 0%, rgba(100, 83, 72, 0.75) 100%), url('/hero_headphones_banner.png');
   }
 
   &--fashion {
-    background-image: linear-gradient(135deg, rgba(48, 32, 22, 0.92) 0%, rgba(161, 85, 42, 0.75) 100%), url('/hero_fashion_banner.png');
+    background-image: linear-gradient(135deg, rgba(48, 32, 22, 0.92) 0%, rgba(161, 85, 42, 0.75) 100%), url('/hero_smartwatches_banner.png');
   }
 }
 
@@ -370,7 +368,6 @@
   color: #ffffff;
 
   h3 {
-    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
     color: #ffffff;
     font-size: 1.65rem;
     font-weight: 700;
@@ -387,7 +384,7 @@
 
 .promo-badge {
   display: inline-block;
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.5rem;
   border-radius: var(--border-radius-xs);
   font-size: 0.68rem;
   font-weight: 700;
@@ -408,8 +405,8 @@
 /* 5. Trust Badges */
 .trust-section {
   border-top: 1px solid rgba(87, 61, 44, 0.08);
-  padding-top: 3.5rem;
-  margin-bottom: 2rem;
+  padding-top: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .trust-grid {
@@ -473,14 +470,14 @@
 .api-status-row {
   display: flex;
   justify-content: center;
-  margin-top: 3.5rem;
+  margin-top: 1.5rem;
 }
 
 .api-status-pill {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  padding: 0.4rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--border-radius-pill);
   font-size: 0.78rem;
   font-weight: 600;
@@ -550,7 +547,7 @@
 
 /* State fallback containers */
 .state-container {
-  padding: 3rem 0;
+  padding: 1.5rem 0;
   display: flex;
   justify-content: center;
 }
@@ -587,7 +584,7 @@
   }
 
   .slide-overlay {
-    padding: 3rem;
+    padding: 1.5rem;
   }
 
   .slide-title {
@@ -606,7 +603,7 @@
   }
 
   .slide-overlay {
-    padding: 2rem;
+    padding: 1.5rem;
   }
 
   .slide-title {
@@ -642,7 +639,7 @@
 
   .promo-banner-card {
     height: 220px;
-    padding: 2rem;
+    padding: 1.5rem;
   }
   
   .promo-overlay-content h3 {
@@ -705,3 +702,5 @@
     padding: 0;
   }
 }
+
+

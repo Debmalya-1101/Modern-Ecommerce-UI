@@ -4,9 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  padding-bottom: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+  padding-bottom: 1.5rem;
   animation: fadeIn 0.4s ease-out;
 }
 
@@ -22,6 +20,10 @@
 }
 
 .page-header {
+  background: var(--surface-color, #ffffff);
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -32,7 +34,7 @@
     align-items: flex-start;
 
     .back-link {
-      margin-bottom: 1rem;
+      
       margin-left: -0.5rem;
       color: var(--color-brand-500);
       font-weight: 600;
@@ -49,31 +51,28 @@
     }
 
     h1 {
-      margin: 0 0 0.5rem 0;
-      font-size: 2rem;
+      margin: 0;
+      font-size: 1.85rem;
       font-weight: 800;
-      font-family: 'Outfit', sans-serif;
-      color: var(--color-neutral-900);
-      letter-spacing: -0.75px;
+      color: var(--primary-color, #8B4513);
+      letter-spacing: -0.03em;
+      line-height: 1.2;
     }
     
     .subtitle {
-      margin: 0;
-      color: var(--color-neutral-600);
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
+      margin: 0.5rem 0 0;
+      color: var(--text-color, #333);
+      opacity: 0.7;
+      font-size: 1.05rem;
+      font-weight: 500;
     }
 
     .badge-id {
       background-color: var(--color-brand-050);
       color: var(--color-brand-600);
       padding: 2px 8px;
-      border-radius: var(--border-radius-xs);
+      
       font-weight: 700;
-      font-family: monospace;
       font-size: 0.85rem;
     }
   }
@@ -85,9 +84,12 @@
   gap: 1.5rem;
 
   .stock-card {
-    border-radius: var(--border-radius-lg);
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+    
     background: #ffffff;
-    border: 1px solid rgba(87, 61, 44, 0.08);
+    
     box-shadow: 0 6px 20px rgba(87, 61, 44, 0.03);
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -97,8 +99,11 @@
     }
 
     &.highlight-card {
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
       background: rgba(181, 95, 52, 0.01);
-      border: 1px solid rgba(181, 95, 52, 0.15);
+      
     }
 
     mat-card-content {
@@ -115,14 +120,12 @@
     color: var(--color-neutral-600);
     text-transform: uppercase;
     letter-spacing: 0.75px;
-    font-family: 'Outfit', sans-serif;
   }
 
   .stock-value {
     font-size: 2.25rem;
     font-weight: 800;
     color: var(--color-neutral-900);
-    font-family: 'Outfit', sans-serif;
     letter-spacing: -0.5px;
     line-height: 1.2;
 
@@ -142,7 +145,7 @@
 
   .stock-progress {
     height: 6px;
-    border-radius: var(--border-radius-pill);
+    
     background-color: var(--color-brand-050);
 
     ::ng-deep .mdc-linear-progress__bar-inner {
@@ -152,9 +155,12 @@
 }
 
 .table-card {
-  border-radius: var(--border-radius-lg);
+  border-radius: 20px;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+  
   background: #ffffff;
-  border: 1px solid rgba(87, 61, 44, 0.08);
+  
   box-shadow: 0 6px 20px rgba(87, 61, 44, 0.03);
   overflow: hidden;
 
@@ -172,7 +178,6 @@
       font-size: 1.2rem;
       font-weight: 700;
       color: var(--color-neutral-900);
-      font-family: 'Outfit', sans-serif;
     }
 
     .section-subtitle {
@@ -218,7 +223,6 @@
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--color-neutral-100);
     background-color: #ffffff;
-    font-family: 'Outfit', sans-serif;
   }
 
   td.mat-cell {
@@ -250,7 +254,6 @@
   }
 
   .monospace-text {
-    font-family: monospace;
     font-size: 0.85rem;
     letter-spacing: 0.25px;
     color: var(--color-neutral-900);
@@ -291,7 +294,7 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   padding: 0.25rem 0.65rem;
-  border-radius: var(--border-radius-sm);
+  
   letter-spacing: 0.3px;
 
   mat-icon {
@@ -303,46 +306,46 @@
   &.text-success {
     background-color: var(--color-success-050);
     color: var(--color-success-700);
-    border: 1px solid rgba(75, 106, 80, 0.15);
+    
   }
 
   &.text-warn {
     background-color: var(--color-danger-050);
     color: var(--color-danger-600);
-    border: 1px solid rgba(161, 70, 52, 0.15);
+    
   }
 
   &.text-accent {
     background-color: var(--color-warning-050);
     color: var(--color-warning-700);
-    border: 1px solid rgba(138, 100, 51, 0.15);
+    
   }
 
   &.text-primary {
     background-color: var(--color-brand-050);
     color: var(--color-brand-600);
-    border: 1px solid rgba(181, 95, 52, 0.15);
+    
   }
 
   &.text-info {
     background-color: var(--color-info-050);
     color: var(--color-info-700);
-    border: 1px solid rgba(77, 61, 52, 0.15);
+    
   }
 }
 
 .ref-type-badge {
   background-color: var(--color-surface-soft);
   color: var(--color-neutral-600);
-  border: 1px solid var(--color-neutral-100);
+  
   padding: 2px 6px;
-  border-radius: var(--border-radius-xs);
+  
   font-size: 0.75rem;
   font-weight: 600;
 }
 
 .empty-state {
-  padding: 5rem 2rem;
+  padding: 1.5rem 1.5rem;
   text-align: center;
   
   .empty-state-content {
@@ -358,7 +361,7 @@
     height: 70px;
     border-radius: 50%;
     background: var(--color-surface-soft);
-    border: 1px solid var(--color-neutral-100);
+    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -377,7 +380,6 @@
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--color-neutral-900);
-    font-family: 'Outfit', sans-serif;
   }
 
   p {
@@ -417,3 +419,6 @@
     }
   }
 }
+
+
+

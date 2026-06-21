@@ -1,7 +1,9 @@
 <div class="dp-feedback-container">
   <div class="page-header">
-    <h1>Delivery Feedback</h1>
-    <p class="subtitle">View ratings and comments from your deliveries.</p>
+    <div class="header-content">
+      <h1 class="page-title">Delivery Feedback</h1>
+      <p class="page-subtitle">View ratings and comments from your deliveries.</p>
+    </div>
   </div>
 
   @if (isLoading() && !summary()) {
@@ -18,25 +20,29 @@
     </div>
   } @else {
     <div class="content-grid">
-      <!-- Summary Card -->
-      <mat-card class="summary-card">
-        <mat-card-header>
-          <mat-card-title>Rating Summary</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="summary-details">
-            <div class="rating-large">
-              <span class="rating-number">{{ summary()?.averageRating | number:'1.1-1' }}</span>
-              <mat-icon class="star-large">star</mat-icon>
-            </div>
-            <p class="total-reviews">Based on {{ summary()?.totalReviews || 0 }} reviews</p>
+      <!-- Premium Summary Card -->
+      <div class="premium-summary-card">
+        <div class="summary-content">
+          <div class="rating-display">
+            <span class="rating-number">{{ summary()?.averageRating | number:'1.1-1' }}</span>
+            <mat-icon class="star-large">star</mat-icon>
           </div>
-        </mat-card-content>
-      </mat-card>
+          <div class="summary-text">
+            <h3>Overall Rating</h3>
+            <p>Based on {{ summary()?.totalReviews || 0 }} total customer reviews</p>
+          </div>
+        </div>
+        <div class="summary-decoration">
+          <mat-icon>workspace_premium</mat-icon>
+        </div>
+      </div>
 
       <!-- Feedback List -->
-      <div class="feedback-list">
-        <h2>Recent Reviews</h2>
+      <div class="feedback-section">
+        <div class="section-header">
+          <h2>Recent Reviews</h2>
+          <div class="divider"></div>
+        </div>
         
         @if (feedbackList().length === 0) {
           <div class="empty-state">
@@ -47,9 +53,13 @@
         } @else {
           <div class="cards-grid">
             @for (feedback of feedbackList(); track feedback.id) {
-              <mat-card class="feedback-card">
-                <mat-card-content>
-                  <div class="feedback-header">
+              <div class="premium-feedback-card">
+                <mat-icon class="quote-watermark">format_quote</mat-icon>
+                <div class="card-header">
+                  <div class="avatar-circle">
+                    <mat-icon>person</mat-icon>
+                  </div>
+                  <div class="header-info">
                     <div class="stars">
                       @for (star of generateStars(feedback.rating); track star) {
                         <mat-icon [class.filled]="star <= feedback.rating" class="star-icon">star</mat-icon>
@@ -57,20 +67,20 @@
                     </div>
                     <span class="date">{{ feedback.createdAt | date:'mediumDate' }}</span>
                   </div>
-                  <div class="feedback-body">
-                    <p class="comment-text">
-                      @if (feedback.comment) {
-                        "{{ feedback.comment }}"
-                      } @else {
-                        <span class="no-comment">No comment provided</span>
-                      }
-                    </p>
-                  </div>
-                  <div class="feedback-footer">
-                    <span class="order-id">Order #{{ feedback.orderId }}</span>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+                </div>
+                
+                <div class="card-body">
+                  @if (feedback.comment) {
+                    <p class="comment-text">"{{ feedback.comment }}"</p>
+                  } @else {
+                    <p class="no-comment">No comment provided</p>
+                  }
+                </div>
+                
+                <div class="card-footer">
+                  <span class="order-id">Order #{{ feedback.orderId }}</span>
+                </div>
+              </div>
             }
           </div>
         }

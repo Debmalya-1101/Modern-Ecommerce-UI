@@ -1,13 +1,18 @@
 .page-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
+  padding-bottom: 2rem;
 }
 
 .page-header {
+  background: var(--surface-color, #ffffff);
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: flex-end;
   flex-wrap: wrap;
   gap: 1rem;
 
@@ -19,10 +24,11 @@
 
       h1 {
         margin: 0;
-        font-size: 2rem;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: var(--text-color);
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--primary-color, #8B4513);
+        letter-spacing: -0.03em;
+        line-height: 1.2;
       }
     }
 
@@ -30,29 +36,47 @@
       margin: 0.5rem 0 0;
       color: var(--text-color);
       opacity: 0.7;
+      font-size: 1rem;
     }
   }
 }
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
 }
 
 .metric-card {
+  background: var(--surface-color, #ffffff);
+  border-radius: 1rem !important;
+  box-shadow: 0 4px 14px rgba(80, 54, 36, 0.06) !important;
+  border: 1px solid rgba(87, 61, 44, 0.13) !important;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    transition: background 0.3s ease;
+  }
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(80, 54, 36, 0.08) !important;
   }
 
   mat-card-content {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
     padding: 1.5rem;
   }
 
@@ -60,54 +84,82 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--primary-color);
+    width: 54px;
+    height: 54px;
+    border-radius: 1rem;
+    background: rgba(139, 69, 19, 0.08);
+    color: var(--primary-color, #8B4513);
+    transition: transform 0.3s ease;
     
     mat-icon {
-      font-size: 24px;
-      width: 24px;
-      height: 24px;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
     }
 
     &.accent {
-      background: rgba(255, 152, 0, 0.1);
-      color: #ff9800;
+      background: rgba(255, 152, 0, 0.12);
+      color: #F57C00;
     }
     
     &.warning {
-      background: rgba(33, 150, 243, 0.1);
-      color: #2196f3;
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976D2;
     }
 
     &.success {
-      background: rgba(76, 175, 80, 0.1);
-      color: #4caf50;
+      background: rgba(76, 175, 80, 0.12);
+      color: #388E3C;
     }
     
     &.danger {
-      background: rgba(244, 67, 54, 0.1);
-      color: #f44336;
+      background: rgba(244, 67, 54, 0.12);
+      color: #D32F2F;
     }
+  }
+
+  &:hover .metric-icon {
+    transform: scale(1.1);
   }
 
   .metric-info {
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
 
     .value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: var(--text-color);
-      line-height: 1.2;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-color, #333);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
     }
 
     .label {
-      font-size: 0.85rem;
-      color: var(--text-color);
-      opacity: 0.7;
+      font-size: 0.95rem;
+      color: var(--shell-muted);
+      font-weight: 500;
     }
   }
+}
+
+// Card side accent borders on hover based on type
+.metric-card.active:hover::before {
+  background: var(--primary-color, #8B4513);
+}
+
+.metric-card:nth-child(2):hover::before {
+  background: #F57C00;
+}
+
+.metric-card:nth-child(3):hover::before {
+  background: #1976D2;
+}
+
+.metric-card:nth-child(4):hover::before {
+  background: #388E3C;
+}
+
+.metric-card:nth-child(5):hover::before {
+  background: #D32F2F;
 }
