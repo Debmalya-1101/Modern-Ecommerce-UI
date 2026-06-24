@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 import { CartService } from '../../core/services/cart.service';
 import { CartItemComponent } from './components/cart-item/cart-item.component';
@@ -17,6 +18,7 @@ import { ButtonStyleDirective } from '../../shared/directives/button-style.direc
   imports: [
     RouterLink,
     MatButtonModule,
+    MatIconModule,
     CartItemComponent,
     CartSummaryComponent,
     CartRecommendationsCarouselComponent,
@@ -33,9 +35,11 @@ export class CartPage {
   private readonly cartService = inject(CartService);
 
   public readonly cartItems = this.cartService.items;
+  public readonly itemCount = this.cartService.itemCount;
   public readonly isEmpty = this.cartService.isEmpty;
   public readonly loading = this.cartService.loading;
   public readonly error = this.cartService.error;
+  public readonly hasSavedItems = computed(() => this.cartService.savedItems().length > 0);
 
   protected handleIncreaseQuantity(itemId: number): void {
     const item = this.cartItems().find((i) => i.itemId === itemId);

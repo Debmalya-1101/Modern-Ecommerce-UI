@@ -104,8 +104,21 @@ export class LoginPage implements OnInit {
 
   private navigateAfterLogin(): void {
     const redirectTo = this.route.snapshot.queryParamMap.get('redirectTo');
-    const targetUrl = redirectTo?.startsWith('/') ? redirectTo : '/';
+    
+    // Honor specific redirect if present
+    if (redirectTo && redirectTo.startsWith('/')) {
+      this.router.navigateByUrl(redirectTo);
+      return;
+    }
 
-    this.router.navigateByUrl(targetUrl);
+    // Default routing based on role
+    const role = this.authService.currentRole();
+    if (role === 'ROLE_ADMIN') {
+      this.router.navigateByUrl('/admin');
+    } else if (role === 'ROLE_DELIVERY_PARTNER') {
+      this.router.navigateByUrl('/delivery-partner/dashboard');
+    } else {
+      this.router.navigateByUrl('/');
+    }
   }
 }

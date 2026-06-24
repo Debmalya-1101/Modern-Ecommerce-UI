@@ -157,9 +157,11 @@ export class HomePage implements OnInit {
     const imgMap: Record<string, string> = {
       headphones: '/cat_headphones.png',
       laptops: '/cat_laptops.png',
+      'mobile accessories': '/cat_accessories.png',
       smartphones: '/cat_smartphones.png',
       smartwatches: '/cat_smartwatches.png',
       speakers: '/cat_speakers.png',
+      tablets: '/cat_tablets.png',
       televisions: '/cat_televisions.png'
     };
     return imgMap[category.toLowerCase()] ?? '/favicon.ico';

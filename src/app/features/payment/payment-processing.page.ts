@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -7,6 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { OrdersApiService } from '../../core/services/orders-api.service';
 import { PaymentApiService } from '../../core/services/payment-api.service';
@@ -26,7 +27,8 @@ import { RazorpayService } from '../../core/services/razorpay.service';
     MatCardModule,
     MatDividerModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ],
   templateUrl: './payment-processing.page.html',
   styleUrls: ['./payment-processing.page.scss']
@@ -34,6 +36,7 @@ import { RazorpayService } from '../../core/services/razorpay.service';
 export class PaymentProcessingPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly ordersApiService = inject(OrdersApiService);
   private readonly paymentApiService = inject(PaymentApiService);
   private readonly snackbar = inject(SnackbarService);
@@ -44,6 +47,11 @@ export class PaymentProcessingPage implements OnInit {
   // State Signals
   readonly isLoading = signal<boolean>(true);
   readonly isProcessing = signal<boolean>(false);
+
+  goBack(): void {
+    this.location.back();
+  }
+
   
   readonly order = signal<OrderDetail | null>(null);
   readonly session = signal<PaymentInitiateResponse | null>(null);
@@ -113,6 +121,7 @@ export class PaymentProcessingPage implements OnInit {
     }
 
     this.isProcessing.set(true);
+    this.snackbar.info('Initializing secure payment...');
 
     try {
       const response = await this.razorpayService.openCheckout({

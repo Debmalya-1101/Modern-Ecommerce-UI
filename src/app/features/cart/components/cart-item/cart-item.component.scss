@@ -42,17 +42,17 @@
     justify-content: space-between;
   }
 
-  &__header {
+  &__top {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 1rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
   }
 
-  &__header-actions {
+  &__details {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: 0.25rem;
   }
 
@@ -70,43 +70,56 @@
     }
   }
 
-  &__delete {
-    color: var(--text-secondary);
-    margin-top: -8px;
-    margin-right: -8px;
-    
-    &:hover {
-      color: var(--danger);
-    }
-  }
-
   &__price-unit {
     color: var(--text-secondary);
     font-size: 0.95rem;
-    margin-top: 0.25rem;
+    font-weight: 500;
   }
 
-  &__actions {
+  &__price-total {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  &__bottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 1rem;
     gap: 1rem;
     flex-wrap: wrap;
   }
 
   .quantity-controls {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: var(--surface-hover);
-    border-radius: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     padding: 0.25rem;
 
     .qty-btn {
       width: 32px;
       height: 32px;
       padding: 0;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: inherit;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: var(--surface-hover);
+      }
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
       
       .mat-icon {
         font-size: 20px;
@@ -117,17 +130,45 @@
     }
 
     .qty-value {
-      min-width: 24px;
+      min-width: 32px;
       text-align: center;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 0.95rem;
+      color: var(--text-primary);
     }
   }
 
-  &__price-total {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
+  &__actions-right {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__action-text {
+    color: var(--text-secondary);
+    border-radius: 8px;
+    padding: 0 12px;
+    font-weight: 500;
+    
+    .mat-icon {
+      margin-right: 4px;
+    }
+
+    &:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+
+    &--delete:hover {
+      color: var(--danger);
+    }
+  }
+
+  &__action-divider {
+    width: 1px;
+    height: 16px;
+    background: var(--border-color);
+    margin: 0 8px;
   }
 }
 

@@ -15,19 +15,27 @@ export interface CustomSnackbarData {
   standalone: true,
   imports: [CommonModule, MatIconModule, MatButtonModule, MatSnackBarModule],
   template: `
-    <div class="flex items-center justify-between w-full p-1" [ngClass]="containerClass">
+    <div class="flex items-center justify-between w-full min-w-[320px] max-w-[450px] pl-4 pr-2 py-3 rounded-2xl shadow-xl border border-white/10 backdrop-blur-md" 
+         [ngClass]="containerClass">
+      
       <div class="flex items-center gap-3">
-        <mat-icon class="!w-6 !h-6 !text-[24px]" [ngClass]="iconColor">{{ icon }}</mat-icon>
-        <span class="text-sm font-medium tracking-wide">{{ data.message }}</span>
+        <div class="flex items-center justify-center w-8 h-8 rounded-full" [ngClass]="iconBgClass">
+          <mat-icon class="!w-5 !h-5 !text-[20px] text-white">{{ icon }}</mat-icon>
+        </div>
+        <span class="text-[0.95rem] font-semibold tracking-wide text-white">{{ data.message }}</span>
       </div>
-      <button *ngIf="data.action" mat-button (click)="snackBarRef.dismissWithAction()" 
-              class="!font-bold tracking-wider text-xs uppercase opacity-90 hover:opacity-100 transition-opacity">
-        {{ data.action }}
-      </button>
-      <button *ngIf="!data.action" mat-icon-button (click)="snackBarRef.dismiss()" 
-              class="!scale-75 opacity-70 hover:opacity-100 transition-opacity">
-        <mat-icon>close</mat-icon>
-      </button>
+
+      <div class="ml-4">
+        <button *ngIf="data.action" mat-button (click)="snackBarRef.dismissWithAction()" 
+                class="!font-bold tracking-wider text-xs uppercase !text-white opacity-90 hover:bg-white/10 !rounded-xl transition-all">
+          {{ data.action }}
+        </button>
+        <button *ngIf="!data.action" mat-icon-button (click)="snackBarRef.dismiss()" 
+                class="!scale-90 text-white/70 hover:text-white hover:bg-white/10 transition-all">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
     </div>
   `,
   styles: [`
@@ -45,27 +53,31 @@ export class CustomSnackbarComponent {
 
   get icon(): string {
     switch (this.data.type) {
-      case 'success': return 'check_circle';
-      case 'info': return 'info';
-      case 'warning': return 'warning';
+      case 'success': return 'check';
+      case 'info': return 'info_outline';
+      case 'warning': return 'warning_amber';
       case 'error': return 'error_outline';
-      default: return 'info';
+      default: return 'info_outline';
     }
   }
 
-  get iconColor(): string {
-    // Relying on the parent background, we can make the icon white/light for contrast
-    // Since the surface background is dark/colored based on type
+  get iconBgClass(): string {
     switch (this.data.type) {
-      case 'success': return 'text-green-300';
-      case 'info': return 'text-blue-300';
-      case 'warning': return 'text-orange-300';
-      case 'error': return 'text-red-300';
-      default: return 'text-blue-300';
+      case 'success': return 'bg-emerald-500/30';
+      case 'info': return 'bg-blue-500/30';
+      case 'warning': return 'bg-amber-500/30';
+      case 'error': return 'bg-rose-500/30';
+      default: return 'bg-white/20';
     }
   }
 
   get containerClass(): string {
-    return 'custom-snackbar-container';
+    switch (this.data.type) {
+      case 'success': return 'bg-[#2b4c34] text-white';
+      case 'info': return 'bg-[#3b332d] text-white';
+      case 'warning': return 'bg-[#6b4a22] text-white';
+      case 'error': return 'bg-[#823322] text-white';
+      default: return 'bg-[#3b332d] text-white';
+    }
   }
 }

@@ -5836,5 +5836,74 @@ What I Learned From This Step:
 - Aligning frontend DTO structures precisely to backend field requirements eliminates data serialization bugs.
 - Flyway migrations are critical for enforcing data integrity, such as adding unique constraints to relational tables.
 
+## UI Spacing Correction: Aligning Payment Page Container Spacing
+
+What was added:
+- Adjusted the payment page wrapper (`.payment-layout` in `payment-processing.page.scss`) by removing custom/excessive paddings (`padding: 2rem 1.5rem 4rem`) and changing the `max-width` from `1080px` to `87.5rem` (which is the global layout container width).
+- Left-aligned the payment processing page header elements (`.page-header` and `.back-btn`) to match other standard app pages like Checkout and Cart.
+- Changed the back button to be inline and self-aligned instead of using absolute positioning, preventing layout overlaps.
+
+Why it was added:
+- The custom padding was doubling the top and side spacing when combined with the global layout wrapper (`.shell-main` which already provides `1rem 1.5rem` padding).
+- Using a custom narrow `max-width` caused the payment screen to look narrower and disconnected compared to the Home page and Checkout page, which occupy the full container width.
+- Left-aligning the header elements ensures consistency with the rest of the application's design system.
+
+What I Learned From This Step:
+- Avoid adding redundant page-level padding/margin if the global shell layout container already provides it.
+- Keep layout container widths (`max-width`) consistent across different feature pages to maintain a unified user experience.
+- Using relative/flex-based flows for page back buttons is more robust and responsive than absolute positioning, especially when the page width stretches or squeezes.
+
+## Workspace Optimization: Deleting Unused Assets from the Public Directory
+
+**Date:** June 2026
+
+**Concept:**
+Cleaning up unused assets (images, icons) from the public asset directory to reduce bundle/repository size and maintain code hygiene.
+
+**Why it's important:**
+In large-scale web projects, temporary assets, placeholder images, and legacy icons frequently accumulate. If left unmanaged, they bloat the git repository size, slow down build times, and increase the final output build size (especially if the build system copies the entire `public` directory into the distribution package). Regular audits of the `public` directory keep the project lean and ensure developers are not confused by orphaned files.
+
+**How we did it:**
+1. **Audit Assets:** We listed all images in `public/` and `public/assets/images/`.
+2. **Search References:** We ran case-insensitive recursive string searches (`grep`) across the codebase (including `.ts`, `.html`, `.scss`, and `.json` files) for each asset filename.
+3. **Identify Unused Images:** We found that two images were entirely unreferenced:
+   - `public/payment_logos.png`
+   - `public/razorpay_shield.png`
+4. **Remove Files:** We deleted these two unused files using standard command line tools, which left only referenced icons/banners (`auth_hero_showcase.png`, `logo.png`, categories `cat_*.png`, and seasonal hero banners `hero_*.png`).
+5. **Verify Build:** We ran a complete Angular production build (`ng build`) to verify that the build succeeds and no references were broken.
+
+## UI Component Enhancement: Horizontal Scrollbar for Categories Selection
+
+**Date:** June 2026
+
+**Concept:**
+Replacing a wrapping grid layout with a horizontally scrollable list (flexbox) for product/category selection lists to optimize screen space and provide a modern e-commerce mobile-first user experience.
+
+**Why it's important:**
+In standard e-commerce designs, display real estate is extremely valuable. If categories or filters wrap to multiple lines, they push down main content (like products) and clutter the viewport, especially on mobile. A horizontal scrolling container keeps category entry points in a single, predictable line, allowing users to scroll horizontally through categories without sacrificing vertical space.
+
+**How we did it:**
+1. **Convert Layout:** We modified the CSS from `display: grid` (which wrapped elements or scaled columns dynamically) to a flex container with `display: flex` and `overflow-x: auto`.
+2. **Prevent Item Shrinking:** Since flex items shrink by default to fit the container, we added `flex: 0 0 170px` (and `140px` on mobile screens) to the `.category-card` and `.category-card-skeleton` components, securing their base size.
+3. **Handle Clipping on Hover:** When hover effects translate elements vertically or scale them, parent elements with `overflow: hidden` or `overflow: auto` can clip these hover transitions. We resolved this by adding padding to the top/bottom and left/right of the container (`padding: 0.75rem 0.25rem`) and offsetting it with negative margin (`margin: -0.75rem -0.25rem`) so the scrollable container's layout boundary is wider than the visible boundary.
+4. **Hide the Scrollbar:** We set `scrollbar-width: none` (for Firefox) and `&::-webkit-scrollbar { display: none; }` (for Chrome/Safari) to visually hide the scrollbar, keeping the user interface clean and minimalist while fully preserving touch and pointer horizontal scrolling.
+5. **Verify Build:** We ran an Angular build (`npm run build`) to ensure the changes did not trigger compiler warnings or errors.
+
+## UI/Asset Enhancement: Custom 3D Clay Category Icons for Tablets and Mobile Accessories
+
+**Date:** June 2026
+
+**Concept:**
+Replacing default/fallback icon placeholders (e.g. standard Angular logos) with customized 3D clay-like product icons that match the visual theme of the rest of the category listings.
+
+**Why it's important:**
+In premium user interfaces, visual consistency is paramount. Fallbacks or placeholders break the cohesive aesthetics of a design. Generating custom 3D renders with matching circular beige backgrounds, studio lighting, and color tones for previously unstyled categories (Tablets and Mobile Accessories) elevates the overall brand experience.
+
+**How we did it:**
+1. **Asset Generation:** Used generative AI tools to design minimalist 3D clay-rendered icons for Tablets (a tablet showing a clean UI) and Mobile Accessories (a power bank, adapter, and earbud case) set against a soft beige circular background.
+2. **Move Assets to Public Directory:** Placed `cat_tablets.png` and `cat_accessories.png` into the `public/` folder of the workspace.
+3. **Map Images in Components:** Updated the dynamic category image mapping dictionary (`imgMap`) in `home.page.ts` to map the category string lowercase keys (`'mobile accessories'` and `'tablets'`) to their corresponding new assets, replacing the fallback Angular logo.
+4. **Compile & Verify:** Rebuilt the Angular application successfully to ensure the asset references display correctly.
+
 
 

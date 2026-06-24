@@ -8,42 +8,24 @@
   </div>
 
   <div class="cart-item__content">
-    <div class="cart-item__header">
-      <h3 class="cart-item__title" [routerLink]="['/products', item.productId]">
-        {{ item.productName }}
-      </h3>
-      <div class="cart-item__header-actions">
-        <button
-          mat-icon-button
-          class="cart-item__save"
-          aria-label="Save for later"
-          [disabled]="disabled"
-          (click)="onSaveForLater()"
-          matTooltip="Save for later"
-        >
-          <mat-icon>favorite_border</mat-icon>
-        </button>
-        <button
-          mat-icon-button
-          class="cart-item__delete"
-          aria-label="Remove item"
-          [disabled]="disabled"
-          (click)="onRemove()"
-          matTooltip="Remove"
-        >
-          <mat-icon>delete_outline</mat-icon>
-        </button>
+    <div class="cart-item__top">
+      <div class="cart-item__details">
+        <h3 class="cart-item__title" [routerLink]="['/products', item.productId]">
+          {{ item.productName }}
+        </h3>
+        <div class="cart-item__price-unit">
+          {{ item.price | currency:currencyCode:'symbol':'1.0-0' }}
+        </div>
+      </div>
+      <div class="cart-item__price-total">
+        {{ item.total | currency:currencyCode:'symbol':'1.0-0' }}
       </div>
     </div>
 
-    <div class="cart-item__price-unit">
-      {{ item.price | currency:currencyCode:'symbol':'1.0-0' }}
-    </div>
-
-    <div class="cart-item__actions">
+    <div class="cart-item__bottom">
       <div class="quantity-controls">
         <button
-          mat-icon-button
+          type="button"
           class="qty-btn"
           aria-label="Decrease quantity"
           [disabled]="disabled"
@@ -55,7 +37,7 @@
           {{ item.quantity }}
         </span>
         <button
-          mat-icon-button
+          type="button"
           class="qty-btn"
           aria-label="Increase quantity"
           [disabled]="disabled"
@@ -65,8 +47,28 @@
         </button>
       </div>
 
-      <div class="cart-item__price-total">
-        {{ item.total | currency:currencyCode:'symbol':'1.0-0' }}
+      <div class="cart-item__actions-right">
+        <button
+          mat-button
+          class="cart-item__action-text"
+          aria-label="Save for later"
+          [disabled]="disabled"
+          (click)="onSaveForLater()"
+        >
+          <mat-icon>favorite_border</mat-icon>
+          <span>Save</span>
+        </button>
+        <div class="cart-item__action-divider"></div>
+        <button
+          mat-button
+          class="cart-item__action-text cart-item__action-text--delete"
+          aria-label="Remove item"
+          [disabled]="disabled"
+          (click)="onRemove()"
+        >
+          <mat-icon>delete_outline</mat-icon>
+          <span>Remove</span>
+        </button>
       </div>
     </div>
   </div>

@@ -27,7 +27,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: #6e5d52;
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
@@ -40,14 +40,14 @@
   }
 
   &:hover {
-    color: #b55f34;
+    color: var(--primary);
     transform: translateX(-4px);
   }
 }
 
 .eyebrow {
   margin: 0 0 0.35rem;
-  color: #b55f34;
+  color: var(--primary);
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -65,7 +65,7 @@ strong {
 h2,
 h3,
 .detail-brand {
-  color: #2d241f;
+  color: var(--text-primary);
 }
 
 .page-copy,
@@ -74,7 +74,7 @@ h3,
 .spec-grid__item span,
 .detail-thumb__label,
 .info-grid__item span {
-  color: #6e5d52;
+  color: var(--text-secondary);
   line-height: 1.7;
 }
 

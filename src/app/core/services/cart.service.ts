@@ -1,4 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Cart, CartItem } from '../models/cart.model';
 import { CartApiService } from './cart-api.service';
@@ -14,6 +15,7 @@ export class CartService {
   private readonly snackbar = inject(SnackbarService);
   private readonly authService = inject(AuthService);
   private readonly requestQueue = inject(CartRequestQueueService);
+  private readonly router = inject(Router);
 
   private readonly _cart = signal<Cart>({ items: [], cartTotal: 0 });
   private readonly _loading = signal<boolean>(false);
@@ -80,12 +82,16 @@ export class CartService {
     if (existingItem) {
       // If it exists, we just update the quantity
       this.updateQuantity(existingItem.itemId, existingItem.quantity + quantity);
-      this.openDrawer();
+      if (!this.router.url.includes('/cart')) {
+        this.openDrawer();
+      }
       return;
     }
 
     this._isAddingToCart.set(true);
-    this.openDrawer();
+    if (!this.router.url.includes('/cart')) {
+      this.openDrawer();
+    }
 
     this.cartApi.addToCart(productId, quantity).subscribe({
       next: (updatedCart) => {

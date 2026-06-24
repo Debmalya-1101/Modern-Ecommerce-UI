@@ -5,6 +5,7 @@
 .cart-summary {
   position: sticky;
   top: 1.5rem;
+  background: var(--shell-surface, rgba(255, 252, 247, 0.88));
 
   &__header {
     padding: 1.5rem;

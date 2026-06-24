@@ -33,15 +33,14 @@ export class CartSummaryComponent {
   public readonly shippingCost = computed(() => {
     const total = this.subtotal();
     if (total === 0) return 0;
-    return total > 5000 ? 0 : 599; // Free shipping over $50.00
+    return total > 500 ? 0 : 599; // Free shipping over 500
   });
 
-  public readonly taxCost = computed(() => {
-    // 8% tax estimation
-    return Math.round(this.subtotal() * 0.08);
+  public readonly platformFee = computed(() => {
+    return this.subtotal() > 0 ? 5 : 0;
   });
 
   public readonly grandTotal = computed(() => {
-    return this.subtotal() + this.shippingCost() + this.taxCost();
+    return this.subtotal() + this.shippingCost() + this.platformFee();
   });
 }

@@ -1,138 +1,172 @@
-<div class="checkout-container">
-  <h1>Checkout</h1>
+<div class="checkout-page-wrapper">
+  <!-- Header with Icon -->
+  <div class="checkout-header">
+    <mat-icon class="header-icon">payment</mat-icon>
+    <h1>Checkout</h1>
+  </div>
 
-  @if (cartIsEmpty()) {
-    <div class="empty-cart-state">
-      <mat-icon>shopping_cart</mat-icon>
-      <h2>Your cart is empty</h2>
-      <p>Add some items to your cart before checking out.</p>
-      <button mat-flat-button color="primary" routerLink="/products">
-        Continue Shopping
-      </button>
-    </div>
-  } @else {
-    <div class="checkout-grid">
-      <!-- Left Column: Address Selection & Form -->
-      <div class="checkout-form-section">
-        <!-- Address Selection -->
-        <div class="mb-6">
-          <h2 class="!m-0 !font-semibold text-lg text-neutral-800 mb-3">Select Shipping Address</h2>
-          
+  <div class="checkout-main-card">
+    @if (cartIsEmpty()) {
+      <div class="empty-cart-state">
+        <mat-icon>shopping_cart_checkout</mat-icon>
+        <h2>Your cart is empty</h2>
+        <p>Add some items to your cart before checking out.</p>
+        <button mat-flat-button color="primary" routerLink="/products">
+          Continue Shopping
+        </button>
+      </div>
+    } @else {
+      <div class="checkout-grid">
+        <!-- Left Column: Address Selection -->
+        <div class="checkout-col-left">
+          <div class="section-header">
+            <div class="step-badge">1</div>
+            <h2>Select Shipping Address</h2>
+          </div>
+
           @if (addressesLoading()) {
-            <div class="flex justify-center p-6 bg-white/40 rounded-2xl border border-neutral-100">
+            <div class="loading-state">
               <mat-spinner diameter="30"></mat-spinner>
             </div>
           } @else {
-            @if (addresses().length <= 2) {
-              <!-- 2 or fewer addresses: grid layout (no horizontal scroll) -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div class="address-grid-container" [class.scrollable]="addresses().length > 4">
+              <div class="address-grid">
                 @for (addr of addresses(); track addr.id) {
-                  <div class="flex flex-col h-full">
-                    <app-address-card 
-                      class="h-full"
-                      [address]="addr"
-                      [selectable]="true"
-                      [selected]="selectedAddressId() === addr.id"
-                      (select)="selectAddress(addr.id!)"
-                    ></app-address-card>
-                  </div>
+                  <app-address-card 
+                    class="address-card-wrapper"
+                    [address]="addr"
+                    [selectable]="true"
+                    [selected]="selectedAddressId() === addr.id"
+                    (select)="selectAddress(addr.id!)"
+                  ></app-address-card>
                 }
-              </div>
-            } @else {
-              <!-- More than 2 addresses: horizontal scroll container -->
-              <div class="address-scroll-container">
-                @for (addr of addresses(); track addr.id) {
-                  <div class="min-w-[280px] sm:min-w-[320px] flex-shrink-0 flex-grow flex flex-col">
-                    <app-address-card 
-                      class="h-full"
-                      [address]="addr"
-                      [selectable]="true"
-                      [selected]="selectedAddressId() === addr.id"
-                      (select)="selectAddress(addr.id!)"
-                    ></app-address-card>
+                
+                <!-- Add New Address Card (Inline) -->
+                <div class="add-address-card" (click)="openAddAddressDialog()">
+                  <div class="add-icon-circle">
+                    <mat-icon>add</mat-icon>
                   </div>
-                }
-              </div>
-            }
-
-            <!-- Add New / Manual Option (Full Width Banner) -->
-            <div 
-              (click)="openAddAddressDialog()"
-              class="flex items-center gap-4 p-4 rounded-2xl border border-dashed border-neutral-300 hover:border-amber-600 cursor-pointer transition-all duration-200 bg-white/50 mb-6"
-            >
-              <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
-                <mat-icon class="scale-110">add_location_alt</mat-icon>
-              </div>
-              <div class="flex-grow">
-                <h4 class="font-semibold text-neutral-800 text-sm m-0">Use New Address / Enter Manually</h4>
-                <p class="text-xs text-neutral-500 m-0 mt-0.5">Select this option to ship to a new destination not saved in your profile.</p>
-              </div>
-              <div class="w-6 h-6 rounded-full border border-neutral-300 bg-white flex items-center justify-center shrink-0">
-                <mat-icon class="scale-75 text-neutral-400">add</mat-icon>
+                  <strong>Add New Address</strong>
+                  <span>Enter a new shipping address</span>
+                </div>
               </div>
             </div>
+
+            <!-- Confirmation Strip -->
+            @if (addresses().find(a => a.id === selectedAddressId()); as selectedAddr) {
+              <div class="selected-address-confirmation">
+                <div class="confirmation-icon">
+                  <mat-icon>check</mat-icon>
+                </div>
+                <div class="confirmation-content">
+                  <span class="label">Delivering to:</span>
+                  <span class="address-text">
+                    <strong>{{ selectedAddr.contactName }}</strong>, 
+                    {{ selectedAddr.addressLine }}, {{ selectedAddr.city }}, {{ selectedAddr.state }} - {{ selectedAddr.postalCode }}
+                  </span>
+                </div>
+                <button mat-stroked-button color="primary" class="edit-btn font-semibold" (click)="openEditAddressDialog(selectedAddr)">
+                  <mat-icon class="scale-90">edit</mat-icon> Edit
+                </button>
+              </div>
+            }
           }
         </div>
 
-        <!-- Selected Address Summary -->
-        @if (addresses().find(a => a.id === selectedAddressId()); as selectedAddr) {
-          <div class="bg-amber-50/30 p-5 rounded-2xl border border-amber-200/50 flex items-start gap-3">
-            <mat-icon class="text-amber-600 mt-0.5">check_circle</mat-icon>
-            <div class="text-neutral-700 text-sm">
-              <p class="font-bold text-neutral-800 text-base mb-1">Delivering to: {{ selectedAddr.contactName }}</p>
-              <p class="leading-relaxed">{{ selectedAddr.addressLine }}</p>
-              <p>{{ selectedAddr.city }}, {{ selectedAddr.state }} - <span class="font-medium text-neutral-800">{{ selectedAddr.postalCode }}</span></p>
-              <p class="text-neutral-500 text-xs mt-2 font-medium">Contact Number: +91 {{ selectedAddr.mobileNumber }}</p>
+        <!-- Right Column: Order Summary -->
+        <div class="checkout-col-right">
+          <div class="section-header">
+            <div class="step-badge">2</div>
+            <h2>Order Summary</h2>
+          </div>
+          
+          <div class="order-items">
+            @for (item of cartItems(); track item.itemId) {
+              <div class="order-item">
+                <img [src]="item.imageUrl || 'assets/images/placeholder.png'" [alt]="item.productName" class="item-image">
+                <div class="item-details">
+                  <h3>{{ item.productName }}</h3>
+                  <p class="item-meta">Qty: {{ item.quantity }}</p>
+                </div>
+                <div class="item-price">{{ item.total | currency:currencyCode:'symbol':'1.0-0' }}</div>
+              </div>
+            }
+          </div>
+
+          <div class="order-totals">
+            <div class="total-row">
+              <span>Subtotal</span>
+              <span>{{ cartTotal() | currency:currencyCode:'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="total-row shipping-row">
+              <span>Shipping</span>
+              <span class="free-text">Free</span>
+            </div>
+            <div class="total-row">
+              <span class="flex items-center gap-1">Platform Fee <mat-icon class="scale-75 text-neutral-400">info_outline</mat-icon></span>
+              <span>{{ 5 | currency:currencyCode:'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="total-row final-total">
+              <div class="flex flex-col">
+                <span>Total</span>
+                <span class="tax-note">(Inclusive of all taxes)</span>
+              </div>
+              <span class="total-price">{{ cartTotal() + 5 | currency:currencyCode:'symbol':'1.0-0' }}</span>
             </div>
           </div>
-        }
+
+          <div class="checkout-action">
+            <button mat-flat-button class="shared-button shared-button--primary submit-btn" 
+                    [disabled]="!selectedAddressId() || isSubmitting()"
+                    (click)="onSubmit()">
+              @if (isSubmitting()) {
+                <mat-spinner diameter="24" color="accent" class="inline-block"></mat-spinner>
+                <span class="ml-2">Processing...</span>
+              } @else {
+                <span class="flex items-center justify-center gap-2">
+                  <mat-icon>lock</mat-icon>
+                  Place Order
+                </span>
+              }
+            </button>
+            <button mat-stroked-button class="continue-btn" routerLink="/products">
+              Continue Shopping
+            </button>
+          </div>
+        </div>
       </div>
+    }
+  </div>
 
-      <!-- Right Column: Order Summary -->
-      <div class="checkout-summary-section">
-        <h2>Order Summary</h2>
-        
-        <div class="order-items">
-          @for (item of cartItems(); track item.itemId) {
-            <div class="order-item">
-              <img [src]="item.imageUrl || 'assets/images/placeholder.png'" [alt]="item.productName" class="item-image">
-              <div class="item-details">
-                <h3>{{ item.productName }}</h3>
-                <p class="item-meta">Qty: {{ item.quantity }}</p>
-              </div>
-              <div class="item-price">{{ item.total | currency:currencyCode:'symbol':'1.0-0' }}</div>
-            </div>
-          }
-        </div>
-
-        <div class="order-totals">
-          <div class="total-row">
-            <span>Subtotal</span>
-            <span>{{ cartTotal() | currency:currencyCode:'symbol':'1.0-0' }}</span>
-          </div>
-          <div class="total-row">
-            <span>Shipping</span>
-            <span>Free</span>
-          </div>
-          <div class="total-row final-total">
-            <span>Total</span>
-            <span>{{ cartTotal() | currency:currencyCode:'symbol':'1.0-0' }}</span>
-          </div>
-        </div>
-
-        <div class="checkout-action">
-          <button mat-flat-button class="shared-button shared-button--primary submit-btn" 
-                  [disabled]="!selectedAddressId() || isSubmitting()"
-                  (click)="onSubmit()">
-            @if (isSubmitting()) {
-              <mat-spinner diameter="24" color="accent" class="inline-block"></mat-spinner>
-              <span class="ml-2">Processing...</span>
-            } @else {
-              Place Order
-            }
-          </button>
-        </div>
+  <!-- Global Trust Badges Footer -->
+  <div class="checkout-trust-footer">
+    <div class="trust-badge">
+      <mat-icon>verified_user</mat-icon>
+      <div class="tb-text">
+        <strong>Secure Payments</strong>
+        <span>100% secure checkout</span>
       </div>
     </div>
-  }
+    <div class="trust-badge">
+      <mat-icon>keyboard_return</mat-icon>
+      <div class="tb-text">
+        <strong>Easy Returns</strong>
+        <span>7-day return policy</span>
+      </div>
+    </div>
+    <div class="trust-badge">
+      <mat-icon>local_shipping</mat-icon>
+      <div class="tb-text">
+        <strong>Free Delivery</strong>
+        <span>On all orders</span>
+      </div>
+    </div>
+    <div class="trust-badge">
+      <mat-icon>workspace_premium</mat-icon>
+      <div class="tb-text">
+        <strong>Original Products</strong>
+        <span>100% verified products</span>
+      </div>
+    </div>
+  </div>
 </div>

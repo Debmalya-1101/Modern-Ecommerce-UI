@@ -28,6 +28,26 @@
   --color-info-700: #4d3d34;
   --color-info-050: #efe4da;
 
+  /* Mapped common semantic variables used in cart UI */
+  --surface: #ffffff;
+  --surface-hover: var(--color-surface-soft);
+  --border-color: var(--color-neutral-300);
+  --text-primary: var(--color-neutral-900);
+  --text-secondary: var(--color-neutral-700);
+  --primary: var(--color-brand-600);
+  --danger: var(--color-danger-600);
+
+  /* Aliases — so both --shell-* and --text-* naming conventions resolve correctly */
+  --primary-color: var(--color-brand-600);
+  --text-color: var(--color-neutral-900);
+  --shell-text: var(--color-neutral-900);
+  --shell-muted: var(--color-neutral-700);
+  --shell-accent: var(--color-brand-500);
+  --shell-accent-soft: rgba(181, 95, 52, 0.12);
+  --shell-surface: rgba(255, 252, 247, 0.88);
+  --shell-border: var(--color-neutral-300);
+  --shell-shadow: 0 18px 45px rgba(80, 54, 36, 0.08);
+
   /* Typography Tokens */
   --font-primary: 'Outfit', 'Trebuchet MS', 'Inter', sans-serif;
   --font-secondary: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
@@ -140,32 +160,16 @@ a {
 }
 
 .app-snackbar {
-  --mdc-snackbar-container-shape: var(--border-radius-lg);
-  --mdc-snackbar-container-elevation: 0 14px 30px rgba(45, 36, 31, 0.2);
-}
-
-.app-snackbar--info {
-  --mdc-snackbar-container-color: var(--color-info-700);
-  --mdc-snackbar-supporting-text-color: #fffaf6;
-  --mat-mdc-snackbar-button-color: #fffaf6;
-}
-
-.app-snackbar--success {
-  --mdc-snackbar-container-color: var(--color-success-700);
-  --mdc-snackbar-supporting-text-color: #f8fff8;
-  --mat-mdc-snackbar-button-color: #f8fff8;
-}
-
-.app-snackbar--warning {
-  --mdc-snackbar-container-color: var(--color-warning-700);
-  --mdc-snackbar-supporting-text-color: #fffaf1;
-  --mat-mdc-snackbar-button-color: #fffaf1;
-}
-
-.app-snackbar--error {
-  --mdc-snackbar-container-color: var(--color-danger-600);
-  --mdc-snackbar-supporting-text-color: #fff8f6;
-  --mat-mdc-snackbar-button-color: #fff8f6;
+  .mat-mdc-snackbar-surface {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    min-width: auto !important;
+  }
+  .mdc-snackbar__label {
+    padding: 0 !important;
+  }
 }
 
 /* Global override for Angular Material Outlined Input Fields border radius */
@@ -185,6 +189,36 @@ a {
     background-color: var(--color-surface-soft, #fffaf5) !important;
     padding: 1.75rem !important;
     box-shadow: 0 24px 48px rgba(87, 61, 44, 0.16) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Shared Page Header Block — use class="page-header-block"
+   to apply consistent page-level h1 + subtitle styling.
+   ═══════════════════════════════════════════════════════════════ */
+.page-header-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-family: var(--font-primary);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  .page-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.5;
   }
 }
 

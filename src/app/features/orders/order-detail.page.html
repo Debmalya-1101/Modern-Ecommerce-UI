@@ -15,45 +15,45 @@
       </div>
     </div>
   } @else if (order()) {
-    <div class="header-actions">
+    <div class="page-header">
       <a mat-button routerLink="/orders" class="back-link">
         <mat-icon>arrow_back</mat-icon>
-        Back to Orders
+        <span>Back to Orders</span>
       </a>
-    </div>
 
-    <div class="page-header">
-      <div class="header-main">
-        <div class="title-area">
-          <h1>Order #{{ order()!.orderId }}</h1>
-          <span class="status-badge" [class]="order()!.orderStatus.toLowerCase()">
-            {{ order()!.orderStatus }}
-          </span>
+      <div class="header-row">
+        <div class="header-main">
+          <div class="title-area">
+            <h1>Order #{{ order()!.orderId }}</h1>
+            <span class="status-badge" [class]="order()!.orderStatus.toLowerCase()">
+              {{ order()!.orderStatus }}
+            </span>
+          </div>
+          <p class="subtitle">
+            Placed on {{ order()!.createdAt | date:'longDate' }} at {{ order()!.createdAt | date:'shortTime' }}
+            @if (order()!.updatedAt && order()!.updatedAt !== order()!.createdAt) {
+              <span class="updated-text">• Updated: {{ order()!.updatedAt | date:'medium' }}</span>
+            }
+          </p>
         </div>
-        <p class="subtitle">
-          Placed on {{ order()!.createdAt | date:'longDate' }} at {{ order()!.createdAt | date:'shortTime' }}
-          @if (order()!.updatedAt && order()!.updatedAt !== order()!.createdAt) {
-            <span class="updated-text">• Updated: {{ order()!.updatedAt | date:'medium' }}</span>
-          }
-        </p>
+        @if (order()!.orderStatus === 'DELIVERED') {
+          <div class="header-actions-right">
+            @if (isLoadingFeedback()) {
+              <mat-spinner diameter="24"></mat-spinner>
+            } @else if (feedbackStatus() && feedbackStatus()!.feedbackSubmitted) {
+              <div class="feedback-submitted-badge">
+                <mat-icon class="star-icon">star</mat-icon>
+                <span>{{ feedbackStatus()!.rating }} / 5 - Feedback Submitted</span>
+              </div>
+            } @else {
+              <button mat-stroked-button color="primary" class="shared-button shared-button--secondary" (click)="openDeliveryFeedbackDialog()">
+                <mat-icon>star_rate</mat-icon>
+                Rate Delivery
+              </button>
+            }
+          </div>
+        }
       </div>
-      @if (order()!.orderStatus === 'DELIVERED') {
-        <div class="header-actions-right">
-          @if (isLoadingFeedback()) {
-            <mat-spinner diameter="24"></mat-spinner>
-          } @else if (feedbackStatus() && feedbackStatus()!.feedbackSubmitted) {
-            <div class="feedback-submitted-badge">
-              <mat-icon class="star-icon">star</mat-icon>
-              <span>{{ feedbackStatus()!.rating }} / 5 - Feedback Submitted</span>
-            </div>
-          } @else {
-            <button mat-stroked-button color="primary" class="shared-button shared-button--secondary" (click)="openDeliveryFeedbackDialog()">
-              <mat-icon>star_rate</mat-icon>
-              Rate Delivery
-            </button>
-          }
-        </div>
-      }
     </div>
 
 

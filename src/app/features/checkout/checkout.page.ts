@@ -107,6 +107,27 @@ export class CheckoutPage implements OnInit {
     });
   }
 
+  protected openEditAddressDialog(address: Address): void {
+    const dialogRef = this.dialog.open<AddressFormComponent, AddressDialogData, Address>(
+      AddressFormComponent,
+      {
+        width: '550px',
+        maxWidth: '95vw',
+        panelClass: 'app-dialog-container',
+        data: {
+          mode: 'edit',
+          address: { ...address }
+        }
+      }
+    );
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.addressService.updateAddress(address.id!, result);
+      }
+    });
+  }
+
   onSubmit(): void {
     const addressId = this.selectedAddressId();
 
@@ -140,7 +161,7 @@ export class CheckoutPage implements OnInit {
     this.ordersApiService.checkout(request).subscribe({
       next: (response) => {
         this.isSubmitting.set(false);
-        this.snackbar.success('Order placed successfully!');
+        this.snackbar.info('Redirecting to secure payment...');
         this.cartService.loadCart();
         this.router.navigate(['/payment', response.orderId]);
       },

@@ -21,13 +21,13 @@
   &__title {
     font-size: 2rem;
     font-weight: 700;
-    color: #2d241f;
+    color: var(--text-primary);
     margin: 0;
     letter-spacing: -0.02em;
   }
 
   &__subtitle {
-    color: #b55f34;
+    color: var(--primary);
     font-size: 0.85rem;
     font-weight: 600;
     text-transform: uppercase;

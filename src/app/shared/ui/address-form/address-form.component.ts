@@ -12,6 +12,7 @@ import { Address } from '../../../core/models/address.model';
 import { ButtonStyleDirective } from '../../../shared/directives/button-style.directive';
 
 export interface AddressDialogData {
+  mode?: 'add' | 'edit';
   address?: Address;
 }
 
