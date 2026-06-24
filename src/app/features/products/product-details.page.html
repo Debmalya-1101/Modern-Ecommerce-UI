@@ -21,7 +21,7 @@
     <mat-card class="detail-container-card" appearance="outlined">
       <section class="detail-layout">
         <div class="detail-media">
-          <div class="gallery-slider">
+          <div class="gallery-slider" (touchstart)="onSwipeStart($event)" (touchend)="onSwipeEnd($event)">
             <app-product-image-placeholder
               [src]="selectedImageUrl() || productDetail.imageUrl"
               [label]="productDetail.name"
@@ -113,7 +113,7 @@
             />
           </div>
 
-          <div class="detail-description-container">
+          <div class="detail-description-container" [class.expanded]="isDescriptionExpanded() && isMobile()">
             @if (parsedDescription().isList) {
               <ul class="detail-description-list">
                 @for (point of parsedDescription().paragraphs; track point) {
@@ -128,7 +128,16 @@
                 <p class="detail-description">{{ para }}</p>
               }
             }
+            @if (isMobile() && !isDescriptionExpanded() && parsedDescription().paragraphs.length > 0) {
+              <div class="description-fade"></div>
+            }
           </div>
+          
+          @if (isMobile() && parsedDescription().paragraphs.length > 0) {
+            <button mat-button class="read-more-btn" (click)="toggleDescription()">
+              {{ isDescriptionExpanded() ? 'Read less' : 'Read more' }}
+            </button>
+          }
 
           <div class="summary-bottom-info">
             <div class="detail-actions">
@@ -197,7 +206,7 @@
             <h3>Specifications</h3>
           </div>
           <p class="detail-specifications__copy">
-            Structured specification rows sourced directly from the backend API.
+            Detailed technical specifications and features of the product.
           </p>
         </div>
 

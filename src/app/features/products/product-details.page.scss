@@ -319,7 +319,13 @@ h3,
   overflow-y: auto;
   padding-right: 0.5rem;
   margin-bottom: 0.5rem;
+  position: relative;
   scrollbar-width: none; /* Hide scrollbar for Firefox by default */
+  transition: max-height 0.3s ease;
+
+  &.expanded {
+    max-height: none;
+  }
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -349,6 +355,25 @@ h3,
     }
   }
 }
+
+.description-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rem;
+  background: linear-gradient(to bottom, transparent, rgba(255, 252, 247, 0.96));
+  pointer-events: none;
+}
+
+.read-more-btn {
+  align-self: flex-start;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
 
 .summary-bottom-info {
   margin-top: auto; /* Push actions to the very bottom to align with metadata */
@@ -497,6 +522,18 @@ h3,
   border-bottom: 0;
 }
 
+@media (max-width: 768px) {
+  // Allow description to use more height on phones/tablets (no fixed truncation)
+  .detail-description-container {
+    max-height: 8rem;
+    overflow: hidden;
+    
+    &.expanded {
+      max-height: 2000px;
+    }
+  }
+}
+
 @media (max-width: 1080px) {
   .detail-layout {
     grid-template-columns: 1fr;
@@ -536,18 +573,82 @@ h3,
   }
 
   .detail-actions {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
 
-    &__group, &__primary {
+    &__group {
+      display: contents;
+    }
+    
+    &__primary {
+      grid-column: 1 / -1;
+      display: flex;
       flex-direction: column;
-      width: 100%;
+      gap: 1rem;
+    }
+
+    &__wishlist-btn {
+      grid-column: 2;
+      grid-row: 1;
+      margin: 0;
     }
   }
 
-  .detail-actions button {
+  .detail-actions__add-btn,
+  .detail-actions__buy-btn {
     width: 100%;
   }
+  
+  .detail-quantity {
+    grid-column: 1;
+    grid-row: 1;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+  }
 }
+
+@media (max-width: 480px) {
+  .detail-container-card {
+    padding: 0.85rem;
+  }
+
+  // On very small phones use 2-col info grid instead of 1-col
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+
+    &__item {
+      padding: 0.6rem 0.75rem;
+
+      span {
+        font-size: 0.68rem;
+      }
+
+      strong {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  // Tighten the action buttons slightly
+  .detail-actions {
+    &__add-btn,
+    &__buy-btn {
+      padding: 1rem 0;
+      font-size: 0.92rem;
+    }
+  }
+
+  .detail-specifications {
+    padding: 0.85rem;
+  }
+
+  .back-navigation {
+    padding: 0 0.25rem;
+  }
+}
+
 
 .detail-reviews-container {
   margin: 0 auto;

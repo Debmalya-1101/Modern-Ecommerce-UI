@@ -129,7 +129,7 @@
 .rating-cell {
   background: #fff9e6;
   padding: 6px 12px;
-  border-radius: 30px;
+  border-radius: var(--border-radius-md);
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -147,7 +147,7 @@
 }
 
 .action-btn {
-  border-radius: 30px !important;
+  border-radius: var(--border-radius-md) !important;
   padding: 0 24px !important;
   height: 40px !important;
   font-weight: 600 !important;

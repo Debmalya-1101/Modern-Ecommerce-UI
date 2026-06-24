@@ -3,6 +3,26 @@
 }
 
 .category-chip {
-  background: rgba(90, 71, 61, 0.08);
-  color: #5a473d;
+  background: transparent !important;
+  border: 1px solid rgba(138, 119, 109, 0.4) !important;
+  border-radius: var(--border-radius-md) !important;
+  color: #6e5d52 !important;
+  min-height: 1.6rem !important;
+  padding: 0 !important;
+  transition: all 0.2s ease;
+  
+  ::ng-deep .mdc-evolution-chip__action {
+    padding: 0 clamp(0.25rem, 1.5vw, 0.6rem) !important;
+  }
+  
+  .chip-content {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  span {
+    font-weight: 500;
+    font-size: 0.82rem;
+  }
 }

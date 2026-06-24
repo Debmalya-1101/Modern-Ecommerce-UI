@@ -40,6 +40,7 @@ export class DpSignupComponent implements OnInit, OnDestroy {
   protected readonly isSubmitting = signal(false);
   protected readonly submitted = signal(false);
   protected readonly error = signal<string | null>(null);
+  protected readonly hidePassword = signal(true);
 
   private idTypeSub?: Subscription;
 

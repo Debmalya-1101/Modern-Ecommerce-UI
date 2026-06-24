@@ -92,7 +92,7 @@
       text-decoration: none;
       padding: 0.25rem 0.75rem 0.25rem 0.25rem !important;
       min-width: 0 !important;
-      border-radius: var(--border-radius-pill, 999px) !important;
+      border-radius: var(--border-radius-md) !important;
       transition: all 0.2s ease;
 
       mat-icon {
@@ -148,7 +148,7 @@
           display: inline-flex;
           align-items: center;
           padding: 0.3rem 0.75rem; // reduced padding
-          border-radius: 999px;
+          border-radius: var(--border-radius-md);
           font-size: 0.78rem;
           font-weight: 700;
           letter-spacing: 0.5px;
@@ -206,7 +206,7 @@
         border: 1px solid rgba(255, 193, 7, 0.3);
         color: #b28900;
         padding: 0.5rem 1rem;
-        border-radius: 999px;
+        border-radius: var(--border-radius-md);
         font-weight: 700;
         font-size: 0.9rem;
         
@@ -416,7 +416,7 @@
     }
     &::-webkit-scrollbar-thumb {
       background: var(--shell-border);
-      border-radius: 999px;
+      border-radius: var(--border-radius-md);
     }
     &::-webkit-scrollbar-thumb:hover {
       background: var(--shell-accent);
@@ -618,7 +618,7 @@
           align-items: center;
           gap: 0.35rem;
           padding: 0.3rem 0.75rem; // reduced from 0.35rem/0.85rem
-          border-radius: 999px;
+          border-radius: var(--border-radius-md);
           font-size: 0.78rem;
           font-weight: 750;
           text-transform: uppercase;
@@ -822,6 +822,102 @@
     .details-grid {
       grid-template-columns: 1fr;
       gap: 1.15rem; // reduced
+    }
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.75rem; // tighter padding on very small phones
+
+    .page-header {
+      .header-main {
+        .title-area {
+          h1 {
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
+
+    // Shrink tracker steps so they fit in fewer scroll widths
+    .order-tracker {
+      min-width: 480px; // reduced from 600px
+
+      .tracker-step {
+        width: 80px; // reduced from 120px
+
+        .step-info {
+          .step-label {
+            font-size: 0.78rem;
+          }
+
+          .step-date {
+            font-size: 0.65rem;
+          }
+        }
+      }
+    }
+
+    .items-list {
+      max-height: 320px;
+
+      .item-row {
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+
+        .item-image-wrapper {
+          width: 54px;
+          height: 54px;
+        }
+
+        .item-details {
+          gap: 0.35rem;
+
+          .item-header {
+            .item-name {
+              font-size: 0.88rem;
+            }
+          }
+        }
+
+        .item-total-price {
+          font-size: 1rem;
+        }
+      }
+    }
+
+    mat-card {
+      mat-card-header {
+        padding: 1rem;
+      }
+
+      mat-card-content {
+        padding: 1rem;
+      }
+    }
+  }
+
+  @media (max-width: 360px) {
+    .order-tracker {
+      min-width: 400px;
+
+      .tracker-step {
+        width: 65px;
+
+        .step-icon {
+          width: 32px;
+          height: 32px;
+        }
+
+        .step-info {
+          .step-label {
+            font-size: 0.7rem;
+          }
+        }
+      }
+
+      .tracker-connector {
+        margin-top: 15px; // re-center for 32px icon
+      }
     }
   }
   

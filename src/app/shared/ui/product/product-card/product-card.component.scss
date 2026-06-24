@@ -97,6 +97,13 @@
   flex-wrap: wrap;
   gap: 0.65rem;
   margin-top: auto;
+
+  // Both buttons take equal width in the card
+  button {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+  }
 }
 
 .product-card__meta {
@@ -137,5 +144,52 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+// On mobile (2-column grid) ensure image frame is a proper square
+@media (max-width: 600px) {
+  .product-card__media {
+    aspect-ratio: 1 / 1;
+  }
+
+  .product-card__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    min-height: 3rem; /* ensure consistent height even if brand/category are missing */
+  }
+
+  .product-card__title {
+    align-items: flex-start;
+    height: auto;
+  }
+  .product-card__title-text {
+    font-size: 0.92rem;
+    -webkit-line-clamp: 1; /* Truncate to 1 line on mobile */
+  }
+
+  .product-card__title.expanded {
+    height: auto;
+
+    .product-card__title-text {
+      -webkit-line-clamp: unset; /* Expand to full text on tap */
+    }
+  }
+
+  .product-card__actions {
+    button {
+      font-size: 0.82rem;
+      padding: 0 0.65rem;
+    }
+
+    button:nth-child(1) {
+      flex: 5;
+    }
+
+    button:nth-child(2) {
+      flex: 3;
+    }
+  }
+}
+
 
 

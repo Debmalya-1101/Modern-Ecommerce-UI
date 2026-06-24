@@ -210,33 +210,46 @@
             }
           </div>
 
-          <form class="toolbar-search" (submit)="onSearch($event, searchInput.value)">
-            <span class="toolbar-search__category">Browse</span>
-            <input
-              #searchInput
-              class="toolbar-search__input"
-              type="text"
-              placeholder="Search products, brands, and categories..."
-              [value]="searchQuery()"
-              (input)="onSearchInput(searchInput.value)"
-            />
-            @if (searchQuery()) {
-              <button class="toolbar-search__clear" type="button" (click)="clearSearch(searchInput)" aria-label="Clear search">
-                <mat-icon>close</mat-icon>
+          @if (!isMobile()) {
+            <form class="toolbar-search" (submit)="onSearch($event, searchInput.value)">
+              <span class="toolbar-search__category">Browse</span>
+              <input
+                #searchInput
+                class="toolbar-search__input"
+                type="text"
+                placeholder="Search products, brands, and categories..."
+                [value]="searchQuery()"
+                (input)="onSearchInput(searchInput.value)"
+              />
+              @if (searchQuery()) {
+                <button class="toolbar-search__clear" type="button" (click)="clearSearch(searchInput)" aria-label="Clear search">
+                  <mat-icon>close</mat-icon>
+                </button>
+              }
+              <button mat-flat-button appButtonStyle="primary" type="submit" class="toolbar-search__btn">
+                Search
               </button>
-            }
-            <button mat-flat-button appButtonStyle="primary" type="submit" class="toolbar-search__btn">
-              Search
-            </button>
-          </form>
+            </form>
+          }
 
           <nav class="toolbar-links" aria-label="Quick links">
+            @if (isMobile()) {
+              <button
+                mat-icon-button
+                type="button"
+                class="toolbar-link search-toggle-btn"
+                (click)="toggleSearch()"
+                [attr.aria-label]="isSearchOpen() ? 'Close search' : 'Open search'"
+              >
+                <mat-icon>{{ isSearchOpen() ? 'close' : 'search' }}</mat-icon>
+              </button>
+            }
             @if (isAuthenticated()) {
               <a 
+                mat-icon-button
                 routerLink="/wishlist" 
                 class="toolbar-link cart-badge-link" 
                 aria-label="Wishlist"
-                [style.cursor]="'pointer'"
               >
                 <mat-icon
                   [matBadge]="wishlistItemCount()"
@@ -247,11 +260,11 @@
                 </mat-icon>
               </a>
               <a 
+                mat-icon-button
                 [routerLink]="isMobile() ? '/cart' : null" 
                 (click)="toggleCartDrawer($event)"
                 class="toolbar-link cart-badge-link" 
                 aria-label="Shopping Cart"
-                [style.cursor]="'pointer'"
               >
                 <mat-icon
                   [matBadge]="cartItemCount()"
@@ -305,6 +318,31 @@
           </nav>
         </mat-toolbar>
       </header>
+
+      <!-- Mobile Search Overlay -->
+      @if (isMobile() && isSearchOpen()) {
+        <div class="mobile-search-overlay">
+          <form class="mobile-search-form" (submit)="onSearch($event, mobileSearchInput.value)">
+            <input
+              #mobileSearchInput
+              class="mobile-search-input"
+              type="search"
+              placeholder="Search products, brands..."
+              [value]="searchQuery()"
+              (input)="onSearchInput(mobileSearchInput.value)"
+              autofocus
+            />
+            @if (searchQuery()) {
+              <button class="toolbar-search__clear" type="button" (click)="clearSearch(mobileSearchInput)" aria-label="Clear search">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+            <button mat-flat-button appButtonStyle="primary" type="submit" class="mobile-search-btn">
+              <mat-icon>search</mat-icon>
+            </button>
+          </form>
+        </div>
+      }
 
       <main class="shell-main">
         <div class="shell-main__container">

@@ -328,6 +328,17 @@ h3 {
     gap: 1rem;
   }
 
+  // Hide the hero image panel on mobile — only show the form
+  .auth-hero {
+    display: none;
+  }
+
+  // Form takes full width when hero is hidden
+  .auth-layout,
+  .auth-layout--compact {
+    grid-template-columns: 1fr;
+  }
+
   .auth-hero,
   .auth-card {
     padding: 1.5rem;

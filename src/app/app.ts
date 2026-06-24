@@ -61,6 +61,7 @@ export class App {
   protected readonly isMobile = signal(this.startsOnMobile);
   protected readonly isSidebarOpen = signal(false); // Start with sidebar closed
   protected readonly searchQuery = signal(''); // Header search text
+  protected readonly isSearchOpen = signal(false); // Mobile search toggle
   protected readonly authState = this.authService.state;
   protected readonly session = this.authService.session;
   protected readonly isAuthenticated = this.authService.isAuthenticated;
@@ -178,6 +179,14 @@ export class App {
 
   protected toggleSidebar(): void {
     this.isSidebarOpen.update((isOpen) => !isOpen);
+  }
+
+  protected toggleSearch(): void {
+    this.isSearchOpen.update((open) => !open);
+  }
+
+  protected closeSearch(): void {
+    this.isSearchOpen.set(false);
   }
 
   protected closeSidebarOnMobile(): void {

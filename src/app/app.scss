@@ -353,7 +353,7 @@
 .toolbar-links {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.25rem;
 }
 
 .toolbar-link,
@@ -452,40 +452,35 @@
     padding-top: 1rem;
   }
 
+  // On mobile the toolbar is a clean single-row flex — no search bar row
   .shell-toolbar {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    row-gap: 0.85rem;
-    column-gap: 0.5rem;
-    padding: 0.85rem 1rem;
-    min-height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    min-height: 3.75rem;
   }
 
   .toolbar-left {
-    grid-column: 1;
-    grid-row: 1;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
   }
 
   .toolbar-links {
-    grid-column: 2;
-    grid-row: 1;
-    justify-self: end;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.15rem;
+    flex-shrink: 0;
   }
 
+  // Hide the desktop search bar on mobile entirely
   .toolbar-search {
-    grid-column: 1 / span 2;
-    grid-row: 2;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    min-height: 3.1rem;
-    padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+    display: none;
   }
 
   .shell-main {
@@ -498,6 +493,152 @@
     align-items: center;
     text-align: center;
     padding-inline: 1rem;
+  }
+}
+
+// Mobile search overlay — slides down below the header
+.mobile-search-overlay {
+  position: sticky;
+  top: 3.75rem; // height of the mobile toolbar
+  z-index: 9;
+  background: rgba(255, 249, 243, 0.98);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--shell-border);
+  padding: 0.65rem 1rem;
+  animation: search-slide-down 0.2s ease;
+}
+
+@keyframes search-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 252, 247, 0.95);
+  border: 1px solid rgba(87, 61, 44, 0.14);
+  border-radius: var(--border-radius-pill);
+  padding: 0.25rem 0.25rem 0.25rem 1rem;
+  min-height: 2.85rem;
+  box-shadow: 0 4px 14px rgba(80, 54, 36, 0.06);
+
+  &:focus-within {
+    border-color: var(--shell-accent);
+    box-shadow: 0 0 0 3px rgba(181, 95, 52, 0.12), 0 4px 14px rgba(80, 54, 36, 0.08);
+  }
+}
+
+.mobile-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--shell-text);
+  font-size: 0.95rem;
+  min-width: 0;
+
+  &::placeholder {
+    color: #8a776d;
+  }
+
+  // Remove the native search field clear button
+  &::-webkit-search-cancel-button {
+    display: none;
+  }
+}
+
+.mobile-search-btn {
+  flex-shrink: 0;
+  border-radius: var(--border-radius-sm) !important;
+  width: 2.35rem !important;
+  height: 2.35rem !important;
+  min-width: 2.35rem !important;
+  max-width: 2.35rem !important;
+  padding: 0 !important;
+  position: relative !important;
+  display: block !important;
+
+  ::ng-deep .mdc-button__label {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  mat-icon {
+    font-size: 1.25rem !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    line-height: 1.25rem !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+.search-toggle-btn {
+  color: var(--shell-text);
+}
+
+@media (max-width: 480px) {
+  .shell-toolbar {
+    padding: 0.65rem 0.75rem;
+    gap: 0.4rem;
+    min-height: 3.25rem;
+  }
+
+  // Shrink brand title slightly on tiny screens
+  .brand-mark__title {
+    font-size: 1.25rem;
+  }
+
+  // Tighten toolbar action icons gap
+  .toolbar-links {
+    gap: 0;
+  }
+
+  // Reduce login/signup buttons font size to prevent wrapping
+  .toolbar-login {
+    font-size: 0.8rem;
+  }
+
+  .shell-main {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .shell-toolbar {
+    padding: 0.5rem;
+    row-gap: 0.5rem;
+  }
+
+  .brand-mark__title {
+    font-size: 1.1rem;
+  }
+}
+
+// Cart drawer should be full-width on mobile
+@media (max-width: 768px) {
+  .cart-drawer-shell {
+    width: 100% !important;
+    max-width: 100vw !important;
   }
 }
 

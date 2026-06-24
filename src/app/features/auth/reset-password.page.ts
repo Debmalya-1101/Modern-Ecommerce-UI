@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -19,6 +20,7 @@ import { ButtonStyleDirective } from '../../shared/directives/button-style.direc
     MatButtonModule,
     MatCardModule,
     MatFormFieldModule,
+    MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
     ButtonStyleDirective
@@ -32,6 +34,8 @@ export class ResetPasswordPage {
   protected readonly submitted = signal(false);
   protected readonly isSubmitting = signal(false);
   protected readonly resetSuccess = signal(false);
+  protected readonly hidePassword = signal(true);
+  protected readonly hideConfirmPassword = signal(true);
 
   protected readonly resetForm = this.formBuilder.nonNullable.group(
     {

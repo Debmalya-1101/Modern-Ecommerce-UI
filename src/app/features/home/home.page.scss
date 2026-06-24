@@ -726,4 +726,95 @@
   }
 }
 
+@media (max-width: 480px) {
+  .hero-carousel {
+    height: 240px;
+    border-radius: var(--border-radius-lg);
+  }
+
+  .slide-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  // Hide subtitle on very small phones so title + CTA remain visible
+  .slide-subtitle {
+    display: none;
+  }
+
+  .slide-overlay {
+    padding: 1rem;
+  }
+
+  // Trust grid stays at 2 columns on phones (≤580px sets 1fr, override here)
+  .trust-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+
+  .trust-item {
+    padding: 0.85rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .trust-icon-box {
+    width: 36px;
+    height: 36px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .trust-info {
+    h4 {
+      font-size: 0.88rem;
+    }
+    p {
+      font-size: 0.75rem;
+    }
+  }
+
+  .category-card {
+    flex: 0 0 120px;
+    padding: 1rem 0.75rem;
+  }
+
+  .category-card-skeleton {
+    flex: 0 0 120px;
+  }
+
+  .section-title {
+    font-size: 1.45rem;
+  }
+
+  .promo-banner-card {
+    height: 190px;
+    padding: 1.1rem;
+  }
+
+  .promo-overlay-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .promo-overlay-content p {
+    font-size: 0.82rem;
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .trust-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .slide-title {
+    font-size: 1.15rem;
+  }
+}
+
 

@@ -3,6 +3,7 @@
     <app-product-image-placeholder
       [src]="product.imageUrl"
       [label]="product.imageLabel"
+      minHeight="100%"
     />
 
     <div class="product-card__wishlist">
@@ -34,7 +35,7 @@
       }
     </div>
 
-    <h3 class="product-card__title">
+    <h3 class="product-card__title" (click)="toggleTitleExpand($event)" [class.expanded]="isTitleExpanded()">
       <span class="product-card__title-text">{{ product.name }}</span>
     </h3>
 

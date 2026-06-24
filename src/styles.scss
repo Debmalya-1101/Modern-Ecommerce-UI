@@ -59,7 +59,7 @@
   --border-radius-md: 12px;
   --border-radius-lg: 16px;
   --border-radius-xl: 20px;
-  --border-radius-pill: 999px;
+  --border-radius-pill: var(--border-radius-md);
   --border-radius-circle: 50%;
 
   /* Outlined text field global corner radius */
@@ -69,6 +69,26 @@
 html {
   height: 100%;
   color-scheme: light;
+
+  /* Global override to match Angular Material Cards border-radius */
+  --mat-sys-corner-extra-small: var(--border-radius-md);
+  --mat-sys-corner-small: var(--border-radius-md);
+  --mat-sys-corner-medium: var(--border-radius-md);
+  --mat-sys-corner-large: var(--border-radius-md);
+  --mat-sys-corner-extra-large: var(--border-radius-md);
+  --mat-sys-corner-extra-large-top: var(--border-radius-md);
+  --mat-sys-corner-full: var(--border-radius-md);
+  
+  --mdc-shape-small: var(--border-radius-md);
+  --mdc-shape-medium: var(--border-radius-md);
+  --mdc-shape-large: var(--border-radius-md);
+
+  /* Button shape overrides */
+  --mdc-text-button-container-shape: var(--border-radius-md);
+  --mdc-protected-button-container-shape: var(--border-radius-md);
+  --mdc-filled-button-container-shape: var(--border-radius-md);
+  --mdc-outlined-button-container-shape: var(--border-radius-md);
+  --mdc-elevated-button-container-shape: var(--border-radius-md);
 
   @include mat.theme(
     (
@@ -110,7 +130,7 @@ a {
 }
 
 .shared-button.mdc-button {
-  border-radius: var(--border-radius-pill);
+  border-radius: var(--border-radius-md);
   padding-inline: 1rem;
   letter-spacing: 0.01em;
   transition:
@@ -124,6 +144,23 @@ a {
   background: var(--color-brand-500);
   color: #fff8f2;
   box-shadow: 0 10px 24px rgba(181, 95, 52, 0.2);
+}
+
+/* Force all standard material buttons to use the universal shape, overriding any internal pill defaults */
+[mat-button], 
+[mat-raised-button], 
+[mat-flat-button], 
+[mat-stroked-button] {
+  border-radius: var(--border-radius-md) !important;
+
+  /* Ensure ripple effects and overlays also match the new border radius */
+  &::before,
+  &::after,
+  .mat-mdc-button-ripple,
+  .mat-mdc-button-touch-target,
+  .mdc-button__ripple {
+    border-radius: var(--border-radius-md) !important;
+  }
 }
 
 .shared-button--primary.mdc-button:hover {
@@ -222,3 +259,48 @@ a {
   }
 }
 
+@media (max-width: 600px) {
+  .page-header-block {
+    margin-bottom: 1rem;
+
+    h1 {
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+      font-size: 0.88rem;
+    }
+  }
+
+  /* Global Paginator Mobile Fix */
+  .mat-mdc-paginator {
+    background: transparent !important;
+  }
+
+  .mat-mdc-paginator-container {
+    justify-content: space-between !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 0.5rem 0.75rem !important;
+    min-height: auto !important;
+    flex-wrap: nowrap !important;
+    width: 100%;
+  }
+
+  /* Hide the clunky items per page dropdown on mobile */
+  .mat-mdc-paginator-page-size {
+    display: none !important;
+  }
+
+  /* Spread the label and arrows to opposite ends */
+  .mat-mdc-paginator-range-actions {
+    margin: 0 !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .mat-mdc-paginator-range-label {
+    margin: 0 !important;
+  }
+}

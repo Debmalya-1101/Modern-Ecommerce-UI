@@ -84,4 +84,20 @@
   }
 }
 
+@media (max-width: 768px) {
+  .cart-drawer {
+    min-width: 0;
+    max-width: 100vw;
+    width: 100vw;
+
+    &__content {
+      padding: 1rem;
+    }
+
+    &__header {
+      padding: 0.85rem 1rem;
+    }
+  }
+}
+
 

@@ -47,7 +47,17 @@
 
           <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
-            <input matInput formControlName="password" type="password" placeholder="Create a password" />
+            <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="Create a password" />
+            <button
+              mat-icon-button
+              matSuffix
+              (click)="hidePassword.set(!hidePassword())"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hidePassword()"
+              type="button"
+            >
+              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
             @if (showFieldError('password')) {
               <mat-error>Password is required (min 6 chars).</mat-error>
             }

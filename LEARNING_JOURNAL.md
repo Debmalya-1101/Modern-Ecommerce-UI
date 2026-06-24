@@ -5903,7 +5903,23 @@ In premium user interfaces, visual consistency is paramount. Fallbacks or placeh
 1. **Asset Generation:** Used generative AI tools to design minimalist 3D clay-rendered icons for Tablets (a tablet showing a clean UI) and Mobile Accessories (a power bank, adapter, and earbud case) set against a soft beige circular background.
 2. **Move Assets to Public Directory:** Placed `cat_tablets.png` and `cat_accessories.png` into the `public/` folder of the workspace.
 3. **Map Images in Components:** Updated the dynamic category image mapping dictionary (`imgMap`) in `home.page.ts` to map the category string lowercase keys (`'mobile accessories'` and `'tablets'`) to their corresponding new assets, replacing the fallback Angular logo.
-4. **Compile & Verify:** Rebuilt the Angular application successfully to ensure the asset references display correctly.
+4. Compile & Verify: Rebuilt the Angular application successfully to ensure the asset references display correctly.
 
+## UI Layout Optimization: Product Actions Mobile View Redesign
 
+**Date:** June 2026
 
+**Concept:**
+Optimizing the mobile layout of the product details actions area (quantity, wishlist, add to cart, and buy now buttons) by adopting CSS Grid instead of Flexbox.
+
+**Why it's important:**
+In mobile e-commerce design, the primary "Add to Cart" and "Buy Now" actions must be extremely prominent and easy to tap, often requiring full-width buttons. Secondary controls like quantity selectors and wishlist toggles can share a row above these primary actions. The previous layout stacked everything differently and was harder to manage purely with Flexbox order overrides without changing the HTML DOM structure.
+
+**How we did it:**
+1. **Adopt CSS Grid:** We replaced the flexbox column layout on the `.detail-actions` container with a CSS Grid layout (`display: grid`, `grid-template-columns: 1fr auto`) for screens under `640px`.
+2. **Flatten Layout Hierarchy:** The wishlist button was nested inside `.detail-actions__group` along with the primary buttons. We used `display: contents` on `.detail-actions__group` so its children could participate directly in the parent `.detail-actions` grid layout.
+3. **Position Elements:** 
+   - Quantity selector was placed in row 1, column 1.
+   - Wishlist button was placed in row 1, column 2.
+   - The primary buttons container (`.detail-actions__primary`) was set to span the entire width of row 2 (`grid-column: 1 / -1`).
+4. **Result:** The DOM structure remained unchanged, preserving desktop layout compatibility, while the mobile layout perfectly achieved the required structure without complex media query hacks.

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,6 +41,13 @@ export class ProductCardComponent {
   @Output() addToCart = new EventEmitter<number>();
 
   protected readonly isInWishlist = computed(() => this.wishlistService.hasItem(this.product.id));
+  protected readonly isTitleExpanded = signal(false);
+
+  protected toggleTitleExpand(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.isTitleExpanded.update((v) => !v);
+  }
 
   protected openQuickView(): void {
     this.quickView.emit(this.product.id);

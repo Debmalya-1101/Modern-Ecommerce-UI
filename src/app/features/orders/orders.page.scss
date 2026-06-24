@@ -178,6 +178,17 @@
       /* Compact stepper tracker column */
       .tracker-col {
         width: 100%;
+        overflow-x: auto; // Prevent mini-tracker from overflowing the card
+        -webkit-overflow-scrolling: touch;
+
+        /* Custom scrollbar for the tracker */
+        &::-webkit-scrollbar {
+          height: 3px;
+        }
+        &::-webkit-scrollbar-thumb {
+          background: rgba(181, 95, 52, 0.2);
+          border-radius: 2px;
+        }
 
         .mini-cancelled-badge {
           display: inline-flex;
@@ -399,6 +410,45 @@
         
         .tracker-col {
           max-width: 100%;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.75rem 0.35rem;
+
+    .order-card-horizontal {
+      .card-header-bar {
+        padding: 0.85rem;
+      }
+
+      .card-body {
+        padding: 0.85rem;
+      }
+
+      .mini-tracker {
+        .mini-step {
+          width: 52px; // Shrink step blocks for very small phones
+
+          .mini-label {
+            font-size: 0.62rem;
+          }
+
+          .mini-icon {
+            width: 26px;
+            height: 26px;
+
+            mat-icon {
+              font-size: 12px;
+              width: 12px;
+              height: 12px;
+            }
+          }
+        }
+
+        .mini-line {
+          margin-top: 12px; // re-center for 26px icon
         }
       }
     }

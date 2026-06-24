@@ -1,3 +1,5 @@
-<mat-chip class="category-chip">
-  {{ label }}
+<mat-chip class="category-chip" [disableRipple]="true">
+  <div class="chip-content">
+    <span>{{ label }}</span>
+  </div>
 </mat-chip>

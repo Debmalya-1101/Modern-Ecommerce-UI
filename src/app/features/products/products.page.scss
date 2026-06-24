@@ -57,7 +57,7 @@
   gap: 0.2rem;
   padding: 0.18rem 0.55rem;
   border: 1px solid rgba(181, 95, 52, 0.3);
-  border-radius: 2rem;
+  border-radius: var(--border-radius-md);
   background: transparent;
   color: #b55f34;
   font-size: 0.78rem;
@@ -101,7 +101,7 @@
   flex-shrink: 0;
   padding: 0.35rem 1rem;
   border: 1.5px solid rgba(87, 61, 44, 0.16);
-  border-radius: 2rem;
+  border-radius: var(--border-radius-md);
   background: rgba(255, 252, 247, 0.96);
   color: #3b2f28;
   font-size: 0.84rem;
@@ -424,7 +424,7 @@
   color: #2d241f !important;
 
   .mat-mdc-paginator-container {
-    padding: 0 !important;
+    padding: 0;
     min-height: 48px;
   }
 }
@@ -448,6 +448,41 @@
 
   .meta-filter {
     display: none; // hide active filter text on mobile to save space
+  }
+}
+
+@media (max-width: 480px) {
+  .catalog-bar {
+    flex-wrap: wrap;
+    padding: 0.5rem 0.65rem;
+    gap: 0.5rem;
+  }
+
+  .catalog-bar__meta {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .meta-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  .sort-select {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.8rem;
+  }
+
+  .filter-toggle-btn {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.65rem;
+  }
+
+  .cat-chip {
+    padding: 0.3rem 0.75rem;
+    font-size: 0.8rem;
   }
 }
 

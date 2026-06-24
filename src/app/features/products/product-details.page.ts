@@ -1,4 +1,5 @@
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -62,6 +63,7 @@ export class ProductDetailsPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly wishlistService = inject(WishlistService);
   private readonly router = inject(Router);
+  private readonly breakpointObserver = inject(BreakpointObserver);
 
   private readonly productState = signal(createInitialRequestState<ProductDetail>());
   protected readonly productId = signal<number | null>(null);
@@ -75,6 +77,20 @@ export class ProductDetailsPage implements OnInit {
 
   // Tracks whether the product specifications table is fully expanded
   protected readonly showAllSpecifications = signal(false);
+
+  // Mobile state and description toggle
+  protected readonly isMobile = signal(this.breakpointObserver.isMatched('(max-width: 768px)'));
+  protected readonly isDescriptionExpanded = signal(false);
+  private touchStartX = 0;
+
+  constructor() {
+    this.breakpointObserver
+      .observe('(max-width: 768px)')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(({ matches }) => {
+        this.isMobile.set(matches);
+      });
+  }
 
   /**
    * The list of specifications to display. Show only first 6 rows by default.
@@ -181,6 +197,27 @@ export class ProductDetailsPage implements OnInit {
     const currentIndex = items.findIndex(item => item.url === currentUrl);
     const nextIndex = (currentIndex + 1) % items.length;
     this.selectedImageUrl.set(items[nextIndex].url);
+  }
+
+  protected onSwipeStart(event: TouchEvent): void {
+    this.touchStartX = event.changedTouches[0].screenX;
+  }
+
+  protected onSwipeEnd(event: TouchEvent): void {
+    const touchEndX = event.changedTouches[0].screenX;
+    const diff = this.touchStartX - touchEndX;
+
+    if (Math.abs(diff) > 50) { // 50px threshold
+      if (diff > 0) {
+        this.nextImage();
+      } else {
+        this.prevImage();
+      }
+    }
+  }
+
+  protected toggleDescription(): void {
+    this.isDescriptionExpanded.update((v) => !v);
   }
 
   protected addToCart(productDetail: ProductDetail): void {
