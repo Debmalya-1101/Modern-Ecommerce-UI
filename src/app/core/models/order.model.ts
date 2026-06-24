@@ -14,6 +14,8 @@ export interface OrderResponse {
   orderId: number;
   total: number;
   status: OrderStatus;
+  paymentStatus: PaymentStatus | string;
+  deliveryStatus: string;
   createdAt: string;
   items: OrderItem[];
 }

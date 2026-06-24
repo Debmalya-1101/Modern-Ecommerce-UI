@@ -42,6 +42,14 @@
                 <span class="label">Items</span>
                 <span class="value">{{ order.items.length }} {{ order.items.length === 1 ? 'item' : 'items' }}</span>
               </div>
+              <div class="meta-item">
+                <span class="label">Payment</span>
+                <span class="value" [ngClass]="{'status-warning': order.paymentStatus === 'INITIATED' || order.paymentStatus === 'PENDING', 'status-success': order.paymentStatus === 'COMPLETED'}">{{ order.paymentStatus }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="label">Delivery</span>
+                <span class="value" [ngClass]="{'status-info': order.deliveryStatus === 'OUT_FOR_DELIVERY', 'status-success': order.deliveryStatus === 'DELIVERED'}">{{ order.deliveryStatus }}</span>
+              </div>
             </div>
             <div class="header-right">
               <span class="order-id">Order #{{ order.orderId }}</span>
