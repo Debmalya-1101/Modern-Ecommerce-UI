@@ -9,21 +9,30 @@
 }
 
 .admin-sidebar {
-  width: min(16rem, 85vw);
-  background-color: #fffcf7;
-  border-right: 1px solid rgba(87, 61, 44, 0.1);
+  width: min(19rem, 85vw);
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow: 1px 0 32px rgba(80, 54, 36, 0.05);
   display: flex;
   flex-direction: column;
 }
 
 .sidebar-brand {
-  padding: 1.5rem 1rem;
+  padding: 0 0 1.5rem 0;
   
   h2 {
     margin: 0;
-    font-size: 1.25rem;
-    color: var(--color-neutral-900);
-    font-weight: 700;
+    font-size: 1.95rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    background: linear-gradient(135deg, var(--color-neutral-900) 0%, var(--color-brand-600) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    line-height: 1.25;
   }
   
   .sidebar-copy {
@@ -43,24 +52,48 @@
   margin-right: 0.75rem;
 }
 
+.sidebar-nav-item {
+  border-radius: var(--border-radius-lg) !important;
+  margin-bottom: 0.4rem !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  width: 100%;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 16px rgba(80, 54, 36, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 1) !important;
+  }
+}
+
 .active-link {
-  background-color: rgba(181, 95, 52, 0.08);
-  border-right: 3px solid var(--color-brand-500);
+  border-radius: var(--border-radius-lg) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 245, 235, 1) 100%) !important;
+  box-shadow: 0 8px 24px rgba(181, 95, 52, 0.12), inset 0 0 0 1px rgba(181, 95, 52, 0.2) !important;
+  border: none !important;
   
   .sidebar-nav-icon {
-    color: var(--color-brand-600);
+    color: var(--color-brand-600) !important;
+    transform: scale(1.1);
   }
   
   ::ng-deep .mdc-list-item__primary-text {
-    font-weight: 600;
-    color: var(--color-brand-600);
+    font-weight: 700 !important;
+    color: var(--color-brand-600) !important;
   }
 }
 
 .sidebar-bottom {
-  padding: 1rem;
+  padding: 1.25rem;
   display: flex;
   justify-content: center;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 24px rgba(80, 54, 36, 0.04);
+  box-sizing: border-box;
+  margin-top: 1rem;
   
   a {
     width: 100%;

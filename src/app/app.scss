@@ -49,12 +49,14 @@
 }
 
 .shell-sidebar {
-  width: min(18rem, 85vw);
-  padding: 1.25rem 1rem;
-  border-right: 1px solid var(--shell-border);
-  background:
-    linear-gradient(180deg, rgba(255, 248, 241, 0.98) 0%, rgba(246, 237, 228, 0.98) 100%);
+  width: min(19rem, 85vw);
+  padding: 1.5rem 1.25rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
   color: var(--shell-text);
+  box-shadow: 1px 0 32px rgba(80, 54, 36, 0.05);
 }
 
 .sidebar-brand,
@@ -81,7 +83,14 @@
 }
 
 .sidebar-brand h2 {
-  font-size: 1.75rem;
+  font-size: 1.95rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  background: linear-gradient(135deg, var(--color-neutral-900) 0%, var(--shell-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  line-height: 1.25;
 }
 
 .sidebar-copy {
@@ -94,10 +103,36 @@
   padding: 0.5rem 0;
 }
 
+.sidebar-nav-item {
+  border-radius: var(--border-radius-lg) !important;
+  margin-bottom: 0.4rem !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  width: 100%;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 16px rgba(80, 54, 36, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 1) !important;
+  }
+}
+
 .active-link {
-  border-radius: var(--border-radius-lg);
-  background: var(--shell-accent-soft);
-  box-shadow: inset 0 0 0 1px rgba(181, 95, 52, 0.08);
+  border-radius: var(--border-radius-lg) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 245, 235, 1) 100%) !important;
+  box-shadow: 0 8px 24px rgba(181, 95, 52, 0.12), inset 0 0 0 1px rgba(181, 95, 52, 0.2) !important;
+  border: none !important;
+
+  ::ng-deep .sidebar-nav-icon {
+    color: var(--shell-accent) !important;
+    transform: scale(1.1);
+  }
+
+  ::ng-deep .mdc-list-item__primary-text {
+    font-weight: 700 !important;
+    color: var(--shell-accent) !important;
+  }
 }
 
 .sidebar-planned ul {
@@ -109,7 +144,13 @@
 
 .sidebar-session {
   display: grid;
-  gap: 0.85rem;
+  gap: 1.15rem;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 24px rgba(80, 54, 36, 0.04);
+  box-sizing: border-box;
 }
 
 .sidebar-session__summary {
@@ -128,8 +169,13 @@
 
 .sidebar-session__actions {
   display: flex;
+  gap: 0.75rem;
   flex-wrap: wrap;
-  gap: 0.6rem;
+
+  > * {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .shell-content {
@@ -356,8 +402,7 @@
   gap: 0.25rem;
 }
 
-.toolbar-link,
-.toolbar-login {
+.toolbar-link {
   color: var(--shell-text);
   font-weight: 600;
   text-decoration: none;
@@ -366,6 +411,8 @@
 .toolbar-login {
   display: inline-flex;
   align-items: center;
+  font-weight: 600;
+  text-decoration: none;
 }
 
 .sidebar-nav-icon {
@@ -603,19 +650,23 @@
     min-height: 3.25rem;
   }
 
-  // Shrink brand title slightly on tiny screens
-  .brand-mark__title {
-    font-size: 1.25rem;
+  // Hide brand title text on tiny screens to save space
+  .brand-mark {
+    display: none;
   }
 
   // Tighten toolbar action icons gap
   .toolbar-links {
-    gap: 0;
+    gap: 0.2rem;
   }
 
-  // Reduce login/signup buttons font size to prevent wrapping
+  // Reduce login/signup buttons padding and font size to prevent wrapping
   .toolbar-login {
     font-size: 0.8rem;
+    padding: 0 0.5rem !important;
+    min-width: 0 !important;
+    height: 2.25rem !important;
+    line-height: 2.25rem !important;
   }
 
   .shell-main {

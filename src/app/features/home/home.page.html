@@ -3,6 +3,8 @@
   <section class="hero-carousel" 
            (mouseenter)="onCarouselMouseEnter()" 
            (mouseleave)="onCarouselMouseLeave()"
+           (touchstart)="onTouchStart($event)"
+           (touchend)="onTouchEnd($event)"
            aria-label="Featured promotions carousel">
     <div class="carousel-inner">
       @for (slide of carouselSlides(); track slide.image; let idx = $index) {

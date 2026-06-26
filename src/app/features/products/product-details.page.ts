@@ -217,7 +217,17 @@ export class ProductDetailsPage implements OnInit {
   }
 
   protected toggleDescription(): void {
+    const isCollapsing = this.isDescriptionExpanded();
     this.isDescriptionExpanded.update((v) => !v);
+
+    if (isCollapsing) {
+      setTimeout(() => {
+        const topInfo = document.querySelector('.detail-summary__top');
+        if (topInfo) {
+          topInfo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 50);
+    }
   }
 
   protected addToCart(productDetail: ProductDetail): void {
@@ -248,7 +258,17 @@ export class ProductDetailsPage implements OnInit {
   }
 
   protected toggleSpecifications(): void {
+    const isCollapsing = this.showAllSpecifications();
     this.showAllSpecifications.update((val) => !val);
+
+    if (isCollapsing) {
+      setTimeout(() => {
+        const specsCard = document.querySelector('.detail-specifications');
+        if (specsCard) {
+          specsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 50);
+    }
   }
 
   private loadProduct(routeId: number): void {

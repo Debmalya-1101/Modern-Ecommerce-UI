@@ -5923,3 +5923,32 @@ In mobile e-commerce design, the primary "Add to Cart" and "Buy Now" actions mus
    - Wishlist button was placed in row 1, column 2.
    - The primary buttons container (`.detail-actions__primary`) was set to span the entire width of row 2 (`grid-column: 1 / -1`).
 4. **Result:** The DOM structure remained unchanged, preserving desktop layout compatibility, while the mobile layout perfectly achieved the required structure without complex media query hacks.
+
+## UI Layout Optimization: Mobile Grid Alignment for Loading Skeletons
+
+**Date:** June 2026
+
+**Concept:**
+Synchronizing the loading skeleton layout with the actual content grid for mobile viewports using CSS Grid and `aspect-ratio`.
+
+**Why it's important:**
+Skeleton loaders must closely mirror the layout and dimensions of the content they are standing in for. If a mobile skeleton loader displays as one large column while the real product list displays as two columns, the visual transition is jarring for the user.
+
+**How we did it:**
+1. **Grid Matching:** Updated the `@media (max-width: 600px)` breakpoint in `.product-skeleton-grid` to match `.product-grid` by rendering 2 columns (`grid-template-columns: repeat(2, minmax(0, 1fr))`) and aligning the `gap`.
+2. **Aspect Ratio:** Removed fixed `min-height` on the skeleton media block and adopted `aspect-ratio: 1 / 1`. This allows the skeleton card image placeholder to scale proportionally inside narrower columns just like real square images do.
+
+## UI Styling Update: Modern Glassmorphism Sidebar
+
+**Date:** June 2026
+
+**Concept:**
+Applying "glassmorphism" (translucent frosted-glass effects) to the main application sidebar and its navigation components.
+
+**Why it's important:**
+In modern web applications, floating sidebars with semi-transparent blur effects create a sense of depth and hierarchy, making the UI feel more premium and spacious rather than flat and bulky.
+
+**How we did it:**
+1. **Backdrop Filter:** Replaced the flat opaque sidebar background with a semi-transparent white `rgba(255, 255, 255, 0.55)` and applied `backdrop-filter: blur(28px)`.
+2. **Micro-interactions:** Updated `.sidebar-nav-item` links with subtle hover and active state transitions, including floating shadow effects and horizontal sliding (`transform: translateX(4px)`).
+3. **Card-based Sections:** Encapsulated the session/account area in its own frosted-glass card, visually separating the primary navigation from the account actions.

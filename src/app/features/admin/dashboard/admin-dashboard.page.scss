@@ -110,6 +110,7 @@
     color: var(--color-neutral-900);
     margin-bottom: 0.5rem;
     line-height: 1.2;
+    word-break: break-word;
   }
 
   .kpi-trend {
@@ -205,6 +206,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
+  min-width: 0;
   
   mat-card-header {
     display: flex;
@@ -440,6 +442,72 @@
     }
   }
 }
+
+// --- Mobile Responsiveness Fixes ---
+@media (max-width: 768px) {
+  .page-container {
+    gap: 1rem;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem;
+    
+    .header-actions {
+      display: flex;
+      width: 100%;
+      
+      button {
+        flex: 1;
+        width: 100%;
+      }
+    }
+  }
+  
+  .kpi-grid, .status-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .dashboard-widgets {
+    gap: 1.5rem;
+  }
+  
+  .widget-card {
+    mat-card-header {
+      padding: 1rem 1rem 0;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      
+      .header-action-btn {
+        margin-left: auto;
+        width: auto;
+        
+        a, button {
+          width: auto;
+        }
+      }
+    }
+    
+    ::ng-deep .mat-mdc-card-content {
+      padding: 1rem !important;
+    }
+  }
+  
+  .table-container {
+    margin: 0;
+    border-radius: 12px;
+  }
+  
+  .shortcuts-widget .shortcuts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 
 
 

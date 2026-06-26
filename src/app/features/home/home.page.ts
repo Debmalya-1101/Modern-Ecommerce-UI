@@ -59,6 +59,9 @@ export class HomePage implements OnInit {
   // Carousel Signals and Data
   protected readonly carouselIndex = signal(0);
   private autoplayIntervalId: any;
+  private touchStartX = 0;
+  private touchEndX = 0;
+  private readonly SWIPE_THRESHOLD = 50;
 
   protected readonly carouselSlides = signal([
     {
@@ -136,6 +139,33 @@ export class HomePage implements OnInit {
 
   protected onCarouselMouseLeave(): void {
     this.startAutoplay();
+  }
+
+  protected onTouchStart(event: TouchEvent): void {
+    this.touchStartX = event.changedTouches[0].screenX;
+    // Pause autoplay during touch interaction
+    this.stopAutoplay();
+  }
+
+  protected onTouchEnd(event: TouchEvent): void {
+    this.touchEndX = event.changedTouches[0].screenX;
+    this.handleSwipe();
+    // Resume autoplay after touch interaction
+    this.startAutoplay();
+  }
+
+  private handleSwipe(): void {
+    const swipeDistance = this.touchStartX - this.touchEndX;
+    
+    if (Math.abs(swipeDistance) >= this.SWIPE_THRESHOLD) {
+      if (swipeDistance > 0) {
+        // Swiped left, go to next slide
+        this.nextSlide();
+      } else {
+        // Swiped right, go to previous slide
+        this.prevSlide();
+      }
+    }
   }
 
   private startAutoplay(): void {

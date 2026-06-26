@@ -58,6 +58,23 @@ export class AdminCategoriesPage implements OnInit {
     this.loadCategories();
   }
 
+  toggleRow(element: CategoryDTO, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    const isCollapsing = this.expandedElement === element;
+    this.expandedElement = isCollapsing ? null : element;
+    
+    if (isCollapsing && event && event.currentTarget) {
+      setTimeout(() => {
+        const target = (event.currentTarget as HTMLElement).closest('tr.element-row');
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 50);
+    }
+  }
+
   loadCategories() {
     this.isLoading.set(true);
     this.categoriesService.getCategories().subscribe({

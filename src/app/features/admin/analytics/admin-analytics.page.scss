@@ -120,6 +120,7 @@
 }
 
 .table-card {
+  min-width: 0;
   border-radius: 20px;
   border: none !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
@@ -195,6 +196,33 @@
     font-size: 1.1rem;
   }
 }
+
+// --- Mobile Responsiveness Fixes ---
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1rem;
+  }
+  
+  .analytics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .products-table {
+    th.mat-header-cell,
+    td.mat-cell {
+      padding: 0.75rem 1rem;
+      &:first-child { padding-left: 1rem; }
+      &:last-child { padding-right: 1rem; }
+    }
+  }
+}
+
 
 
 

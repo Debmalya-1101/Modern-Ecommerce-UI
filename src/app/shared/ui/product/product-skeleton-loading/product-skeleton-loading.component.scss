@@ -18,7 +18,7 @@
 }
 
 .product-skeleton-card__media {
-  min-height: 14rem;
+  aspect-ratio: 1 / 1;
   border-radius: 1.3rem;
   background:
     linear-gradient(
@@ -49,11 +49,19 @@
 
 @media (max-width: 900px) {
   .product-skeleton-grid {
+    gap: 1rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 600px) {
+  .product-skeleton-grid {
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
   .product-skeleton-grid {
     grid-template-columns: 1fr;
   }

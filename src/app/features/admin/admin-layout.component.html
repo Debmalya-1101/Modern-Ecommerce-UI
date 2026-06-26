@@ -17,6 +17,7 @@
         @for (item of navigationItems; track item.path) {
           <a
             mat-list-item
+            class="sidebar-nav-item"
             [routerLink]="item.path"
             routerLinkActive="active-link"
             (click)="closeSidebarOnMobile()"

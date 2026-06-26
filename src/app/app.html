@@ -91,6 +91,7 @@
           @for (item of filteredNavigationItems(); track item.path) {
             <a
               mat-list-item
+              class="sidebar-nav-item"
               [routerLink]="item.path"
               routerLinkActive="active-link"
               [routerLinkActiveOptions]="{ exact: item.path === '/' }"
@@ -98,7 +99,6 @@
             >
               <mat-icon matListItemIcon class="sidebar-nav-icon">{{ item.icon }}</mat-icon>
               <span matListItemTitle>{{ item.label }}</span>
-              <span matListItemLine>{{ item.description }}</span>
             </a>
           }
         </mat-nav-list>
@@ -117,7 +117,7 @@
 
           <div class="sidebar-session__actions">
             <a
-              mat-button
+              mat-stroked-button
               appButtonStyle="secondary"
               routerLink="/profile"
               (click)="closeSidebarOnMobile()"
