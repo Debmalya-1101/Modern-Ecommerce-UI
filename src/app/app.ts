@@ -62,6 +62,13 @@ export class App {
   protected readonly isSidebarOpen = signal(false); // Start with sidebar closed
   protected readonly searchQuery = signal(''); // Header search text
   protected readonly isSearchOpen = signal(false); // Mobile search toggle
+  
+  // Pull to refresh state
+  protected readonly isPulling = signal(false);
+  protected readonly pullDistance = signal(0);
+  protected readonly isRefreshing = signal(false);
+  private touchStartY = 0;
+  private readonly PULL_THRESHOLD = 70;
   protected readonly authState = this.authService.state;
   protected readonly session = this.authService.session;
   protected readonly isAuthenticated = this.authService.isAuthenticated;
@@ -230,5 +237,47 @@ export class App {
     this.authService.logout();
     this.closeSidebarOnMobile();
     this.router.navigateByUrl('/login');
+  }
+
+  protected onTouchStart(event: TouchEvent): void {
+    if (!this.isMobile() || this.isRefreshing()) return;
+    const contentEl = event.currentTarget as HTMLElement;
+    if (contentEl.scrollTop <= 0) {
+      this.touchStartY = event.touches[0].clientY;
+      this.isPulling.set(true);
+    }
+  }
+
+  protected onTouchMove(event: TouchEvent): void {
+    if (!this.isPulling() || this.isRefreshing()) return;
+    
+    const contentEl = event.currentTarget as HTMLElement;
+    const touchY = event.touches[0].clientY;
+    const distance = touchY - this.touchStartY;
+    
+    if (distance > 0 && contentEl.scrollTop <= 0) {
+      this.pullDistance.set(Math.min(distance * 0.45, this.PULL_THRESHOLD + 20));
+      if (event.cancelable) {
+        event.preventDefault();
+      }
+    } else {
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+    }
+  }
+
+  protected onTouchEnd(): void {
+    if (!this.isPulling()) return;
+    
+    if (this.pullDistance() >= this.PULL_THRESHOLD) {
+      this.isRefreshing.set(true);
+      this.pullDistance.set(this.PULL_THRESHOLD);
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    } else {
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+    }
   }
 }

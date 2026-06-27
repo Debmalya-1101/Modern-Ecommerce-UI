@@ -134,7 +134,7 @@
           </div>
           
           @if (isMobile() && parsedDescription().paragraphs.length > 0) {
-            <button mat-button class="read-more-btn" (click)="toggleDescription()">
+            <button mat-button class="read-more-btn" (click)="toggleDescription($event)">
               {{ isDescriptionExpanded() ? 'Read less' : 'Read more' }}
             </button>
           }
@@ -226,7 +226,7 @@
             <button
               mat-button
               class="spec-toggle-btn"
-              (click)="toggleSpecifications()"
+              (click)="toggleSpecifications($event)"
             >
               {{ showAllSpecifications() ? 'View less' : 'View full details' }}
               <mat-icon>{{ showAllSpecifications() ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>

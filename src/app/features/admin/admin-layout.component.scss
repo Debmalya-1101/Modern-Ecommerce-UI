@@ -16,8 +16,12 @@
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
   box-shadow: 1px 0 32px rgba(80, 54, 36, 0.05);
-  display: flex;
-  flex-direction: column;
+
+  ::ng-deep .mat-drawer-inner-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
 }
 
 .sidebar-brand {
@@ -69,13 +73,13 @@
 
 .active-link {
   border-radius: var(--border-radius-lg) !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 245, 235, 1) 100%) !important;
-  box-shadow: 0 8px 24px rgba(181, 95, 52, 0.12), inset 0 0 0 1px rgba(181, 95, 52, 0.2) !important;
-  border: none !important;
+  background: rgba(181, 95, 52, 0.12) !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(181, 95, 52, 0.15) !important;
   
   .sidebar-nav-icon {
     color: var(--color-brand-600) !important;
-    transform: scale(1.1);
+    transform: scale(1.05);
   }
   
   ::ng-deep .mdc-list-item__primary-text {

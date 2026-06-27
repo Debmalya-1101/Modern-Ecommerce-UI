@@ -79,85 +79,86 @@
       [mode]="isMobile() ? 'over' : 'side'"
       [opened]="isSidebarOpen()"
     >
-      <div class="sidebar-brand">
-        <h2>{{ title }}</h2>
-        <p class="sidebar-copy">Your modern shopping destination.</p>
+      <div class="sidebar-inner-layout">
+        <div class="sidebar-top">
+          <div class="sidebar-brand">
+            <h2>{{ title }}</h2>
+            <p class="sidebar-copy">Your modern shopping destination.</p>
+          </div>
+
+          <mat-divider />
+
+          <nav class="sidebar-nav" aria-label="Primary navigation">
+            <mat-nav-list>
+              @for (item of filteredNavigationItems(); track item.path) {
+                <a
+                  mat-list-item
+                  class="sidebar-nav-item"
+                  [routerLink]="item.path"
+                  routerLinkActive="active-link"
+                  [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+                  (click)="closeSidebarOnMobile()"
+                >
+                  <mat-icon matListItemIcon class="sidebar-nav-icon">{{ item.icon }}</mat-icon>
+                  <span matListItemTitle>{{ item.label }}</span>
+                </a>
+              }
+            </mat-nav-list>
+          </nav>
+        </div>
+
+        <div class="sidebar-bottom">
+          <section class="sidebar-session">
+            @if (isAuthenticated()) {
+              <div class="sidebar-session__summary">
+                <strong>{{ currentUserLabel() }}</strong>
+                <span>{{ session().user?.role ?? 'ROLE_USER' }}</span>
+              </div>
+
+              <div class="sidebar-session__actions">
+                <a
+                  mat-stroked-button
+                  appButtonStyle="secondary"
+                  routerLink="/profile"
+                  (click)="closeSidebarOnMobile()"
+                >
+                  My Profile
+                </a>
+
+                <button
+                  mat-flat-button
+                  appButtonStyle="danger"
+                  type="button"
+                  (click)="logout()"
+                >
+                  Logout
+                </button>
+              </div>
+            } @else {
+              <div class="sidebar-session__actions">
+                <a
+                  mat-flat-button
+                  appButtonStyle="secondary"
+                  routerLink="/login"
+                  [queryParams]="isAuthRoute() ? null : { redirectTo: currentUrl() }"
+                  (click)="closeSidebarOnMobile()"
+                >
+                  Login
+                </a>
+
+                <a
+                  mat-flat-button
+                  appButtonStyle="primary"
+                  routerLink="/signup"
+                  (click)="closeSidebarOnMobile()"
+                >
+                  Sign up
+                </a>
+              </div>
+            }
+          </section>
+        </div>
       </div>
-
-      <mat-divider />
-
-      <nav class="sidebar-nav" aria-label="Primary navigation">
-        <mat-nav-list>
-          @for (item of filteredNavigationItems(); track item.path) {
-            <a
-              mat-list-item
-              class="sidebar-nav-item"
-              [routerLink]="item.path"
-              routerLinkActive="active-link"
-              [routerLinkActiveOptions]="{ exact: item.path === '/' }"
-              (click)="closeSidebarOnMobile()"
-            >
-              <mat-icon matListItemIcon class="sidebar-nav-icon">{{ item.icon }}</mat-icon>
-              <span matListItemTitle>{{ item.label }}</span>
-            </a>
-          }
-        </mat-nav-list>
-      </nav>
-
-      <mat-divider />
-
-      <section class="sidebar-session" aria-labelledby="account-title">
-        <p id="account-title" class="section-label">Account</p>
-
-        @if (isAuthenticated()) {
-          <div class="sidebar-session__summary">
-            <strong>{{ currentUserLabel() }}</strong>
-            <span>{{ session().user?.role ?? 'ROLE_USER' }}</span>
-          </div>
-
-          <div class="sidebar-session__actions">
-            <a
-              mat-stroked-button
-              appButtonStyle="secondary"
-              routerLink="/profile"
-              (click)="closeSidebarOnMobile()"
-            >
-              My Profile
-            </a>
-
-            <button
-              mat-flat-button
-              appButtonStyle="danger"
-              type="button"
-              (click)="logout()"
-            >
-              Logout
-            </button>
-          </div>
-        } @else {
-          <div class="sidebar-session__actions">
-            <a
-              mat-flat-button
-              appButtonStyle="secondary"
-              routerLink="/login"
-              [queryParams]="isAuthRoute() ? null : { redirectTo: currentUrl() }"
-              (click)="closeSidebarOnMobile()"
-            >
-              Login
-            </a>
-
-            <a
-              mat-flat-button
-              appButtonStyle="primary"
-              routerLink="/signup"
-              (click)="closeSidebarOnMobile()"
-            >
-              Sign up
-            </a>
-          </div>
-        }
-      </section>
-
     </mat-drawer>
 
     <!-- Mini-Cart Drawer -->
@@ -171,7 +172,13 @@
       <app-cart-drawer />
     </mat-drawer>
 
-    <mat-drawer-content class="shell-content">
+    <mat-drawer-content 
+      class="shell-content"
+      (touchstart)="onTouchStart($event)"
+      (touchmove)="onTouchMove($event)"
+      (touchend)="onTouchEnd()"
+      (touchcancel)="onTouchEnd()"
+    >
       <header class="shell-header">
         <mat-toolbar class="shell-toolbar">
           <div class="toolbar-left">
@@ -318,6 +325,22 @@
           </nav>
         </mat-toolbar>
       </header>
+
+      <!-- Pull to Refresh Indicator -->
+      @if (isMobile() && (isPulling() || isRefreshing())) {
+        <div class="pull-to-refresh-wrapper">
+          <div 
+            class="pull-to-refresh-indicator"
+            [style.transform]="'translateY(' + pullDistance() + 'px)'"
+          >
+            <div class="pull-to-refresh-circle" [class.refreshing]="isRefreshing()">
+              <mat-icon [class.spin]="isRefreshing()" [style.transform]="!isRefreshing() ? 'rotate(' + (pullDistance() * 3.5) + 'deg)' : ''">
+                {{ isRefreshing() ? 'refresh' : 'arrow_downward' }}
+              </mat-icon>
+            </div>
+          </div>
+        </div>
+      }
 
       <!-- Mobile Search Overlay -->
       @if (isMobile() && isSearchOpen()) {

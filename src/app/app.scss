@@ -120,13 +120,13 @@
 
 .active-link {
   border-radius: var(--border-radius-lg) !important;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(255, 245, 235, 1) 100%) !important;
-  box-shadow: 0 8px 24px rgba(181, 95, 52, 0.12), inset 0 0 0 1px rgba(181, 95, 52, 0.2) !important;
-  border: none !important;
+  background: rgba(181, 95, 52, 0.12) !important; /* var(--shell-accent-soft) */
+  box-shadow: none !important;
+  border: 1px solid rgba(181, 95, 52, 0.15) !important;
 
   ::ng-deep .sidebar-nav-icon {
     color: var(--shell-accent) !important;
-    transform: scale(1.1);
+    transform: scale(1.05);
   }
 
   ::ng-deep .mdc-list-item__primary-text {
@@ -140,6 +140,17 @@
   padding-left: 1.1rem;
   color: var(--shell-muted);
   line-height: 1.9;
+}
+
+.sidebar-inner-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-bottom: 0.5rem;
 }
 
 .sidebar-session {
@@ -543,43 +554,59 @@
   }
 }
 
-// Mobile search overlay — slides down below the header
+// Mobile search overlay — floats below the header with shadow backdrop
 .mobile-search-overlay {
-  position: sticky;
+  position: fixed;
   top: 3.75rem; // height of the mobile toolbar
-  z-index: 9;
-  background: rgba(255, 249, 243, 0.98);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid var(--shell-border);
-  padding: 0.65rem 1rem;
-  animation: search-slide-down 0.2s ease;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  animation: search-fade-in 0.2s ease;
+}
+
+@keyframes search-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mobile-search-form {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 252, 247, 0.98);
+  border: 1px solid rgba(87, 61, 44, 0.14);
+  border-radius: var(--border-radius-pill);
+  padding: 0.25rem 0.25rem 0.25rem 1rem;
+  min-height: 3.2rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  animation: search-slide-down 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:focus-within {
+    border-color: var(--shell-accent);
+    box-shadow: 0 0 0 3px rgba(181, 95, 52, 0.12), 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
 }
 
 @keyframes search-slide-down {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-12px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-.mobile-search-form {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 252, 247, 0.95);
-  border: 1px solid rgba(87, 61, 44, 0.14);
-  border-radius: var(--border-radius-pill);
-  padding: 0.25rem 0.25rem 0.25rem 1rem;
-  min-height: 2.85rem;
-  box-shadow: 0 4px 14px rgba(80, 54, 36, 0.06);
-
-  &:focus-within {
-    border-color: var(--shell-accent);
-    box-shadow: 0 0 0 3px rgba(181, 95, 52, 0.12), 0 4px 14px rgba(80, 54, 36, 0.08);
   }
 }
 
@@ -671,6 +698,10 @@
 
   .shell-main {
     padding: 0.75rem;
+  }
+
+  .mobile-search-overlay {
+    top: 3.25rem;
   }
 }
 
@@ -773,6 +804,54 @@
       }
     }
   }
+}
+
+// Pull to Refresh
+.pull-to-refresh-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.pull-to-refresh-indicator {
+  position: absolute;
+  top: 1rem; // Starts hidden underneath the sticky header
+  transition: transform 0.1s ease-out;
+}
+
+.pull-to-refresh-circle {
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border-radius: var(--border-radius-circle);
+  box-shadow: 0 4px 12px rgba(80, 54, 36, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--shell-accent);
+  border: 1px solid rgba(87, 61, 44, 0.05);
+  
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    will-change: transform;
+  }
+}
+
+.pull-to-refresh-circle.refreshing mat-icon {
+  animation: ptr-spin 1s linear infinite;
+}
+
+@keyframes ptr-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 

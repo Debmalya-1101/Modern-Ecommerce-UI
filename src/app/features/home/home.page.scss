@@ -403,21 +403,17 @@
 
 .promo-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--border-radius-xs);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+  color: #ffedd5;
   margin-bottom: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 2px solid #b55f34;
+  padding-left: 0.5rem;
 
   &--accent {
-    background: #fdf2f8;
-    color: #be185d;
-    border-color: #fbcfe8;
+    border-left-color: #eab308; /* A sophisticated gold/yellow accent */
   }
 }
 
@@ -645,6 +641,17 @@
     &.next {
       right: 1rem;
     }
+  }
+
+  .slide-actions a {
+    --mdc-filled-button-container-color: rgba(255, 255, 255, 0.2) !important;
+    --mdc-filled-button-label-text-color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
   }
 
   .categories-skeleton-grid {

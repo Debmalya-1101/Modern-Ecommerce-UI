@@ -216,17 +216,36 @@ export class ProductDetailsPage implements OnInit {
     }
   }
 
-  protected toggleDescription(): void {
+  protected toggleDescription(event?: MouseEvent): void {
     const isCollapsing = this.isDescriptionExpanded();
     this.isDescriptionExpanded.update((v) => !v);
 
-    if (isCollapsing) {
-      setTimeout(() => {
-        const topInfo = document.querySelector('.detail-summary__top');
-        if (topInfo) {
-          topInfo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 50);
+    if (isCollapsing && event) {
+      const btn = event.currentTarget as HTMLElement;
+      const scrollContainer = document.querySelector('.shell-content') as HTMLElement;
+      
+      if (scrollContainer) {
+        // Keep the button at the exact same Y position relative to the viewport
+        // while the container's max-height transition runs.
+        const targetY = btn.getBoundingClientRect().top;
+        const startTime = Date.now();
+        const duration = 350; // 300ms transition + 50ms buffer
+        
+        const syncScroll = () => {
+          const currentY = btn.getBoundingClientRect().top;
+          const diff = currentY - targetY;
+          
+          if (Math.abs(diff) > 0.5) {
+            scrollContainer.scrollTop += diff;
+          }
+          
+          if (Date.now() - startTime < duration) {
+            requestAnimationFrame(syncScroll);
+          }
+        };
+        
+        requestAnimationFrame(syncScroll);
+      }
     }
   }
 
@@ -257,17 +276,35 @@ export class ProductDetailsPage implements OnInit {
     this.wishlistService.toggleWishlist(productId);
   }
 
-  protected toggleSpecifications(): void {
+  protected toggleSpecifications(event?: MouseEvent): void {
     const isCollapsing = this.showAllSpecifications();
     this.showAllSpecifications.update((val) => !val);
 
-    if (isCollapsing) {
-      setTimeout(() => {
-        const specsCard = document.querySelector('.detail-specifications');
-        if (specsCard) {
-          specsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 50);
+    if (isCollapsing && event) {
+      const btn = event.currentTarget as HTMLElement;
+      const scrollContainer = document.querySelector('.shell-content') as HTMLElement;
+      
+      if (scrollContainer) {
+        // Keep the button at the exact same Y position relative to the viewport
+        const targetY = btn.getBoundingClientRect().top;
+        const startTime = Date.now();
+        const duration = 150; // DOM removal is usually instant, but provide small buffer
+        
+        const syncScroll = () => {
+          const currentY = btn.getBoundingClientRect().top;
+          const diff = currentY - targetY;
+          
+          if (Math.abs(diff) > 0.5) {
+            scrollContainer.scrollTop += diff;
+          }
+          
+          if (Date.now() - startTime < duration) {
+            requestAnimationFrame(syncScroll);
+          }
+        };
+        
+        requestAnimationFrame(syncScroll);
+      }
     }
   }
 
