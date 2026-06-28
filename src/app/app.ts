@@ -68,6 +68,8 @@ export class App {
   protected readonly pullDistance = signal(0);
   protected readonly isRefreshing = signal(false);
   private touchStartY = 0;
+  private touchStartX = 0;
+  private isHorizontalScroll = false;
   private readonly PULL_THRESHOLD = 70;
   protected readonly authState = this.authService.state;
   protected readonly session = this.authService.session;
@@ -244,6 +246,8 @@ export class App {
     const contentEl = event.currentTarget as HTMLElement;
     if (contentEl.scrollTop <= 0) {
       this.touchStartY = event.touches[0].clientY;
+      this.touchStartX = event.touches[0].clientX;
+      this.isHorizontalScroll = false;
       this.isPulling.set(true);
     }
   }
@@ -253,10 +257,24 @@ export class App {
     
     const contentEl = event.currentTarget as HTMLElement;
     const touchY = event.touches[0].clientY;
-    const distance = touchY - this.touchStartY;
+    const touchX = event.touches[0].clientX;
+    const distanceY = touchY - this.touchStartY;
+    const distanceX = Math.abs(touchX - this.touchStartX);
+
+    if (this.isHorizontalScroll) {
+      return;
+    }
+
+    // Determine if the user is scrolling horizontally (e.g. swiping a carousel)
+    if (distanceX > Math.abs(distanceY)) {
+      this.isHorizontalScroll = true;
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+      return;
+    }
     
-    if (distance > 0 && contentEl.scrollTop <= 0) {
-      this.pullDistance.set(Math.min(distance * 0.45, this.PULL_THRESHOLD + 20));
+    if (distanceY > 0 && contentEl.scrollTop <= 0) {
+      this.pullDistance.set(Math.min(distanceY * 0.45, this.PULL_THRESHOLD + 20));
       if (event.cancelable) {
         event.preventDefault();
       }
