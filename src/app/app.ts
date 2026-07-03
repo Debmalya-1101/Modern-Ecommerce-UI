@@ -130,12 +130,6 @@ export class App {
       path: '/orders',
       description: 'Your order history',
       icon: 'receipt_long'
-    },
-    {
-      label: 'Profile',
-      path: '/profile',
-      description: 'Manage your account',
-      icon: 'person'
     }
   ];
 
@@ -183,6 +177,19 @@ export class App {
         // Sync header search bar with router query params
         const urlTree = this.router.parseUrl(url);
         this.searchQuery.set(urlTree.queryParams['q'] || '');
+
+        // Fix scroll restoration issue: manually scroll main layout containers to top on route change
+        setTimeout(() => {
+          const scrollContainers = document.querySelectorAll('.shell-content, .shell-main, .admin-shell, .mat-drawer-content');
+          scrollContainers.forEach(el => {
+            if (el.scrollTo) {
+              el.scrollTo(0, 0);
+            } else {
+              el.scrollTop = 0;
+            }
+          });
+          window.scrollTo(0, 0);
+        }, 0);
       });
   }
 

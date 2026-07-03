@@ -36,9 +36,10 @@
   justify-content: space-between;
   gap: 1rem;
   align-items: center;
-  width: min(100% - 2rem, 78rem);
+  width: 100%;
+  max-width: 87.5rem;
   margin: 0 auto;
-  padding: 1.25rem 0 0;
+  padding: 1rem 1.5rem 0;
 }
 
 .auth-shell__actions {
@@ -111,10 +112,12 @@
   border: 1px solid transparent !important;
   width: 100%;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.8) !important;
-    box-shadow: 0 4px 16px rgba(80, 54, 36, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 1) !important;
+  @media (hover: hover) {
+    &:hover {
+      background: rgba(255, 255, 255, 0.8) !important;
+      box-shadow: 0 4px 16px rgba(80, 54, 36, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 1) !important;
+    }
   }
 }
 
@@ -321,6 +324,7 @@
   -webkit-text-fill-color: transparent;
   display: inline-block;
   line-height: 1.25;
+  padding-right: 0.2em;
   padding-bottom: 0.1em;
 }
 
@@ -453,12 +457,13 @@
 .shell-main--auth {
   display: flex;
   flex-direction: column;
-  padding-top: 1.5rem;
+  padding-top: 0.45rem;
   padding-bottom: 1.5rem;
 }
 
 .shell-main__container--auth {
-  width: min(100%, 76rem);
+  width: 100%;
+  max-width: 87.5rem;
   margin-block: auto;
 }
 
@@ -504,10 +509,8 @@
 
 @media (max-width: 768px) {
   .auth-shell__header {
-    width: min(100% - 1.5rem, 78rem);
-    flex-direction: column;
-    align-items: flex-start;
-    padding-top: 1rem;
+    width: 100%;
+    padding: 1rem 1rem 0;
   }
 
   // On mobile the toolbar is a clean single-row flex — no search bar row

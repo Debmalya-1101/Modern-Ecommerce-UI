@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import { AppHttpError } from '../models/api.model';
 import { ApiService } from './api.service';
 import { TokenStorageService } from './token-storage.service';
-import { AuthResponse, AuthSession, AuthState, AuthUserInfo, JwtTokenPayload, LoginRequest, SignupRequest, UserRole } from '../models/auth.model';
+import { AuthResponse, AuthSession, AuthState, AuthUserInfo, JwtTokenPayload, LoginRequest, SignupRequest, TokenRefreshRequest, TokenRefreshResponse, UserRole } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +42,7 @@ export class AuthService {
         trackLoading: true
       })
       .pipe(
-        tap((response) => this.setSessionToken(response.token, rememberSession)),
+        tap((response) => this.setSessionTokens(response.accessToken, response.refreshToken, rememberSession)),
         switchMap((response) =>
           this.refreshCurrentUser().pipe(
             map(() => response)
@@ -105,6 +105,35 @@ export class AuthService {
           return of(this.currentUser());
         })
       );
+  }
+
+  refreshSession(): Observable<TokenRefreshResponse> {
+    const refreshToken = this.tokenStorage.getRefreshToken();
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    const request: TokenRefreshRequest = { refreshToken };
+    
+    return this.apiService
+      .post<TokenRefreshResponse, TokenRefreshRequest>(API_ENDPOINTS.auth.refresh, request, {
+        trackLoading: false
+      })
+      .pipe(
+        tap((response) => {
+          this.setSessionTokens(response.accessToken, response.refreshToken, true);
+        }),
+        catchError((error) => {
+          this.logout();
+          return throwError(() => error);
+        })
+      );
+  }
+
+  setTokensFromOAuth(accessToken: string, refreshToken: string): void {
+    this.setSessionTokens(accessToken, refreshToken, true);
+    this.isReady.set(true);
   }
 
   restoreSession(): void {
@@ -175,10 +204,10 @@ export class AuthService {
     this.authError.set(null);
   }
 
-  private setSessionToken(token: string, rememberSession = true): void {
-    this.tokenStorage.setToken(token, rememberSession);
-    this.token.set(token);
-    this.currentUser.set(this.createUserFromToken(token));
+  private setSessionTokens(accessToken: string, refreshToken: string, rememberSession = true): void {
+    this.tokenStorage.setTokens(accessToken, refreshToken, rememberSession);
+    this.token.set(accessToken);
+    this.currentUser.set(this.createUserFromToken(accessToken));
     this.authError.set(null);
   }
 

@@ -6,7 +6,8 @@ import { AuthService } from '../services/auth.service';
 
 const publicPaths = [
   API_ENDPOINTS.auth.login,
-  API_ENDPOINTS.auth.signup
+  API_ENDPOINTS.auth.signup,
+  API_ENDPOINTS.auth.refresh
 ];
 const publicPrefixes = [
   API_ENDPOINTS.products.list

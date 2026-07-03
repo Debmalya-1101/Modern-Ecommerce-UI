@@ -15,28 +15,45 @@
         </div>
 
         <div class="hero-highlights">
-          <div>
-            <strong>Curated Hardware</strong>
-            <span>Explore hand-picked premium laptops, smart devices, and next-gen tech essentials.</span>
+          <div class="highlight-card">
+            <mat-icon class="highlight-icon">laptop_mac</mat-icon>
+            <div class="highlight-content">
+              <strong>Curated Hardware</strong>
+              <span>Explore hand-picked premium laptops, smart devices, and next-gen tech essentials.</span>
+            </div>
           </div>
-          <div>
-            <strong>Express Checkout</strong>
-            <span>Your saved preferences are ready for secure, instantaneous tech upgrades.</span>
+          <div class="highlight-card">
+            <mat-icon class="highlight-icon">check_circle_outline</mat-icon>
+            <div class="highlight-content">
+              <strong>Express Checkout</strong>
+              <span>Your saved preferences are ready for secure, instantaneous tech upgrades.</span>
+            </div>
           </div>
-          <div>
-            <strong>Client Care</strong>
-            <span>Access 24/7 dedicated support and order tracking in a single click.</span>
+          <div class="highlight-card">
+            <mat-icon class="highlight-icon">headset_mic</mat-icon>
+            <div class="highlight-content">
+              <strong>Client Care</strong>
+              <span>Access 24/7 dedicated support and order tracking in a single click.</span>
+            </div>
           </div>
         </div>
       </mat-card>
 
       <mat-card class="auth-card" appearance="outlined">
         <div class="auth-card__header">
-          <div>
-            <h3>Welcome back</h3>
-            <p class="auth-subtitle">Please enter your details to continue.</p>
+          <div class="header-content">
+            <div class="header-icon">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div>
+              <h3>Welcome back</h3>
+              <p class="auth-subtitle">Please enter your details to continue.</p>
+            </div>
           </div>
-          <a routerLink="/" class="back-link">Back to home</a>
+          <a routerLink="/" class="back-link">
+            <mat-icon>arrow_back</mat-icon>
+            Back to home
+          </a>
         </div>
 
         @if (signupSuccess()) {
@@ -52,14 +69,14 @@
         }
 
         <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
-          <mat-form-field appearance="outline">
-            <mat-label>Username or email</mat-label>
+          <mat-form-field appearance="outline" class="auth-input">
+            <mat-icon matPrefix>person_outline</mat-icon>
             <input
               matInput
               type="text"
               formControlName="usernameOrEmail"
               autocomplete="username"
-              placeholder="Enter your username or email"
+              placeholder="Username or email*"
             />
 
             @if (showFieldError('usernameOrEmail')) {
@@ -69,14 +86,14 @@
             }
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Password</mat-label>
+          <mat-form-field appearance="outline" class="auth-input">
+            <mat-icon matPrefix>lock_outline</mat-icon>
             <input
               matInput
               [type]="hidePassword() ? 'password' : 'text'"
               formControlName="password"
               autocomplete="current-password"
-              placeholder="Enter your password"
+              placeholder="Password*"
             />
             <button
               mat-icon-button
@@ -130,15 +147,50 @@
             </button>
           </div>
 
-          <p class="auth-footer-copy" style="margin-top: 0.5rem;">
-            New here?
-            <a routerLink="/signup" class="inline-link">Create an account</a>
-          </p>
+          <div class="auth-divider">
+            <span>or continue with</span>
+          </div>
 
-          <p class="auth-footer-copy" style="margin-top: 0.5rem;">
-            Want to deliver for us?
-            <a routerLink="/delivery-partner/signup" class="inline-link">Sign up as a Delivery Partner</a>
-          </p>
+          <div class="auth-social-actions">
+            <button
+              mat-stroked-button
+              type="button"
+              class="social-btn google-btn"
+              (click)="loginWithGoogle()"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.7 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                <path fill="none" d="M0 0h48v48H0z"/>
+              </svg>
+              <span>Google</span>
+            </button>
+            <button
+              mat-stroked-button
+              type="button"
+              class="social-btn facebook-btn"
+              (click)="loginWithFacebook()"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="20px" height="20px">
+                <path fill="#1877F2" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/>
+              </svg>
+              <span>Facebook</span>
+            </button>
+          </div>
+
+          <div class="auth-footer-container">
+            <p class="auth-footer-copy">
+              New here?
+              <a routerLink="/signup" class="inline-link">Create an account</a>
+            </p>
+
+            <p class="auth-footer-copy">
+              Want to deliver for us?
+              <a routerLink="/delivery-partner/signup" class="inline-link">Sign up as a Delivery Partner</a>
+            </p>
+          </div>
         </form>
       </mat-card>
     </div>

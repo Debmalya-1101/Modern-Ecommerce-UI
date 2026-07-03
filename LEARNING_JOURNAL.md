@@ -5952,3 +5952,50 @@ In modern web applications, floating sidebars with semi-transparent blur effects
 1. **Backdrop Filter:** Replaced the flat opaque sidebar background with a semi-transparent white `rgba(255, 255, 255, 0.55)` and applied `backdrop-filter: blur(28px)`.
 2. **Micro-interactions:** Updated `.sidebar-nav-item` links with subtle hover and active state transitions, including floating shadow effects and horizontal sliding (`transform: translateX(4px)`).
 3. **Card-based Sections:** Encapsulated the session/account area in its own frosted-glass card, visually separating the primary navigation from the account actions.
+
+## Feature Update: Refresh Tokens and OAuth2
+
+What was added:
+- Support for short-lived access tokens and long-lived refresh tokens.
+- An automatic HTTP interceptor queue that pauses API calls when an access token expires, seamlessly requests a new one, and replays the paused requests.
+- OAuth2 login integration (Google and Facebook) with a new frontend callback route.
+
+Why it was added:
+- Security best practice: Short-lived access tokens limit the window of opportunity for stolen tokens, while refresh tokens keep the user logged in without requiring them to re-type their password frequently.
+- User convenience: Allowing social login (Google/Meta) removes friction from the onboarding and login process, which is critical for modern e-commerce sites.
+
+Angular concept behind it:
+- **HttpInterceptor (Queueing requests):** Interceptors act as middleware for HTTP requests and responses. In `error.interceptor.ts`, when a 401 response is caught, we use RxJS `BehaviorSubject` to pause subsequent incoming requests while the refresh call completes, and then replay them with the new token.
+
+Simple example:
+
+```ts
+let isRefreshing = false;
+let refreshTokenSubject = new BehaviorSubject<string | null>(null);
+
+function handle401Error(request, next, authService) {
+  if (!isRefreshing) {
+    isRefreshing = true;
+    refreshTokenSubject.next(null);
+    return authService.refreshSession().pipe(
+      switchMap((tokenResponse) => {
+        isRefreshing = false;
+        refreshTokenSubject.next(tokenResponse.accessToken);
+        return next(request.clone({ setHeaders: { Authorization: `Bearer ${tokenResponse.accessToken}` } }));
+      })
+    );
+  } else {
+    // If already refreshing, wait for the subject to emit a token
+    return refreshTokenSubject.pipe(
+      filter(token => token !== null),
+      take(1),
+      switchMap(token => next(request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })))
+    );
+  }
+}
+```
+
+What I learned:
+- When implementing a refresh token flow, you must handle concurrency. If a page loads and fires 5 API calls simultaneously, and the token is expired, you only want to call the refresh endpoint *once*, not 5 times. 
+- Using RxJS `BehaviorSubject` allows the interceptor to block and queue subsequent failed requests until the single refresh request is successfully fulfilled.
+- OAuth2 is a backend-driven flow: the frontend simply redirects the user to the backend authorization URL, and the backend handles the complex redirect dance with Google/Facebook, eventually redirecting the browser back to a specific frontend callback route (`/oauth2/callback`) with the tokens in the URL.

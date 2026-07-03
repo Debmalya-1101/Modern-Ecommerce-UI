@@ -1,6 +1,6 @@
 <div class="cart-page">
   <div class="cart-page__header">
-    <h1>Your Shopping Cart ({{ itemCount() }} items)</h1>
+    <h1>Your Shopping Cart ({{ cartItems().length }} {{ cartItems().length === 1 ? 'item' : 'items' }})</h1>
   </div>
 
   <div class="cart-page__content">
@@ -48,7 +48,7 @@
               </div>
             </div>
 
-            @if (itemCount() === 1) {
+            @if (cartItems().length === 1) {
               <div class="cart-trust-badges">
                 <div class="trust-badge">
                   <mat-icon>local_shipping</mat-icon>

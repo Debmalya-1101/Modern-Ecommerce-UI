@@ -2,7 +2,8 @@ export const API_ENDPOINTS = {
   auth: {
     login: '/auth/login',
     signup: '/auth/signup',
-    me: '/auth/me'
+    me: '/auth/me',
+    refresh: '/auth/refresh'
   },
   products: {
     list: '/api/products',
@@ -59,6 +60,10 @@ export const API_ENDPOINTS = {
     attributeKeyDetail: (keyId: number | string) => `/api/admin/attribute-keys/${keyId}`,
     scraperAmazon: '/api/admin/scraper/amazon',
     scraperFlipkart: '/api/admin/scraper/flipkart'
+  },
+  oauth2: {
+    google: '/oauth2/authorization/google',
+    facebook: '/oauth2/authorization/facebook'
   },
   deliveryPartner: {
     auth: {

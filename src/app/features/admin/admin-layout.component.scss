@@ -64,10 +64,12 @@
   border: 1px solid transparent !important;
   width: 100%;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.8) !important;
-    box-shadow: 0 4px 16px rgba(80, 54, 36, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 1) !important;
+  @media (hover: hover) {
+    &:hover {
+      background: rgba(255, 255, 255, 0.8) !important;
+      box-shadow: 0 4px 16px rgba(80, 54, 36, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 1) !important;
+    }
   }
 }
 

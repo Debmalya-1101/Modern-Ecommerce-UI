@@ -13,6 +13,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../core/services/auth.service';
 import { ButtonStyleDirective } from '../../shared/directives/button-style.directive';
 import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading-spinner.component';
+import { environment } from '../../../environments/environment';
+import { API_ENDPOINTS } from '../../core/config/api-endpoints.constants';
 
 @Component({
   selector: 'app-login-page',
@@ -103,6 +105,14 @@ export class LoginPage implements OnInit {
     const control = this.loginForm.controls[fieldName];
 
     return control.invalid && (control.touched || this.submitted());
+  }
+
+  protected loginWithGoogle(): void {
+    window.location.href = `${environment.apiBaseUrl}${API_ENDPOINTS.oauth2.google}`;
+  }
+
+  protected loginWithFacebook(): void {
+    window.location.href = `${environment.apiBaseUrl}${API_ENDPOINTS.oauth2.facebook}`;
   }
 
   private navigateAfterLogin(): void {

@@ -13,6 +13,8 @@ import { SignupRequest } from '../../core/models/auth.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ButtonStyleDirective } from '../../shared/directives/button-style.directive';
 import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading-spinner.component';
+import { environment } from '../../../environments/environment';
+import { API_ENDPOINTS } from '../../core/config/api-endpoints.constants';
 
 @Component({
   selector: 'app-signup-page',
@@ -129,6 +131,14 @@ export class SignupPage implements OnInit {
   protected showPasswordMismatch(): boolean {
     return this.signupForm.hasError('passwordMismatch')
       && (this.confirmPasswordControl.touched || this.submitted());
+  }
+
+  protected loginWithGoogle(): void {
+    window.location.href = `${environment.apiBaseUrl}${API_ENDPOINTS.oauth2.google}`;
+  }
+
+  protected loginWithFacebook(): void {
+    window.location.href = `${environment.apiBaseUrl}${API_ENDPOINTS.oauth2.facebook}`;
   }
 }
 

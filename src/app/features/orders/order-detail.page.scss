@@ -920,32 +920,41 @@
       }
     }
   }
-  
+
   @media (max-width: 480px) {
     .items-list {
       .item-row {
-        flex-direction: column;
+        flex-direction: row;
         align-items: flex-start;
-        gap: 1rem;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
         
         .item-image-wrapper {
-          width: 100%;
-          height: 140px; // reduced from 150px
-          
-          .product-image {
-            object-fit: contain;
-          }
+          width: 64px;
+          height: 64px;
+          flex-shrink: 0;
         }
         
         .item-details {
-          width: 100%;
+          width: auto;
+          flex: 1;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: flex-start;
+          gap: 0.35rem;
+
+          .item-header {
+            max-width: 100%;
+          }
         }
         
         .item-total-price {
-          width: 100%;
-          text-align: left;
-          border-top: 1px dashed var(--shell-border);
-          padding-top: 0.75rem;
+          width: auto;
+          text-align: right;
+          border-top: none;
+          padding-top: 0;
+          font-size: 1rem;
+          min-width: auto;
         }
       }
     }

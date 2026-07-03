@@ -10,6 +10,11 @@ export const routes: Routes = [
       import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES)
   },
   {
+    path: 'oauth2/callback',
+    loadComponent: () =>
+      import('./features/auth/oauth2-callback.page').then((m) => m.Oauth2CallbackPage)
+  },
+  {
     path: 'signup',
     loadComponent: () =>
       import('./features/auth/signup.page').then((m) => m.SignupPage)

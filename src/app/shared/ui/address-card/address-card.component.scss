@@ -11,3 +11,59 @@ mat-icon {
   align-items: center;
   justify-content: center;
 }
+
+/* Mobile-only compact overrides so we don't break desktop Tailwind classes */
+@media (max-width: 600px) {
+  :host > div {
+    padding: 0.75rem !important;
+  }
+
+  .gap-4 {
+    gap: 0.75rem !important;
+  }
+
+  .mb-4 {
+    margin-bottom: 0.5rem !important;
+  }
+
+  .w-10 {
+    width: 2.25rem !important;
+  }
+  
+  .h-10 {
+    height: 2.25rem !important;
+  }
+
+  .text-base {
+    font-size: 0.95rem !important;
+  }
+
+  [class*="text-[0.9rem]"] {
+    font-size: 0.85rem !important;
+  }
+
+  /* Compact selected badge */
+  .absolute.-top-3.-right-3 {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    top: -0.5rem !important;
+    right: -0.5rem !important;
+    
+    mat-icon {
+      transform: scale(0.65) !important;
+    }
+  }
+
+  /* Compact location icon */
+  .w-10.h-10 mat-icon.scale-90 {
+    transform: scale(0.75) !important;
+  }
+
+  /* Move tags to top right to save vertical space */
+  .address-tags-wrapper {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    margin-top: 0 !important;
+  }
+}
