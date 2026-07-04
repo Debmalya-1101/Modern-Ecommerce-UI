@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import { AppHttpError } from '../models/api.model';
 import { ApiService } from './api.service';
 import { TokenStorageService } from './token-storage.service';
-import { AuthResponse, AuthSession, AuthState, AuthUserInfo, JwtTokenPayload, LoginRequest, SignupRequest, TokenRefreshRequest, TokenRefreshResponse, UserRole } from '../models/auth.model';
+import { AuthResponse, AuthSession, AuthState, AuthUserInfo, JwtTokenPayload, LoginRequest, SignupRequest, TokenRefreshResponse, UserRole } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
@@ -39,10 +39,12 @@ export class AuthService {
 
     return this.apiService
       .post<AuthResponse, LoginRequest>(API_ENDPOINTS.auth.login, request, {
-        trackLoading: true
+        trackLoading: true,
+        // Required to allow the browser to receive and store the HttpOnly refresh-token cookie
+        withCredentials: true
       })
       .pipe(
-        tap((response) => this.setSessionTokens(response.accessToken, response.refreshToken, rememberSession)),
+        tap((response) => this.setSessionToken(response.accessToken, rememberSession)),
         switchMap((response) =>
           this.refreshCurrentUser().pipe(
             map(() => response)
@@ -52,7 +54,7 @@ export class AuthService {
         catchError((error: AppHttpError) => {
           if (error.status === 403) {
             const isGenericForbidden = !error.message || error.message.toLowerCase() === 'forbidden';
-            const message = isGenericForbidden 
+            const message = isGenericForbidden
               ? 'Your delivery partner account is pending approval, rejected, or suspended. Please contact the administrator.'
               : error.message;
             this.authError.set(message);
@@ -107,32 +109,41 @@ export class AuthService {
       );
   }
 
+  /**
+   * Calls POST /auth/refresh with credentials (so the browser sends the HttpOnly cookie).
+   * The backend reads the cookie, rotates the refresh token, sets a new cookie, and
+   * returns a fresh access token in the JSON body.
+   *
+   * On failure, ONLY clears local state — does NOT call logout() to avoid firing
+   * another HTTP request that could create an infinite loop.
+   */
   refreshSession(): Observable<TokenRefreshResponse> {
-    const refreshToken = this.tokenStorage.getRefreshToken();
-    if (!refreshToken) {
-      this.logout();
-      return throwError(() => new Error('No refresh token available'));
-    }
-
-    const request: TokenRefreshRequest = { refreshToken };
-    
     return this.apiService
-      .post<TokenRefreshResponse, TokenRefreshRequest>(API_ENDPOINTS.auth.refresh, request, {
-        trackLoading: false
+      .post<TokenRefreshResponse, Record<string, never>>(API_ENDPOINTS.auth.refresh, {}, {
+        trackLoading: false,
+        // withCredentials is essential — this is what sends the HttpOnly cookie to the backend
+        withCredentials: true
       })
       .pipe(
         tap((response) => {
-          this.setSessionTokens(response.accessToken, response.refreshToken, true);
+          this.setSessionToken(response.accessToken, true);
         }),
         catchError((error) => {
-          this.logout();
+          // Clear local state only. Do NOT call logout() here — that would fire
+          // another HTTP request and can cause an infinite refresh/logout loop.
+          this.clearLocalSession();
           return throwError(() => error);
         })
       );
   }
 
-  setTokensFromOAuth(accessToken: string, refreshToken: string): void {
-    this.setSessionTokens(accessToken, refreshToken, true);
+  /**
+   * Called after a successful OAuth2 social login.
+   * The access token arrives as a query param; the refresh token is already stored
+   * in an HttpOnly cookie set by the backend — no further action needed for it.
+   */
+  setTokensFromOAuth(accessToken: string): void {
+    this.setSessionToken(accessToken, true);
     this.isReady.set(true);
   }
 
@@ -142,21 +153,36 @@ export class AuthService {
 
     const storedToken = this.tokenStorage.getToken();
 
-    if (!storedToken) {
-      this.clearSessionState();
-      this.isReady.set(true);
-      this.isLoading.set(false);
+    if (!storedToken || this.isTokenExpired(storedToken)) {
+      // Either no access token in storage, or the stored one has expired.
+      //
+      // Attempt a silent refresh using the HttpOnly cookie.
+      // This is the correct path for:
+      //   • Users returning after the 15-min access token lifetime (cookie still valid)
+      //   • Users after a page reload where the token was stored in sessionStorage
+      //
+      // Safe to try even with no stored token because:
+      //   • refreshSession() failure calls clearLocalSession() (no HTTP), NOT logout()
+      //   • The error interceptor excludes /auth/refresh from the retry loop
+      //   → No infinite loop risk.
+      this.refreshSession().pipe(
+        finalize(() => {
+          this.isReady.set(true);
+          this.isLoading.set(false);
+        })
+      ).subscribe({
+        next: () => {
+          this.authError.set(null);
+        },
+        error: () => {
+          // Cookie was absent or expired — user must log in.
+          // clearLocalSession() was already called by refreshSession() catchError.
+        }
+      });
       return;
     }
 
-    if (this.isTokenExpired(storedToken)) {
-      this.logout();
-      this.authError.set('The saved session expired and was cleared.');
-      this.isReady.set(true);
-      this.isLoading.set(false);
-      return;
-    }
-
+    // Access token is valid — restore immediately and verify with the server
     this.token.set(storedToken);
     this.currentUser.set(this.createUserFromToken(storedToken));
 
@@ -177,7 +203,28 @@ export class AuthService {
       });
   }
 
+  /**
+   * Clears the local access token and calls the backend logout endpoint
+   * so the backend revokes the refresh tokens and clears the HttpOnly cookie.
+   *
+   * IMPORTANT: The HTTP call is initiated BEFORE clearing local state so that
+   * the JWT interceptor can read the token synchronously from the signal and
+   * attach it as the Bearer header. Local state is then cleared immediately
+   * after — we don't wait for the HTTP response.
+   */
   logout(): void {
+    // 1. Initiate the backend call FIRST — the JWT interceptor runs synchronously
+    //    here and captures the current token before we clear it.
+    this.apiService
+      .post<string, Record<string, never>>(API_ENDPOINTS.auth.logout, {}, {
+        trackLoading: false,
+        withCredentials: true,
+        responseType: 'text'
+      })
+      .subscribe({ error: () => { /* silently ignore — cookie will expire naturally */ } });
+
+    // 2. Now clear local state. The HTTP request is already queued with the
+    //    correct Authorization header, so clearing state here is safe.
     this.tokenStorage.clearToken();
     this.clearSessionState();
     this.authError.set(null);
@@ -204,8 +251,8 @@ export class AuthService {
     this.authError.set(null);
   }
 
-  private setSessionTokens(accessToken: string, refreshToken: string, rememberSession = true): void {
-    this.tokenStorage.setTokens(accessToken, refreshToken, rememberSession);
+  private setSessionToken(accessToken: string, rememberSession = true): void {
+    this.tokenStorage.setTokens(accessToken, rememberSession);
     this.token.set(accessToken);
     this.currentUser.set(this.createUserFromToken(accessToken));
     this.authError.set(null);
@@ -237,6 +284,13 @@ export class AuthService {
     }
 
     return expiresAt * 1000 <= Date.now();
+  }
+
+  private clearLocalSession(): void {
+    this.tokenStorage.clearToken();
+    this.token.set(null);
+    this.currentUser.set(null);
+    this.isReady.set(true);
   }
 
   private clearSessionState(): void {

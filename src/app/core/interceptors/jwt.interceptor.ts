@@ -8,6 +8,8 @@ const publicPaths = [
   API_ENDPOINTS.auth.login,
   API_ENDPOINTS.auth.signup,
   API_ENDPOINTS.auth.refresh
+  // NOTE: /auth/logout is intentionally NOT here — the Bearer token must be
+  // sent so the backend can authenticate and revoke the correct user's tokens.
 ];
 const publicPrefixes = [
   API_ENDPOINTS.products.list

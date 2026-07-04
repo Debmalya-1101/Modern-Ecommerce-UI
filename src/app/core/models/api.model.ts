@@ -24,6 +24,8 @@ export interface ApiRequestOptions {
   params?: ApiQueryParams;
   trackLoading?: boolean;
   responseType?: 'json' | 'text';
+  /** Set to true for requests that need to send/receive HttpOnly cookies (e.g. refresh, logout). */
+  withCredentials?: boolean;
 }
 
 export interface MockRequestOptions {

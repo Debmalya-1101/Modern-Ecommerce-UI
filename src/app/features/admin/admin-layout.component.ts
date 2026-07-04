@@ -56,6 +56,17 @@ export class AdminLayoutComponent {
   protected readonly currentUserLabel = computed(() => this.authService.session().user?.username ?? 'Admin');
   protected readonly currentRole = computed(() => this.authService.session().user?.role ?? 'ROLE_ADMIN');
 
+  // Pull to refresh state
+  protected readonly isPulling = signal(false);
+  protected readonly pullDistance = signal(0);
+  protected readonly isRefreshing = signal(false);
+  private touchStartY = 0;
+  private touchStartX = 0;
+  private isHorizontalScroll = false;
+  private readonly PULL_THRESHOLD = 70;
+  private innerScrollEl: HTMLElement | null = null;
+  private innerScrollTopAtStart = 0;
+
   protected readonly navigationItems: AdminNavigationItem[] = [
     { label: 'Dashboard', path: '/admin/dashboard', icon: 'dashboard' },
     { label: 'Orders', path: '/admin/orders', icon: 'shopping_cart' },
@@ -101,5 +112,86 @@ export class AdminLayoutComponent {
   protected logout(): void {
     this.authService.logout();
     this.router.navigateByUrl('/login');
+  }
+
+  private findInnerScrollable(target: EventTarget | null, shellEl: HTMLElement): HTMLElement | null {
+    let el = target as HTMLElement | null;
+    while (el && el !== shellEl) {
+      const overflowY = window.getComputedStyle(el).overflowY;
+      if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') {
+        return el;
+      }
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  protected onTouchStart(event: TouchEvent): void {
+    if (!this.isMobile() || this.isRefreshing()) return;
+    const contentEl = event.currentTarget as HTMLElement;
+
+    this.innerScrollEl = this.findInnerScrollable(event.target, contentEl);
+    this.innerScrollTopAtStart = this.innerScrollEl?.scrollTop ?? 0;
+
+    if (contentEl.scrollTop <= 0 && !(this.innerScrollEl && this.innerScrollTopAtStart > 0)) {
+      this.touchStartY = event.touches[0].clientY;
+      this.touchStartX = event.touches[0].clientX;
+      this.isHorizontalScroll = false;
+      this.isPulling.set(true);
+    }
+  }
+
+  protected onTouchMove(event: TouchEvent): void {
+    if (!this.isPulling() || this.isRefreshing()) return;
+
+    const contentEl = event.currentTarget as HTMLElement;
+    const touchY = event.touches[0].clientY;
+    const touchX = event.touches[0].clientX;
+    const distanceY = touchY - this.touchStartY;
+    const distanceX = Math.abs(touchX - this.touchStartX);
+
+    if (this.isHorizontalScroll) return;
+
+    if (this.innerScrollEl && this.innerScrollEl.scrollTop !== this.innerScrollTopAtStart) {
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+      return;
+    }
+
+    if (this.innerScrollEl && distanceY > 0) {
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+      return;
+    }
+
+    if (distanceX > Math.abs(distanceY)) {
+      this.isHorizontalScroll = true;
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+      return;
+    }
+
+    if (distanceY > 0 && contentEl.scrollTop <= 0) {
+      this.pullDistance.set(Math.min(distanceY * 0.45, this.PULL_THRESHOLD + 20));
+      if (event.cancelable) event.preventDefault();
+    } else {
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+    }
+  }
+
+  protected onTouchEnd(): void {
+    if (!this.isPulling()) return;
+
+    if (this.pullDistance() >= this.PULL_THRESHOLD) {
+      this.isRefreshing.set(true);
+      this.pullDistance.set(this.PULL_THRESHOLD);
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    } else {
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+    }
   }
 }

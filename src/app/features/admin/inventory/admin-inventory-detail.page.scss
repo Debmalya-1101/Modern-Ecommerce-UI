@@ -411,6 +411,29 @@
       width: 100%;
     }
   }
+
+  .stock-overview {
+    gap: 0.5rem;
+    
+    .stock-card {
+      mat-card-content {
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+      }
+    }
+
+    .stock-label {
+      font-size: 0.7rem;
+    }
+
+    .stock-value {
+      font-size: 1.45rem;
+
+      &.main-value {
+        font-size: 1.75rem;
+      }
+    }
+  }
   
   .transactions-table {
     th.mat-header-cell,
@@ -419,6 +442,3 @@
     }
   }
 }
-
-
-

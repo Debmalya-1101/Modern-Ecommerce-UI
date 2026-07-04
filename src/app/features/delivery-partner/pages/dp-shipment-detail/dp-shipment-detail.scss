@@ -110,18 +110,61 @@
   }
 }
 
-@media (max-width: 600px) {
-  .detail-card .card-actions {
-    flex-direction: column;
-    
-    button {
-      width: 100%;
+@media (max-width: 768px) {
+  .page-container {
+    gap: 1.25rem;
+    padding-bottom: 1rem;
+  }
+
+  .page-header {
+    padding: 1.25rem;
+    flex-direction: row;
+    align-items: flex-start;
+    border-radius: 16px;
+
+    .back-btn {
+      margin-bottom: 0;
+    }
+
+    .header-main {
+      .title-area h1 {
+        font-size: 1.5rem;
+      }
+      .subtitle {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .detail-card {
+    border-radius: 16px !important;
+    position: relative;
+
+    mat-card-content {
+      padding: 1.25rem 1rem 1rem 1rem;
+      gap: 1rem;
+    }
+
+    .status-banner {
+      position: absolute;
+      top: 1.25rem;
+      right: 1rem;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .card-actions {
+      padding: 1rem;
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+      }
     }
   }
 }
-
-
-
-
-
 

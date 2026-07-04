@@ -71,6 +71,11 @@ export class App {
   private touchStartX = 0;
   private isHorizontalScroll = false;
   private readonly PULL_THRESHOLD = 70;
+  // Tracks whether the touch started inside a nested scrollable child,
+  // and what its scrollTop was at touch start — used to abort pull-to-refresh
+  // when the inner card handles the gesture itself.
+  private innerScrollEl: HTMLElement | null = null;
+  private innerScrollTopAtStart = 0;
   protected readonly authState = this.authService.state;
   protected readonly session = this.authService.session;
   protected readonly isAuthenticated = this.authService.isAuthenticated;
@@ -248,10 +253,37 @@ export class App {
     this.router.navigateByUrl('/login');
   }
 
+  /**
+   * Walks up the DOM from the touch target to find the nearest scrollable
+   * ancestor (excluding the shell container itself). Returns the element
+   * if found, or null. Used to detect whether a gesture originated inside
+   * a nested scrollable card/list.
+   */
+  private findInnerScrollable(target: EventTarget | null, shellEl: HTMLElement): HTMLElement | null {
+    let el = target as HTMLElement | null;
+    while (el && el !== shellEl) {
+      const overflowY = window.getComputedStyle(el).overflowY;
+      if (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') {
+        return el;
+      }
+      el = el.parentElement;
+    }
+    return null;
+  }
+
   protected onTouchStart(event: TouchEvent): void {
     if (!this.isMobile() || this.isRefreshing()) return;
     const contentEl = event.currentTarget as HTMLElement;
-    if (contentEl.scrollTop <= 0) {
+
+    // Record any inner scrollable the touch landed on so onTouchMove can
+    // abort pull-to-refresh if that element handles the gesture.
+    this.innerScrollEl = this.findInnerScrollable(event.target, contentEl);
+    this.innerScrollTopAtStart = this.innerScrollEl?.scrollTop ?? 0;
+
+    // Only arm pull-to-refresh when the shell is at the very top AND the
+    // touch did NOT start inside a nested scrollable that already has
+    // content scrolled above the current position.
+    if (contentEl.scrollTop <= 0 && !(this.innerScrollEl && this.innerScrollTopAtStart > 0)) {
       this.touchStartY = event.touches[0].clientY;
       this.touchStartX = event.touches[0].clientX;
       this.isHorizontalScroll = false;
@@ -261,7 +293,7 @@ export class App {
 
   protected onTouchMove(event: TouchEvent): void {
     if (!this.isPulling() || this.isRefreshing()) return;
-    
+
     const contentEl = event.currentTarget as HTMLElement;
     const touchY = event.touches[0].clientY;
     const touchX = event.touches[0].clientX;
@@ -272,6 +304,23 @@ export class App {
       return;
     }
 
+    // Abort if the inner scrollable element has moved since touch started —
+    // it consumed the gesture, so do not trigger pull-to-refresh.
+    if (this.innerScrollEl && this.innerScrollEl.scrollTop !== this.innerScrollTopAtStart) {
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+      return;
+    }
+
+    // Also abort if the finger is dragging downward (scroll-up gesture) while
+    // inside a scrollable child that is currently at its top — the child will
+    // handle any subsequent upward movement once it has content to scroll.
+    if (this.innerScrollEl && distanceY > 0) {
+      this.isPulling.set(false);
+      this.pullDistance.set(0);
+      return;
+    }
+
     // Determine if the user is scrolling horizontally (e.g. swiping a carousel)
     if (distanceX > Math.abs(distanceY)) {
       this.isHorizontalScroll = true;
@@ -279,7 +328,7 @@ export class App {
       this.pullDistance.set(0);
       return;
     }
-    
+
     if (distanceY > 0 && contentEl.scrollTop <= 0) {
       this.pullDistance.set(Math.min(distanceY * 0.45, this.PULL_THRESHOLD + 20));
       if (event.cancelable) {

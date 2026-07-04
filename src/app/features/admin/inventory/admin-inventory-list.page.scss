@@ -196,10 +196,7 @@
   border-radius: 20px;
   border: none !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
-  
   background: #ffffff;
-  
-  box-shadow: 0 6px 20px rgba(87, 61, 44, 0.03);
   overflow: hidden;
 
   mat-card-content {
@@ -250,26 +247,37 @@
 .inventory-table {
   width: 100%;
   background: transparent;
-  border-collapse: separate;
-  border-spacing: 0;
-  
-  th.mat-header-cell {
-    font-size: 0.8rem;
-    font-weight: 700;
+  th.mat-mdc-header-cell, th.mat-header-cell {
     color: var(--color-neutral-600);
+    font-weight: 600;
+    font-size: 0.85rem;
     text-transform: uppercase;
-    letter-spacing: 0.75px;
-    padding: 1.25rem 1.5rem;
-    border-bottom: 2px solid var(--color-neutral-100);
-    background-color: var(--color-surface-soft);
+    letter-spacing: 0.05em;
+    background-color: #f9fafb;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(87, 61, 44, 0.1);
+
+    &:first-child {
+      padding-left: 1.5rem;
+    }
+    &:last-child {
+      padding-right: 1.5rem;
+    }
   }
 
-  td.mat-cell {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--color-neutral-100);
-    vertical-align: middle;
-    color: var(--color-neutral-700);
+  td.mat-mdc-cell, td.mat-cell {
+    padding: 1rem 1.5rem;
+    color: var(--color-neutral-900);
     font-size: 0.95rem;
+    border-bottom: 1px solid rgba(87, 61, 44, 0.05);
+    vertical-align: middle;
+
+    &:first-child {
+      padding-left: 1.5rem;
+    }
+    &:last-child {
+      padding-right: 1.5rem;
+    }
   }
 
   .inventory-row {
@@ -277,11 +285,7 @@
     cursor: pointer;
     
     &:hover {
-      background-color: rgba(181, 95, 52, 0.02);
-      
-      td.mat-cell {
-        color: var(--color-neutral-900);
-      }
+      background-color: #f9fafb;
 
       .action-btn {
         transform: translateX(3px);
@@ -300,12 +304,13 @@
   .product-icon-avatar {
     width: 40px;
     height: 40px;
-    
+    flex-shrink: 0;
     background-color: var(--color-brand-050);
     color: var(--color-brand-500);
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 8px;
 
     mat-icon {
       font-size: 20px;
@@ -331,6 +336,7 @@
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--color-neutral-900);
+    white-space: nowrap;
   }
 
   .font-medium {
@@ -361,6 +367,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.35rem 0.85rem;
+  border-radius: var(--border-radius-pill);
   
   font-size: 0.75rem;
   font-weight: 700;
@@ -466,6 +473,45 @@
     td.mat-cell {
       padding: 1rem;
     }
+  }
+  .analytics-grid {
+    gap: 0.5rem;
+    
+    .kpi-card {
+      mat-card-content {
+        padding: 0.6rem 0.85rem;
+      }
+    }
+  }
+
+  .kpi-header {
+    margin-bottom: 0.25rem;
+  }
+
+  .kpi-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+  }
+
+  .kpi-icon-wrapper {
+    width: 28px;
+    height: 28px;
+    
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .kpi-value {
+    font-size: 1.35rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .kpi-subtext {
+    font-size: 0.75rem;
+    gap: 0.35rem;
   }
 }
 

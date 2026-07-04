@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -44,8 +44,9 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
 export class AdminInventoryListPage implements OnInit {
   private inventoryService = inject(AdminInventoryService);
   private snackBar = inject(SnackbarService);
+  private router = inject(Router);
 
-  displayedColumns: string[] = ['productName', 'availableQuantity', 'reservedQuantity', 'reorderLevel', 'totalQuantity', 'status', 'actions'];
+  displayedColumns: string[] = ['productName', 'availableQuantity', 'reservedQuantity', 'reorderLevel', 'totalQuantity', 'status'];
   dataSource = new MatTableDataSource<InventoryResponseDTO>([]);
   
   totalElements = signal(0);
@@ -130,5 +131,9 @@ export class AdminInventoryListPage implements OnInit {
     if (item.availableQuantity === 0) return 'out-of-stock';
     if (item.availableQuantity <= item.reorderLevel) return 'low-stock';
     return 'in-stock';
+  }
+
+  navigateToDetails(item: InventoryResponseDTO) {
+    this.router.navigate(['/admin/inventory', item.productId]);
   }
 }

@@ -75,16 +75,12 @@ export class AdminDashboardPage implements OnInit {
     this.isLoading = true;
     this.hasError = false;
     this.cdr.markForCheck();
-    
-    console.log('AdminDashboardPage: Starting to load dashboard data...');
 
     try {
       forkJoin({
         analytics: this.analyticsService.getDashboardAnalytics().pipe(
           tap({
-            next: (val) => console.log('AdminDashboardPage: Analytics API emitted data:', val),
-            error: (err) => console.error('AdminDashboardPage: Analytics API error:', err),
-            complete: () => console.log('AdminDashboardPage: Analytics API completed')
+            error: (err) => console.error('AdminDashboardPage: Analytics API error:', err)
           }),
           catchError((err) => {
             console.warn('AdminDashboardPage: Catching Analytics API error, returning null:', err);
@@ -93,9 +89,7 @@ export class AdminDashboardPage implements OnInit {
         ),
         orders: this.ordersService.getOrders({ page: 0, size: 5, status: 'PLACED' }).pipe(
           tap({
-            next: (val) => console.log('AdminDashboardPage: Orders API emitted data:', val),
-            error: (err) => console.error('AdminDashboardPage: Orders API error:', err),
-            complete: () => console.log('AdminDashboardPage: Orders API completed')
+            error: (err) => console.error('AdminDashboardPage: Orders API error:', err)
           }),
           catchError((err) => {
             console.warn('AdminDashboardPage: Catching Orders API error, returning null:', err);
@@ -104,9 +98,7 @@ export class AdminDashboardPage implements OnInit {
         ),
         products: this.productsService.getProducts(0, 5, undefined, 'stock', 'asc').pipe(
           tap({
-            next: (val) => console.log('AdminDashboardPage: Products API emitted data:', val),
-            error: (err) => console.error('AdminDashboardPage: Products API error:', err),
-            complete: () => console.log('AdminDashboardPage: Products API completed')
+            error: (err) => console.error('AdminDashboardPage: Products API error:', err)
           }),
           catchError((err) => {
             console.warn('AdminDashboardPage: Catching Products API error, returning null:', err);
@@ -115,9 +107,7 @@ export class AdminDashboardPage implements OnInit {
         ),
         categories: this.categoriesService.getCategories().pipe(
           tap({
-            next: (val) => console.log('AdminDashboardPage: Categories API emitted data:', val),
-            error: (err) => console.error('AdminDashboardPage: Categories API error:', err),
-            complete: () => console.log('AdminDashboardPage: Categories API completed')
+            error: (err) => console.error('AdminDashboardPage: Categories API error:', err)
           }),
           catchError((err) => {
             console.warn('AdminDashboardPage: Catching Categories API error, returning empty array:', err);
@@ -126,9 +116,7 @@ export class AdminDashboardPage implements OnInit {
         ),
         inventory: this.inventoryService.getInventoryAnalytics().pipe(
           tap({
-            next: (val) => console.log('AdminDashboardPage: Inventory API emitted data:', val),
-            error: (err) => console.error('AdminDashboardPage: Inventory API error:', err),
-            complete: () => console.log('AdminDashboardPage: Inventory API completed')
+            error: (err) => console.error('AdminDashboardPage: Inventory API error:', err)
           }),
           catchError((err) => {
             console.warn('AdminDashboardPage: Catching Inventory API error, returning null:', err);
@@ -138,14 +126,12 @@ export class AdminDashboardPage implements OnInit {
       })
       .pipe(
         finalize(() => {
-          console.log('AdminDashboardPage: forkJoin finalize executed, setting isLoading = false');
           this.isLoading = false;
           this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: (results) => {
-          console.log('AdminDashboardPage: forkJoin next handler received results:', results);
           try {
             if (!results.analytics) {
               console.warn('AdminDashboardPage: Analytics data is empty, setting error state');
@@ -183,7 +169,6 @@ export class AdminDashboardPage implements OnInit {
               else if (statusCount.status === 'DELIVERED') this.deliveredCount = statusCount.count;
             });
             
-            console.log('AdminDashboardPage: Data processed successfully. averageOrderValue:', this.averageOrderValue);
             this.cdr.markForCheck();
           } catch (innerError) {
             console.error('AdminDashboardPage: Exception while processing successful results:', innerError);
@@ -197,7 +182,6 @@ export class AdminDashboardPage implements OnInit {
           this.cdr.markForCheck();
         },
         complete: () => {
-          console.log('AdminDashboardPage: forkJoin subscription completed');
         }
       });
     } catch (outerError) {

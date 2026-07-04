@@ -9,23 +9,33 @@ import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 let isRefreshing = false;
 let refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
+/**
+ * Auth-aware error interceptor.
+ *
+ * On a 401 response from any *non-auth* endpoint, transparently attempts to
+ * refresh the access token using the HttpOnly cookie and retries the request.
+ *
+ * Auth endpoints (/auth/login, /auth/refresh, /auth/logout) are excluded from
+ * the retry logic to prevent infinite loops.
+ */
 export const errorInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
 
+  // URLs that must never trigger the 401 retry / refresh loop
+  const isAuthEndpoint =
+    request.url.includes(API_ENDPOINTS.auth.login) ||
+    request.url.includes(API_ENDPOINTS.auth.refresh) ||
+    request.url.includes(API_ENDPOINTS.auth.logout);
+
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (
-        error.status === 401 &&
-        !request.url.includes(API_ENDPOINTS.auth.login) &&
-        !request.url.includes(API_ENDPOINTS.auth.refresh)
-      ) {
+      if (error.status === 401 && !isAuthEndpoint) {
+        // Regular API call returned 401 — silently refresh and retry
         return handle401Error(request, next, authService);
       }
 
-      if (error.status === 401 && request.url.includes(API_ENDPOINTS.auth.refresh)) {
-        authService.logout();
-      }
-
+      // For auth endpoints that returned 401, just pass the error through.
+      // auth.service.ts handles the local state cleanup via clearLocalSession().
       return throwError(() => normalizeApiError(error));
     })
   );
@@ -50,10 +60,12 @@ function handle401Error(request: HttpRequest<unknown>, next: HttpHandlerFn, auth
       }),
       catchError((err) => {
         isRefreshing = false;
+        // refreshSession() already cleared local state — just propagate the error
         return throwError(() => normalizeApiError(err));
       })
     );
   } else {
+    // A refresh is already in flight — queue this request until it completes
     return refreshTokenSubject.pipe(
       filter((token) => token !== null),
       take(1),

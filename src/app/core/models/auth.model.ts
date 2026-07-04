@@ -13,17 +13,11 @@ export interface SignupRequest {
 
 export interface AuthResponse {
   accessToken: string;
-  refreshToken: string;
   tokenType: string;
-}
-
-export interface TokenRefreshRequest {
-  refreshToken: string;
 }
 
 export interface TokenRefreshResponse {
   accessToken: string;
-  refreshToken: string;
   tokenType: string;
 }
 

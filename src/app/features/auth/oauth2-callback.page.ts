@@ -33,11 +33,12 @@ export class Oauth2CallbackPage implements OnInit {
     }
 
     const accessToken = this.route.snapshot.queryParamMap.get('accessToken');
-    const refreshToken = this.route.snapshot.queryParamMap.get('refreshToken');
 
-    if (accessToken && refreshToken) {
-      this.authService.setTokensFromOAuth(accessToken, refreshToken);
-      
+    if (accessToken) {
+      // The refresh token was set as an HttpOnly cookie by the backend redirect.
+      // We only need to store the access token on the frontend.
+      this.authService.setTokensFromOAuth(accessToken);
+
       const role = this.authService.currentRole();
       if (role === 'ROLE_ADMIN') {
         this.router.navigateByUrl('/admin');

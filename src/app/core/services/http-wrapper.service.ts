@@ -18,7 +18,8 @@ export class HttpWrapperService {
     return this.http
       .get<T>(this.buildUrl(path), {
         params: this.createParams(options?.params),
-        responseType: (options?.responseType || 'json') as any
+        responseType: (options?.responseType || 'json') as any,
+        withCredentials: options?.withCredentials ?? false
       })
       .pipe(timeout(this.requestTimeoutMs));
   }
@@ -27,7 +28,8 @@ export class HttpWrapperService {
     return this.http
       .post<TResponse>(this.buildUrl(path), body, {
         params: this.createParams(options?.params),
-        responseType: (options?.responseType || 'json') as any
+        responseType: (options?.responseType || 'json') as any,
+        withCredentials: options?.withCredentials ?? false
       })
       .pipe(timeout(this.requestTimeoutMs));
   }

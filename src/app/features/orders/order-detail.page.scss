@@ -406,6 +406,7 @@
     max-height: 380px;
     overflow-y: auto;
     padding-right: 0.5rem;
+    overscroll-behavior: contain; // prevents pull-to-refresh when scrolling up inside the card on mobile
 
     /* Custom Scrollbar Styling */
     &::-webkit-scrollbar {

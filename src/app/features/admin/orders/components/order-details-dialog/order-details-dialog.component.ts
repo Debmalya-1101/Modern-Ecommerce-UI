@@ -362,13 +362,11 @@ export class OrderDetailsDialogComponent implements OnInit {
   }
 
   loadOrderDetails(): void {
-    console.log('OrderDetailsDialogComponent: Fetching order details for ID:', this.data.orderId);
     this.loading = true;
     this.error = '';
 
     this.adminOrdersService.getOrderDetails(this.data.orderId).subscribe({
       next: (order) => {
-        console.log('OrderDetailsDialogComponent: API success. Order response:', order);
         this.order = order;
         this.loading = false;
         this.cdr.markForCheck();

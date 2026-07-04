@@ -40,7 +40,28 @@
     </div>
   </mat-drawer>
 
-  <mat-drawer-content class="admin-content">
+  <mat-drawer-content class="admin-content"
+    (touchstart)="onTouchStart($event)"
+    (touchmove)="onTouchMove($event)"
+    (touchend)="onTouchEnd()"
+    (touchcancel)="onTouchEnd()"
+  >
+    <!-- Pull to Refresh Indicator -->
+    @if (isMobile() && (isPulling() || isRefreshing())) {
+      <div class="pull-to-refresh-wrapper">
+        <div 
+          class="pull-to-refresh-indicator"
+          [style.transform]="'translateY(' + pullDistance() + 'px)'"
+        >
+          <div class="pull-to-refresh-circle" [class.refreshing]="isRefreshing()">
+            <mat-icon [class.spin]="isRefreshing()" [style.transform]="!isRefreshing() ? 'rotate(' + (pullDistance() * 3.5) + 'deg)' : ''">
+              {{ isRefreshing() ? 'refresh' : 'arrow_downward' }}
+            </mat-icon>
+          </div>
+        </div>
+      </div>
+    }
+
     <header class="admin-header">
       <mat-toolbar class="admin-toolbar">
         <div class="toolbar-left">

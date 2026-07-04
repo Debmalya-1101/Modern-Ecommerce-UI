@@ -39,6 +39,12 @@
       font-size: 1rem;
     }
   }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
 }
 
 .metrics-grid {
@@ -162,4 +168,82 @@
 
 .metric-card:nth-child(5):hover::before {
   background: #D32F2F;
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    gap: 1.25rem;
+    padding-bottom: 1rem;
+  }
+
+  .page-header {
+    padding: 1.25rem;
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 16px;
+
+    .header-main {
+      .title-area h1 {
+        font-size: 1.5rem;
+      }
+      .subtitle {
+        font-size: 0.9rem;
+      }
+    }
+
+    .header-actions {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+
+      button {
+        width: 100%;
+        padding: 0 8px;
+        font-size: 0.85rem;
+        
+        &:last-child {
+          grid-column: 1 / -1;
+        }
+      }
+    }
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .metric-card {
+    border-radius: 14px !important;
+
+    mat-card-content {
+      padding: 1rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .metric-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .metric-info {
+      .value {
+        font-size: 1.6rem;
+      }
+      .label {
+        font-size: 0.85rem;
+        line-height: 1.2;
+      }
+    }
+  }
 }
