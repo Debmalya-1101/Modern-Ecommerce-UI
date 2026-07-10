@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Cancel Order #{{ data.orderId }}</h2>
+<mat-dialog-content>
+  <p>Please provide a reason for cancelling this order.</p>
+  <form [formGroup]="cancelForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="outline" class="w-full mt-4">
+      <mat-label>Cancellation Reason</mat-label>
+      <textarea matInput formControlName="reason" rows="4" placeholder="Enter reason (10-1000 characters)"></textarea>
+      <mat-error *ngIf="cancelForm.get('reason')?.hasError('required')">Reason is required</mat-error>
+      <mat-error *ngIf="cancelForm.get('reason')?.hasError('minlength')">Reason must be at least 10 characters</mat-error>
+      <mat-error *ngIf="cancelForm.get('reason')?.hasError('maxlength')">Reason cannot exceed 1000 characters</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Back</button>
+  <button mat-flat-button color="warn" [disabled]="cancelForm.invalid" (click)="onSubmit()">Confirm Cancel</button>
+</mat-dialog-actions>

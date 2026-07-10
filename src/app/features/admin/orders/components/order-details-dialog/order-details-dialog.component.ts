@@ -384,7 +384,8 @@ export class OrderDetailsDialogComponent implements OnInit {
 
   getStatusClass(status: string): string {
     switch (status) {
-      case 'PLACED': return 'status-placed';
+      case 'CONFIRMED':
+      case 'PENDING_PAYMENT': return 'status-placed';
       case 'SHIPPED': return 'status-shipped';
       case 'DELIVERED': return 'status-delivered';
       case 'CANCELLED': return 'status-cancelled';

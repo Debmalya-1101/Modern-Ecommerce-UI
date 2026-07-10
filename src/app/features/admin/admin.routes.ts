@@ -22,6 +22,11 @@ export const ADMIN_ROUTES: Routes = [
           import('./analytics/admin-analytics.page').then((m) => m.AdminAnalyticsPage)
       },
       {
+        path: 'notifications',
+        loadComponent: () =>
+          import('./notifications/admin-notifications.page').then((m) => m.AdminNotificationsPage)
+      },
+      {
         path: 'products',
         loadComponent: () =>
           import('./products/admin-products.page').then((m) => m.AdminProductsPage)

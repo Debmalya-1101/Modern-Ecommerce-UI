@@ -238,6 +238,12 @@ a {
   }
 }
 
+/* Global Table Border Radius Fix */
+.mat-mdc-table {
+  border-radius: var(--border-radius-md) !important;
+  overflow: hidden !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Shared Page Header Block — use class="page-header-block"
    to apply consistent page-level h1 + subtitle styling.

@@ -13,10 +13,16 @@
           <mat-label>Filter by Status</mat-label>
           <mat-select [value]="statusFilter || 'ALL'" (selectionChange)="onStatusFilterChange($event.value)">
             <mat-option value="ALL">All Orders</mat-option>
-            <mat-option value="PLACED">Placed</mat-option>
+            <mat-option value="PENDING_PAYMENT">Pending Payment</mat-option>
+            <mat-option value="PAYMENT_FAILED">Payment Failed</mat-option>
+            <mat-option value="CONFIRMED">Confirmed</mat-option>
+            <mat-option value="PROCESSING">Processing</mat-option>
             <mat-option value="SHIPPED">Shipped</mat-option>
+            <mat-option value="OUT_FOR_DELIVERY">Out for Delivery</mat-option>
             <mat-option value="DELIVERED">Delivered</mat-option>
+            <mat-option value="DELIVERY_FAILED">Delivery Failed</mat-option>
             <mat-option value="CANCELLED">Cancelled</mat-option>
+            <mat-option value="RETURNED">Returned</mat-option>
           </mat-select>
         </mat-form-field>
         <div class="spacer"></div>
@@ -75,10 +81,10 @@
                   <span>View Details</span>
                 </button>
                 
-                <ng-container *ngFor="let newStatus of getAvailableStatusTransitions(order.status)">
-                  <button mat-menu-item (click)="updateOrderStatus(order, newStatus)">
-                    <mat-icon color="accent">local_shipping</mat-icon>
-                    <span>Mark as {{ newStatus }}</span>
+                <ng-container *ngIf="order.status === 'CONFIRMED'">
+                  <button mat-menu-item (click)="cancelOrder(order)">
+                    <mat-icon color="warn">cancel</mat-icon>
+                    <span>Cancel Order</span>
                   </button>
                 </ng-container>
               </mat-menu>

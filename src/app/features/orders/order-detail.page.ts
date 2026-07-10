@@ -126,8 +126,12 @@ export class OrderDetailPage implements OnInit {
     if (!status) return 1;
     const s = status.toUpperCase();
     switch (s) {
-      case 'PLACED': return 1;
+      case 'PENDING_PAYMENT':
+      case 'PAYMENT_FAILED':
+      case 'CONFIRMED': return 1;
+      case 'PROCESSING':
       case 'SHIPPED': return 2;
+      case 'OUT_FOR_DELIVERY':
       case 'DELIVERED': return 3;
       default: return 1;
     }

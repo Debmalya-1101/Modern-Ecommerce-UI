@@ -17,6 +17,8 @@ import { CartService } from './core/services/cart.service';
 import { WishlistService } from './core/services/wishlist.service';
 import { ButtonStyleDirective } from './shared/directives/button-style.directive';
 import { CartDrawerComponent } from './features/cart/components/cart-drawer/cart-drawer.component';
+import { ColdStartBannerComponent } from './shared/components/cold-start-banner/cold-start-banner.component';
+import { ColdStartService } from './core/services/cold-start.service';
 
 interface NavigationItem {
   label: string;
@@ -41,7 +43,8 @@ interface NavigationItem {
     MatIconModule,
     MatMenuModule,
     ButtonStyleDirective,
-    CartDrawerComponent
+    CartDrawerComponent,
+    ColdStartBannerComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
@@ -53,6 +56,7 @@ export class App {
   private readonly authService = inject(AuthService);
   private readonly cartService = inject(CartService);
   private readonly wishlistService = inject(WishlistService);
+  protected readonly coldStartService = inject(ColdStartService);
   private readonly mobileBreakpoint = '(max-width: 768px)';
   private readonly startsOnMobile = this.breakpointObserver.isMatched(this.mobileBreakpoint);
   protected readonly currentUrl = signal(this.router.url);

@@ -87,7 +87,7 @@ export class AdminDashboardPage implements OnInit {
             return of(null);
           })
         ),
-        orders: this.ordersService.getOrders({ page: 0, size: 5, status: 'PLACED' }).pipe(
+        orders: this.ordersService.getOrders({ page: 0, size: 5, status: 'CONFIRMED' }).pipe(
           tap({
             error: (err) => console.error('AdminDashboardPage: Orders API error:', err)
           }),
@@ -164,7 +164,7 @@ export class AdminDashboardPage implements OnInit {
             this.deliveredCount = 0;
 
             this.analyticsData.ordersByStatus.forEach(statusCount => {
-              if (statusCount.status === 'PLACED') this.placedCount = statusCount.count;
+              if (statusCount.status === 'CONFIRMED' || statusCount.status === 'PENDING_PAYMENT') this.placedCount += statusCount.count;
               else if (statusCount.status === 'SHIPPED') this.shippedCount = statusCount.count;
               else if (statusCount.status === 'DELIVERED') this.deliveredCount = statusCount.count;
             });
@@ -198,7 +198,8 @@ export class AdminDashboardPage implements OnInit {
 
   getStatusColor(status: string): string {
     switch (status) {
-      case 'PLACED': return 'primary';
+      case 'CONFIRMED':
+      case 'PENDING_PAYMENT': return 'primary';
       case 'SHIPPED': return 'accent';
       case 'DELIVERED': return 'primary';
       case 'CANCELLED': return 'warn';

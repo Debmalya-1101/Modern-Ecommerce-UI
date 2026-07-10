@@ -81,7 +81,7 @@ export class PaymentProcessingPage implements OnInit {
       next: (order) => {
         this.order.set(order);
         
-        if (order.orderStatus !== 'PLACED') {
+        if (order.orderStatus !== 'PENDING_PAYMENT' && order.orderStatus !== 'PAYMENT_FAILED') {
           // If already shipped/delivered or cancelled, payment shouldn't be processed here
           this.snackbar.info('This order has already been processed.');
           this.router.navigate(['/orders', orderId]);

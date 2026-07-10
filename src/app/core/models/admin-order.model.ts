@@ -14,7 +14,7 @@ export interface AdminOrder {
   address: string;
   phoneNo: string | number;
   total: number;
-  status: 'PLACED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  status: import('./order.model').OrderStatus;
   createdAt: string;
   items: AdminOrderItem[];
 }

@@ -91,7 +91,7 @@ export class DpShipmentsActiveComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result?: DpShipmentFailureDialogResult) => {
       if (result && result.failureReason) {
-        this.executeStatusUpdate(shipment.id, ShipmentStatus.FAILED, result.failureReason);
+        this.executeStatusUpdate(shipment.id, ShipmentStatus.DELIVERY_FAILED, result.failureReason);
       }
     });
   }
@@ -100,8 +100,8 @@ export class DpShipmentsActiveComponent implements OnInit {
     this.shipmentsService.updateShipmentStatus(id, { status, failureReason }).subscribe({
       next: (updated) => {
         this.snackbarService.success(`Shipment status updated to ${status}`);
-        // Remove from active list if terminal state (DELIVERED or FAILED)
-        if (status === ShipmentStatus.DELIVERED || status === ShipmentStatus.FAILED) {
+        // Remove from active list if terminal state (DELIVERED or DELIVERY_FAILED)
+        if (status === ShipmentStatus.DELIVERED || status === ShipmentStatus.DELIVERY_FAILED) {
           this.shipments.update(list => list.filter(s => s.id !== id));
         } else {
           // Update in place

@@ -116,7 +116,7 @@ export class DpShipmentDetailComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result?: DpShipmentFailureDialogResult) => {
       if (result && result.failureReason) {
-        this.executeStatusUpdate(currentShipment.id, ShipmentStatus.FAILED, result.failureReason);
+        this.executeStatusUpdate(currentShipment.id, ShipmentStatus.DELIVERY_FAILED, result.failureReason);
       }
     });
   }

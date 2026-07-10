@@ -19,7 +19,7 @@ import { MatCardModule } from '@angular/material/card';
 import { AdminOrder } from '../../../core/models/admin-order.model';
 import { AdminOrdersService } from '../../../core/services/admin-orders.service';
 import { OrderDetailsDialogComponent } from './components/order-details-dialog/order-details-dialog.component';
-import { OrderConfirmDialogComponent } from './components/order-confirm-dialog/order-confirm-dialog.component';
+import { AdminCancelOrderDialogComponent } from './components/admin-cancel-order-dialog/admin-cancel-order-dialog.component';
 
 @Component({
   selector: 'app-admin-orders',
@@ -109,30 +109,22 @@ export class AdminOrdersPage implements OnInit {
     });
   }
 
-  updateOrderStatus(order: AdminOrder, newStatus: 'PLACED' | 'SHIPPED' | 'DELIVERED'): void {
-    if (order.status === newStatus) return;
-
-    const dialogRef = this.dialog.open(OrderConfirmDialogComponent, {
-      width: '400px',
-      data: {
-        title: 'Confirm Status Update',
-        message: `Are you sure you want to update the status of order #${order.orderId} to ${newStatus}?`,
-        confirmText: 'Update Status',
-        cancelText: 'Cancel',
-        color: 'primary'
-      }
+  cancelOrder(order: AdminOrder): void {
+    const dialogRef = this.dialog.open(AdminCancelOrderDialogComponent, {
+      width: '500px',
+      data: { orderId: order.orderId }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.adminOrdersService.updateOrderStatus(order.orderId, newStatus).subscribe({
+    dialogRef.afterClosed().subscribe(reason => {
+      if (reason) {
+        this.adminOrdersService.cancelOrder(order.orderId, reason).subscribe({
           next: () => {
-            this.snackBar.success('Order status updated successfully');
+            this.snackBar.success('Order cancelled successfully');
             this.loadOrders();
           },
           error: (error: any) => {
-            console.error('Error updating order status', error);
-            this.snackBar.error('Failed to update order status');
+            console.error('Error cancelling order', error);
+            this.snackBar.error('Failed to cancel order');
           }
         });
       }
@@ -140,19 +132,21 @@ export class AdminOrdersPage implements OnInit {
   }
 
   getStatusClass(status: string): string {
-    switch (status) {
-      case 'PLACED': return 'status-placed';
+    if (!status) return '';
+    const s = status.toUpperCase();
+    switch (s) {
+      case 'PENDING_PAYMENT': return 'status-pending';
+      case 'PAYMENT_FAILED': return 'status-failed';
+      case 'CONFIRMED': return 'status-placed';
+      case 'PROCESSING': return 'status-processing';
       case 'SHIPPED': return 'status-shipped';
+      case 'OUT_FOR_DELIVERY': return 'status-out-for-delivery';
       case 'DELIVERED': return 'status-delivered';
+      case 'DELIVERY_FAILED': return 'status-failed';
       case 'CANCELLED': return 'status-cancelled';
+      case 'RETURNED': return 'status-returned';
       default: return '';
     }
-  }
-
-  getAvailableStatusTransitions(currentStatus: string): ('PLACED' | 'SHIPPED' | 'DELIVERED')[] {
-    if (currentStatus === 'PLACED') return ['SHIPPED', 'DELIVERED'];
-    if (currentStatus === 'SHIPPED') return ['DELIVERED'];
-    return [];
   }
 }
 

@@ -1,4 +1,4 @@
-export type OrderStatus = 'PLACED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus = 'PENDING_PAYMENT' | 'PAYMENT_FAILED' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'DELIVERY_FAILED' | 'CANCELLED' | 'RETURNED';
 export type PaymentStatus = 'INITIATED' | 'COMPLETED' | 'FAILED';
 
 export interface OrderItem {
@@ -44,6 +44,10 @@ export interface OrderDetail {
   items: OrderDetailItem[];
   totalItems: number;
   grandTotal: number;
+  deliveryPartnerName?: string;
+  deliveryPartnerPhone?: string;
+  adminCancelReason?: string;
+  paymentRetriesRemaining?: number;
 }
 
 export interface CheckoutRequest {

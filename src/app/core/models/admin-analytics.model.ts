@@ -1,4 +1,4 @@
-export type OrderStatus = 'PLACED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+import { OrderStatus } from './order.model';
 
 export interface StatusCountDTO {
   status: OrderStatus;
@@ -24,6 +24,8 @@ export interface DashboardAnalyticsDTO {
   totalUsers: number;
   totalOrders: number;
   totalRevenue: number;
+  totalEmailsSent: number;
+  totalEmailsFailed: number;
   ordersByStatus: StatusCountDTO[];
   monthlySalesGraph: MonthlySalesDataDTO[];
   topSellingProducts: TopSellingProductDTO[];

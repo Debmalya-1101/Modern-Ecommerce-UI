@@ -131,6 +131,30 @@
           </div>
         </mat-card-content>
       </mat-card>
+
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="status-content">
+            <mat-icon class="success-text">mark_email_read</mat-icon>
+            <div class="status-info">
+              <div class="status-label">Emails Sent</div>
+              <div class="status-count">{{ analyticsData.totalEmailsSent | number }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="status-card">
+        <mat-card-content>
+          <div class="status-content">
+            <mat-icon color="warn">mark_email_unread</mat-icon>
+            <div class="status-info">
+              <div class="status-label">Emails Failed</div>
+              <div class="status-count">{{ analyticsData.totalEmailsFailed | number }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
 
     <!-- Dashboard Widgets Grid -->

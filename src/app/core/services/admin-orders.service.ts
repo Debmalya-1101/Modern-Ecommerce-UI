@@ -20,7 +20,7 @@ export class AdminOrdersService {
       address: '123 Main St, New York, NY 10001',
       phoneNo: '9876543210',
       total: 1299.99,
-      status: 'PLACED',
+      status: 'CONFIRMED',
       createdAt: new Date().toISOString(),
       items: [
         { productId: 1, productName: 'Apple iPhone 15 Pro', quantity: 1, price: 1299.99, total: 1299.99 }
@@ -105,13 +105,13 @@ export class AdminOrdersService {
     );
   }
 
-  updateOrderStatus(id: number, status: 'PLACED' | 'SHIPPED' | 'DELIVERED'): Observable<any> {
-    return this.apiService.put<any, { status: string }>(API_ENDPOINTS.admin.orderStatus(id), { status }).pipe(
+  cancelOrder(id: number, reason: string): Observable<any> {
+    return this.apiService.post<any, { reason: string }>(`${API_ENDPOINTS.admin.orders}/${id}/cancel`, { reason }).pipe(
       catchError(error => {
-        console.warn(`Backend unavailable or error updating status for order ${id}. Using mock data.`, error);
+        console.warn(`Backend unavailable or error cancelling order ${id}. Using mock data.`, error);
         const orderIndex = this.mockOrders.findIndex(o => o.orderId === id);
         if (orderIndex !== -1) {
-          this.mockOrders[orderIndex].status = status;
+          this.mockOrders[orderIndex].status = 'CANCELLED';
           return of(this.mockOrders[orderIndex]);
         }
         return throwError(() => error);

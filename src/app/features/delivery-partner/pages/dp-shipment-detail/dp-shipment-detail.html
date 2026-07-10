@@ -35,7 +35,7 @@
         
         <div class="status-banner">
           <mat-chip 
-            [color]="s.status === 'DELIVERED' ? 'primary' : s.status === 'FAILED' ? 'warn' : 'accent'" 
+            [color]="s.status === 'DELIVERED' ? 'primary' : s.status === 'DELIVERY_FAILED' ? 'warn' : 'accent'" 
             highlighted>
             {{ s.status }}
           </mat-chip>

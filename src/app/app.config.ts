@@ -4,6 +4,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideRouter } from '@angular/router';
 
 import { provideAuthInitialization } from './core/providers/auth.providers';
+import { coldStartInterceptor } from './core/interceptors/cold-start.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { jwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { routes } from './app.routes';
@@ -12,7 +13,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor])),
+    provideHttpClient(withInterceptors([jwtInterceptor, coldStartInterceptor, errorInterceptor])),
     provideAuthInitialization(),
     provideRouter(routes)
   ]

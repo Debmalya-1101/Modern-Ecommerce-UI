@@ -5999,3 +5999,34 @@ What I learned:
 - When implementing a refresh token flow, you must handle concurrency. If a page loads and fires 5 API calls simultaneously, and the token is expired, you only want to call the refresh endpoint *once*, not 5 times. 
 - Using RxJS `BehaviorSubject` allows the interceptor to block and queue subsequent failed requests until the single refresh request is successfully fulfilled.
 - OAuth2 is a backend-driven flow: the frontend simply redirects the user to the backend authorization URL, and the backend handles the complex redirect dance with Google/Facebook, eventually redirecting the browser back to a specific frontend callback route (`/oauth2/callback`) with the tokens in the URL.
+
+## Feature Update: Advanced Order State Machine
+
+What was added:
+- Updated frontend models and logic to support a robust 10-state order lifecycle (`PENDING_PAYMENT`, `PAYMENT_FAILED`, `CONFIRMED`, `PROCESSING`, `SHIPPED`, `OUT_FOR_DELIVERY`, `DELIVERED`, `DELIVERY_FAILED`, `CANCELLED`, `RETURNED`).
+- Implemented an `AdminCancelOrderDialogComponent` requiring administrators to supply a justification (reason) when cancelling confirmed orders.
+- Improved the Order Details UI to conditionally display Delivery Partner Details, Admin Cancellation Reasons, and offer smart Payment Retries based on new backend data points.
+
+Why it was added:
+- Enterprise e-commerce platforms require granular tracking of shipments and orders (e.g. knowing a payment failed vs pending, or tracking last-mile delivery failure). 
+- Providing cancellation reasons creates an audit trail and improves customer transparency.
+
+Angular concept behind it:
+- **MatDialog with Reactive Forms:** The cancellation modal uses Angular Material's Dialog combined with Reactive Forms to enforce validation rules (min/max length, required) before submission.
+- **Control Flow (@if):** Leveraging the new Angular `@if` syntax for cleaner template-level conditional rendering of the Delivery Partner card and Cancellation alert blocks based on optional object properties.
+
+Simple example:
+
+```html
+@if (order()!.orderStatus === 'CANCELLED' && order()!.adminCancelReason) {
+  <div class="cancellation-alert">
+    <h4>Order Cancelled</h4>
+    <p>{{ order()!.adminCancelReason }}</p>
+  </div>
+}
+```
+
+What I learned:
+- When the backend state machine evolves significantly, mapping those states appropriately in frontend models and utility functions is crucial to avoid breaking existing UI components.
+- The new Angular control flow (`@if`) handles optional chaining checks gracefully and keeps templates readable compared to nested `*ngIf` directives.
+- Hardcoded type unions like `'PLACED' | 'SHIPPED'` need to be updated globally. Defining them centrally (e.g. `type OrderStatus = ...`) ensures easier maintainability.

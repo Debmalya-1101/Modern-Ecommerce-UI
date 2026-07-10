@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterLink } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 
 import { AdminAnalyticsService } from '../../../core/services/admin-analytics.service';
@@ -12,7 +14,7 @@ Chart.register(...registerables);
 
 @Component({
   selector: 'app-admin-analytics',
-  imports: [CommonModule, MatCardModule, MatIconModule, MatTableModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatTableModule, MatProgressSpinnerModule, RouterLink],
   templateUrl: './admin-analytics.page.html',
   styleUrl: './admin-analytics.page.scss'
 })
@@ -107,15 +109,7 @@ export class AdminAnalyticsPage implements OnInit {
 
     const statusLabels = data.ordersByStatus.map(s => s.status);
     const statusData = data.ordersByStatus.map(s => s.count);
-    const statusColors = data.ordersByStatus.map(s => {
-      switch (s.status) {
-        case 'PLACED': return '#b55f34';
-        case 'SHIPPED': return '#8a6433';
-        case 'DELIVERED': return '#4b6a50';
-        case 'CANCELLED': return '#a14634';
-        default: return '#5a473d';
-      }
-    });
+    const statusColors = data.ordersByStatus.map(s => this.getStatusColor(s.status));
 
     this.statusChartInstance = new Chart(this.statusChartRef.nativeElement, {
       type: 'doughnut',
@@ -136,5 +130,16 @@ export class AdminAnalyticsPage implements OnInit {
         }
       }
     });
+  }
+
+  private getStatusColor(status: string): string {
+    switch (status) {
+      case 'PENDING_PAYMENT':
+      case 'CONFIRMED': return '#b55f34';
+      case 'SHIPPED': return '#8a6433';
+      case 'DELIVERED': return '#4b6a50';
+      case 'CANCELLED': return '#a14634';
+      default: return '#5a473d';
+    }
   }
 }
