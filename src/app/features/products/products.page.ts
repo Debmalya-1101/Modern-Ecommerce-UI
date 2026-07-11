@@ -3,6 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatSelectModule, MatSelectChange } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -40,6 +42,8 @@ interface CatalogFilters {
     MatIconModule,
     MatPaginatorModule,
     MatSidenavModule,
+    MatSelectModule,
+    MatFormFieldModule,
     EmptyStateComponent,
     ErrorStateComponent,
     ProductGridComponent,
@@ -176,9 +180,9 @@ export class ProductsPage implements OnInit {
     this.showFilterDrawer.update(v => !v);
   }
 
-  protected changeSort(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const [sortBy, order] = target.value.split('-');
+  protected changeSort(event: MatSelectChange): void {
+    const value = event.value;
+    const [sortBy, order] = value.split('-');
     this.updateCatalogFilters({ sortBy, order });
   }
 

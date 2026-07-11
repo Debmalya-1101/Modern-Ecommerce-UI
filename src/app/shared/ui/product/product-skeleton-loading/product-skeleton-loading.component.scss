@@ -4,7 +4,7 @@
 
 .product-skeleton-grid {
   display: grid;
-  gap: 1rem;
+  gap: 1.5rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
@@ -13,8 +13,9 @@
   gap: 0.85rem;
   padding: 1rem;
   border: 1px solid rgba(87, 61, 44, 0.12);
-  border-radius: 1.4rem;
+  border-radius: var(--border-radius-md, 12px);
   background: rgba(255, 252, 247, 0.96);
+  box-shadow: 0 8px 24px rgba(80, 54, 36, 0.05);
 }
 
 .product-skeleton-card__media {
@@ -23,9 +24,9 @@
   background:
     linear-gradient(
       90deg,
-      rgba(233, 223, 213, 0.82) 0%,
-      rgba(248, 242, 236, 0.95) 50%,
-      rgba(233, 223, 213, 0.82) 100%
+      rgba(246, 231, 219, 0.7) 0%,
+      rgba(255, 250, 243, 0.95) 50%,
+      rgba(246, 231, 219, 0.7) 100%
     );
   background-size: 200% 100%;
   animation: product-skeleton-shimmer 1.6s linear infinite;
@@ -49,14 +50,14 @@
 
 @media (max-width: 900px) {
   .product-skeleton-grid {
-    gap: 1rem;
+    gap: 1.25rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 600px) {
   .product-skeleton-grid {
-    gap: 0.75rem;
+    gap: 1rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

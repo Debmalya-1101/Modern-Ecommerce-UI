@@ -3,18 +3,23 @@
 }
 
 .category-chip {
-  background: transparent !important;
-  border: 1px solid rgba(138, 119, 109, 0.4) !important;
+  background: var(--color-brand-050, #f6e7db) !important;
+  border: 1px solid rgba(181, 95, 52, 0.15) !important;
   border-radius: var(--border-radius-md) !important;
-  color: #6e5d52 !important;
+  color: var(--color-neutral-700) !important;
   min-height: 1.6rem !important;
   padding: 0 !important;
   transition: all 0.2s ease;
-  
+
+  &:hover {
+    transform: scale(1.03);
+    border-color: rgba(181, 95, 52, 0.3) !important;
+  }
+
   ::ng-deep .mdc-evolution-chip__action {
     padding: 0 clamp(0.25rem, 1.5vw, 0.6rem) !important;
   }
-  
+
   .chip-content {
     display: flex;
     align-items: center;
@@ -22,7 +27,8 @@
   }
 
   span {
-    font-weight: 500;
+    font-weight: 600;
     font-size: 0.82rem;
+    letter-spacing: 0.01em;
   }
 }

@@ -67,13 +67,15 @@
       }
       
       <div class="meta-actions">
-        <select class="sort-select" [value]="filters().sortBy + '-' + filters().order" (change)="changeSort($event)" aria-label="Sort products">
-          <option value="createdAt-desc">Newest</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="rating-desc">Top Rated</option>
-          <option value="name-asc">Name: A to Z</option>
-        </select>
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="sort-select-field">
+          <mat-select [value]="filters().sortBy + '-' + filters().order" (selectionChange)="changeSort($event)" aria-label="Sort products">
+            <mat-option value="createdAt-desc">Newest</mat-option>
+            <mat-option value="price-asc">Price: Low to High</mat-option>
+            <mat-option value="price-desc">Price: High to Low</mat-option>
+            <mat-option value="rating-desc">Top Rated</mat-option>
+            <mat-option value="name-asc">Name: A to Z</mat-option>
+          </mat-select>
+        </mat-form-field>
         <button class="filter-toggle-btn" (click)="toggleFilterDrawer()">
           <mat-icon>tune</mat-icon> Filters
         </button>

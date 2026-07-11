@@ -6030,3 +6030,130 @@ What I learned:
 - When the backend state machine evolves significantly, mapping those states appropriately in frontend models and utility functions is crucial to avoid breaking existing UI components.
 - The new Angular control flow (`@if`) handles optional chaining checks gracefully and keeps templates readable compared to nested `*ngIf` directives.
 - Hardcoded type unions like `'PLACED' | 'SHIPPED'` need to be updated globally. Defining them centrally (e.g. `type OrderStatus = ...`) ensures easier maintainability.
+
+---
+
+## Premium Products Page Redesign (Style-Only)
+
+**What was done:** Upgraded the products catalog page to have a premium, luxury feel by modifying 9 SCSS files — no TypeScript or HTML changes.
+
+### Key CSS Concepts Learned
+
+#### 1. Glassmorphism (Frosted Glass Effect)
+A modern UI trend where elements look like frosted glass panels. You achieve it with two properties:
+
+```scss
+.card {
+  background: rgba(255, 252, 247, 0.85);   // Semi-transparent background
+  backdrop-filter: blur(12px);              // Blurs whatever is behind the element
+  -webkit-backdrop-filter: blur(12px);      // Safari support
+}
+```
+
+Think of it like looking through frosted bathroom glass — you can see blurry shapes behind. The semi-transparent background adds a tint color.
+
+#### 2. Layered Box Shadows for Depth
+Instead of one flat shadow, premium UIs use multiple shadows at different distances to simulate real-world light:
+
+```scss
+.card {
+  box-shadow:
+    0 4px 16px rgba(80, 54, 36, 0.05),   // Large, soft, far shadow
+    0 1px 3px rgba(80, 54, 36, 0.04);    // Tight, close shadow for definition
+}
+```
+
+It's like how a real card on a desk casts both a sharp shadow near the edges and a softer one further out.
+
+#### 3. CSS Keyframe Animations with Stagger
+Cards "cascade in" on page load. The animation is defined once, but each card gets a slightly later `animation-delay`:
+
+```scss
+// 1. Define the animation
+@keyframes card-entrance {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// 2. Apply it in the card
+.product-card {
+  animation: card-entrance 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+  // "backwards" means the element starts invisible (at the `from` state)
+}
+
+// 3. Stagger in the grid using SCSS @for loop
+.product-grid > * {
+  @for $i from 1 through 12 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * 0.04}s;  // 0s, 0.04s, 0.08s, 0.12s...
+    }
+  }
+}
+```
+
+The SCSS `@for` loop generates 12 CSS rules at compile time — the browser never runs any loop. Card 1 starts immediately, card 2 after 40ms, card 3 after 80ms, etc.
+
+#### 4. CSS Custom Properties as Design Tokens
+Instead of hardcoding colors everywhere, the app defines tokens once in `:root`:
+
+```scss
+:root {
+  --color-brand-500: #b55f34;
+}
+
+// Then use them everywhere:
+.button { background: var(--color-brand-500); }
+.chip   { border-color: var(--color-brand-500); }
+```
+
+This is the CSS equivalent of constants. Change one value, everything updates. The `var()` function also supports fallbacks: `var(--color-brand-500, #b55f34)`.
+
+What I learned:
+- `backdrop-filter: blur()` creates glassmorphism but needs `-webkit-` prefix for Safari. The background must be semi-transparent for the blur to show through.
+- Layered `box-shadow` (comma-separated values) creates more realistic depth than a single shadow.
+- SCSS `@for` loops generate CSS at compile time — great for creating nth-child animation stagger without writing repetitive rules.
+- `animation-fill-mode: backwards` keeps the element at the `from` keyframe state until the animation starts — crucial when using `animation-delay` so elements don't flash before animating.
+- Style-only changes (SCSS) are the safest kind of refactor — no risk of breaking component logic, routing, or data flow.
+
+## Converting Native Selects to Angular Material
+
+**Date:** July 11, 2026
+**Topic:** Angular Material UI Modernization
+
+**Concept:** 
+Angular Material provides <mat-select> to replace the native browser <select> dropdown, resulting in a cleaner, more premium look that aligns with modern e-commerce requirements. For a backend-heavy developer, think of this as upgrading a standard database row fetch to a fully mapped object in an ORM — it requires a bit more boilerplate (importing specific modules, setting up the wrapper components), but the result is more powerful, feature-rich, and standardized across the app.
+
+**How to implement:**
+1. Import MatSelectModule and MatFormFieldModule in your component (if standalone) or NgModule.
+2. Ensure you also import MatSelectChange if you want strictly typed event handlers.
+3. Replace <select> with <mat-form-field> containing a <mat-select>.
+
+**Example:**
+Before:
+\\\html
+<select (change)=\changeSort()\>
+  <option value=\
+ewest\>Newest</option>
+</select>
+\\\
+
+After:
+\\\html
+<mat-form-field appearance=\outline\ subscriptSizing=\dynamic\>
+  <mat-select (selectionChange)=\changeSort()\>
+    <mat-option value=\
+ewest\>Newest</option>
+  </mat-select>
+</mat-form-field>
+\\\
+
+\\\	ypescript
+import { MatSelectChange } from '@angular/material/select';
+
+// Inside Component:
+changeSort(event: MatSelectChange) {
+  const value = event.value; 
+  // do something with value
+}
+\\\
+

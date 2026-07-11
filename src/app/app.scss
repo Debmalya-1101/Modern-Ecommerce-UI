@@ -15,9 +15,6 @@
 
 .shell-container {
   height: 100dvh;
-  background:
-    radial-gradient(circle at top left, rgba(255, 222, 196, 0.7), transparent 28%),
-    linear-gradient(180deg, #fbf6f0 0%, #f3ede6 100%);
 }
 
 .auth-shell {
@@ -25,10 +22,6 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  background:
-    radial-gradient(circle at top left, rgba(255, 224, 201, 0.62), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(255, 242, 229, 0.92), transparent 30%),
-    linear-gradient(180deg, #fcf8f3 0%, #f4eee6 100%);
 }
 
 .auth-shell__header {

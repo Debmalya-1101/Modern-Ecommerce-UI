@@ -4,13 +4,23 @@
 
 .product-grid {
   display: grid;
-  gap: 1.25rem;
+  gap: 1.5rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  // Staggered entrance animation — cards cascade in from left to right
+  > * {
+    @for $i from 1 through 12 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{($i - 1) * 0.04}s;
+      }
+    }
+  }
 }
 
 @media (max-width: 1200px) {
   .product-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
   }
 }
 
@@ -21,7 +31,7 @@
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .product-grid {
     gap: 0.75rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));

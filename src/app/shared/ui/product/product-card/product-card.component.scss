@@ -3,6 +3,7 @@
   height: 100%;
 }
 
+// ── Premium Product Card ──────────────────────────────────────────────
 .product-card {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -11,36 +12,67 @@
   padding: 1rem;
   border-radius: var(--border-radius-md);
   overflow: hidden;
-  border-color: rgba(87, 61, 44, 0.12);
+  border-color: rgba(87, 61, 44, 0.08);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 249, 241, 0.98) 100%);
-  box-shadow: 0 12px 26px rgba(80, 54, 36, 0.06);
+    linear-gradient(
+      168deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(255, 250, 243, 0.96) 50%,
+      rgba(255, 247, 237, 0.94) 100%
+    );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 4px 16px rgba(80, 54, 36, 0.05),
+    0 1px 3px rgba(80, 54, 36, 0.04);
   transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    border-color 180ms ease,
-    background 180ms ease;
+    transform 280ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 280ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    border-color 280ms ease;
+
+  // Entrance animation — stagger is applied by the grid via nth-child
+  animation: card-entrance 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
 }
 
+@keyframes card-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── Hover state ───────────────────────────────────────────────────────
 .product-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(181, 95, 52, 0.24);
-  box-shadow: 0 18px 36px rgba(80, 54, 36, 0.10);
+  transform: translateY(-6px);
+  border-color: rgba(181, 95, 52, 0.18);
+  box-shadow:
+    0 20px 40px rgba(181, 95, 52, 0.1),
+    0 8px 16px rgba(80, 54, 36, 0.06);
 
   ::ng-deep .product-image {
     transform: scale(1.06);
   }
+
+  .product-card__actions button[appButtonStyle="primary"] {
+    box-shadow: 0 6px 18px rgba(181, 95, 52, 0.28);
+  }
 }
 
+// ── Image zone ────────────────────────────────────────────────────────
 .product-card__media {
   position: relative;
   padding: 0.5rem;
   border-radius: var(--border-radius-lg);
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(87, 61, 44, 0.05);
-  aspect-ratio: 1 / 1; /* Enforce square aspect ratio */
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(87, 61, 44, 0.04);
+  aspect-ratio: 1 / 1;
   display: flex;
   overflow: hidden;
+  box-shadow: inset 0 0 24px rgba(87, 61, 44, 0.03);
 
   app-product-image-placeholder {
     width: 100%;
@@ -48,6 +80,7 @@
   }
 }
 
+// ── Wishlist button ───────────────────────────────────────────────────
 .product-card__wishlist {
   position: absolute;
   top: 0.8rem;
@@ -55,23 +88,29 @@
   z-index: 2;
 
   .wishlist-btn {
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: var(--border-radius-circle);
     color: #8a776d;
-    box-shadow: 0 4px 12px rgba(80, 54, 36, 0.06);
-    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(80, 54, 36, 0.08);
+    transition:
+      background 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
 
     &:hover {
       background: rgba(255, 255, 255, 0.95);
-      color: #b55f34;
-      box-shadow: 0 6px 16px rgba(80, 54, 36, 0.12);
-      transform: scale(1.05);
+      color: var(--color-brand-500);
+      box-shadow: 0 6px 18px rgba(80, 54, 36, 0.14);
+      transform: scale(1.08);
     }
 
     &--active {
       color: #e91e63;
+      animation: wishlist-pulse 0.4s ease;
+
       &:hover {
         color: #c2185b;
       }
@@ -79,55 +118,72 @@
   }
 }
 
+@keyframes wishlist-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+// ── Badge ─────────────────────────────────────────────────────────────
 .product-card__badge {
   position: absolute;
   top: 0.8rem;
   left: 0.8rem;
 }
 
+// ── Content section ───────────────────────────────────────────────────
 .product-card__content {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  gap: 0.65rem;
+  gap: 0.6rem;
 }
 
+// ── Action buttons ────────────────────────────────────────────────────
 .product-card__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
+  gap: 0.6rem;
   margin-top: auto;
 
-  // Both buttons take equal width in the card
   button {
     flex: 1;
     min-width: 0;
     white-space: nowrap;
+    transition:
+      background 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
   }
 }
 
+// ── Meta row (category + brand) ───────────────────────────────────────
 .product-card__meta {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
   align-items: center;
   flex-wrap: wrap;
-  min-height: 1.75rem; /* Reserve space even if category/brand are missing */
+  min-height: 1.75rem;
 }
 
+// ── Brand label — luxury micro-label ──────────────────────────────────
 .product-card__brand {
-  color: #8a776d;
-  font-size: 0.88rem;
-  font-weight: 600;
+  color: var(--color-neutral-600);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .product-card__description {
   margin: 0;
-  color: #6e5d52;
-  font-size: 0.94rem;
-  line-height: 1.6;
+  color: var(--color-neutral-600);
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
+// ── Title — uses Outfit for premium editorial feel ────────────────────
 .product-card__title {
   margin: 0;
   height: 2.6rem;
@@ -136,46 +192,71 @@
 }
 
 .product-card__title-text {
-  color: #2d241f;
+  color: var(--color-neutral-900);
+  font-family: var(--font-primary);
   font-size: 1.02rem;
+  font-weight: 600;
   line-height: 1.28;
+  letter-spacing: -0.01em;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-// On mobile (2-column grid) ensure image frame is a proper square
-@media (max-width: 600px) {
+// ── Mobile-friendly layout (<768px) ───────────────────────────────────
+@media (max-width: 768px) {
+  .product-card {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
   .product-card__media {
+    padding: 0.35rem;
     aspect-ratio: 1 / 1;
+    border-radius: var(--border-radius-md);
   }
 
   .product-card__meta {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.35rem;
-    min-height: 3rem; /* ensure consistent height even if brand/category are missing */
+    gap: 0.3rem;
+    min-height: 2.8rem;
+  }
+
+  .product-card__brand {
+    font-size: 0.72rem;
   }
 
   .product-card__title {
     align-items: flex-start;
     height: auto;
   }
+
   .product-card__title-text {
     font-size: 0.92rem;
-    -webkit-line-clamp: 1; /* Truncate to 1 line on mobile */
+    -webkit-line-clamp: 1;
   }
 
   .product-card__title.expanded {
     height: auto;
 
     .product-card__title-text {
-      -webkit-line-clamp: unset; /* Expand to full text on tap */
+      -webkit-line-clamp: unset;
     }
   }
 
+  .product-card__content {
+    gap: 0.45rem;
+  }
+
+  .product-card__description {
+    font-size: 0.82rem;
+  }
+
   .product-card__actions {
+    gap: 0.5rem;
+
     button {
       font-size: 0.82rem;
       padding: 0 0.65rem;
@@ -189,7 +270,15 @@
       flex: 3;
     }
   }
+
+  .product-card__wishlist .wishlist-btn {
+    width: 34px;
+    height: 34px;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
 }
-
-
-

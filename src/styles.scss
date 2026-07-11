@@ -13,7 +13,7 @@
   --color-neutral-600: #6e5d52;
   --color-neutral-300: rgba(87, 61, 44, 0.25);
   --color-neutral-100: #f3e9df;
-  --color-surface-soft: #fffaf5;
+  --color-surface-soft: #ffffff;
 
   --color-danger-600: #a14634;
   --color-danger-050: #f6e4df;
@@ -29,7 +29,7 @@
   --color-info-050: #efe4da;
 
   /* Mapped common semantic variables used in cart UI */
-  --surface: #ffffff;
+  --surface: var(--color-surface-soft);
   --surface-hover: var(--color-surface-soft);
   --border-color: var(--color-neutral-300);
   --text-primary: var(--color-neutral-900);
@@ -70,6 +70,15 @@ html {
   height: 100%;
   color-scheme: light;
 
+  /* Global override for Material surface color */
+  --mat-sys-surface: var(--color-surface-soft);
+  --mat-sys-surface-container-lowest: var(--color-surface-soft);
+  --mat-sys-surface-container-low: var(--color-surface-soft);
+  --mat-sys-surface-container: var(--color-surface-soft);
+  --mat-sys-surface-container-high: var(--color-surface-soft);
+  --mat-sys-surface-container-highest: var(--color-surface-soft);
+  --mat-sys-background: var(--color-surface-soft);
+
   /* Global override to match Angular Material Cards border-radius */
   --mat-sys-corner-extra-small: var(--border-radius-md);
   --mat-sys-corner-small: var(--border-radius-md);
@@ -104,7 +113,10 @@ html {
 
 body {
   background:
-    linear-gradient(180deg, #fcf7f1 0%, #f2ebe2 100%);
+    radial-gradient(circle at top left, rgba(255, 224, 201, 0.62), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(255, 242, 229, 0.92), transparent 30%),
+    linear-gradient(180deg, #fcf8f3 0%, #f4eee6 100%);
+  background-attachment: fixed;
   color: #2d241f;
   font: var(--mat-sys-body-medium);
   font-family: var(--font-secondary);
@@ -127,6 +139,12 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 button,
 a {
   font: inherit;
+}
+
+/* Ensure material drawer containers are transparent so body background shows through */
+.mat-drawer-container,
+.mat-mdc-drawer-container {
+  background-color: transparent !important;
 }
 
 .shared-button.mdc-button {

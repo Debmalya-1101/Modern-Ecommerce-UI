@@ -75,7 +75,7 @@
           </div>
 
           @if (addressesLoading()) {
-            <div class="flex justify-center p-8 bg-white/50 rounded-2xl border border-neutral-100">
+            <div class="flex justify-center p-8 bg-[#fffaf5]/50 rounded-2xl border border-neutral-100">
               <mat-spinner diameter="40"></mat-spinner>
             </div>
           } @else if (addressesError()) {
@@ -84,7 +84,7 @@
               <p class="text-sm text-red-700 m-0 font-medium">{{ addressesError() }}</p>
             </mat-card>
           } @else if (addresses().length === 0) {
-            <div class="p-8 text-center border-dashed border-2 border-neutral-300 bg-white/40 rounded-2xl flex flex-col items-center justify-center gap-2">
+            <div class="p-8 text-center border-dashed border-2 border-neutral-300 bg-[#fffaf5]/40 rounded-2xl flex flex-col items-center justify-center gap-2">
               <mat-icon class="text-neutral-400 scale-125 mb-2">location_off</mat-icon>
               <p class="m-0 text-sm font-semibold text-neutral-700">No saved addresses found</p>
               <p class="m-0 text-xs text-neutral-500">Add an address to speed up your checkout process.</p>

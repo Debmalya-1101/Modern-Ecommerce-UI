@@ -35,7 +35,7 @@
   justify-content: center;
   padding: 3rem;
   text-align: center;
-  background: var(--surface-color, #ffffff);
+  background: var(--surface-color, var(--shell-surface));
   border-radius: 1rem;
   border: 1px solid rgba(87, 61, 44, 0.08);
   box-shadow: 0 4px 14px rgba(80, 54, 36, 0.04);
@@ -304,7 +304,7 @@
     flex-direction: column;
     align-items: stretch;
     border-radius: 16px;
-    background: var(--surface-color, #ffffff);
+    background: var(--surface-color, var(--shell-surface));
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 
     .header-content {
