@@ -1,9 +1,76 @@
-mat-dialog-content p {
-  margin: 0;
-  color: #6e5d52;
-  line-height: 1.7;
+:host {
+  display: block;
 }
 
-mat-dialog-actions {
+.premium-dialog-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 0.5rem;
   padding-top: 1rem;
+}
+
+.dialog-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-brand-050, #f6e7db);
+  margin-bottom: 1.25rem;
+
+  .dialog-icon {
+    font-size: 36px;
+    height: 36px;
+    width: 36px;
+    color: var(--color-brand-600, #9e522c);
+  }
+}
+
+.dialog-title {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: var(--font-primary, 'Outfit', sans-serif);
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: var(--text-primary, #2d241f);
+  line-height: 1.3 !important;
+}
+
+.dialog-content {
+  text-align: center;
+  padding: 0 1.5rem 1.5rem !important;
+  max-height: 60vh;
+}
+
+.dialog-message {
+  margin: 0;
+  color: var(--text-secondary, #5a473d);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-weight: 400;
+
+  /* Target the <strong> tag we pass in */
+  ::ng-deep strong {
+    font-weight: 700;
+    color: var(--text-primary, #2d241f);
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0 1.5rem 1.5rem !important;
+  margin-bottom: 0 !important;
+  min-height: auto !important;
+
+  .action-btn {
+    min-width: 120px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.25rem 1.5rem;
+  }
 }

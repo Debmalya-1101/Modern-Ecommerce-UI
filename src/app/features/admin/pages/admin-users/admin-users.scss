@@ -1,0 +1,225 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0;
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+    .header-main {
+      .title-area {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        h1 {
+          margin: 0;
+          font-size: 1.75rem;
+          font-weight: 800;
+          color: var(--primary-color, #8B4513);
+          letter-spacing: -0.03em;
+          line-height: 1.2;
+        }
+      }
+
+      .subtitle {
+        margin: 0.5rem 0 0;
+        color: var(--text-color, #333);
+        opacity: 0.7;
+        font-size: 1.1rem;
+        font-weight: 500;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: nowrap;
+
+      mat-form-field {
+        /* Hide the bottom padding/subscript wrapper to perfectly center with buttons */
+        ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+          display: none;
+        }
+      }
+
+      .search-field {
+        width: 200px;
+      }
+
+      .clear-filters-btn {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+
+      .apply-btn {
+        border-radius: 20px;
+        padding: 0 24px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .shared-card {
+    border-radius: 20px;
+    border: none !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05) !important;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  .table-card {
+    padding: 0;
+    border-radius: 20px;
+    border: none !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.5);
+
+    .table-container {
+      overflow-x: auto;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .user-id {
+    color: var(--color-neutral-700, #6b7280);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+
+    strong {
+      color: var(--color-neutral-900, #111827);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .user-email {
+      color: var(--color-neutral-600, #6b7280);
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+  }
+
+  /* ── Role Badges using application theme tokens ── */
+  .role-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: var(--border-radius-sm, 8px);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+
+    &.role-delivery {
+      background-color: var(--color-warning-050, #f5ead7);
+      color: var(--color-warning-700, #8a6433);
+    }
+
+    &.role-admin {
+      background-color: var(--color-danger-050, #f6e4df);
+      color: var(--color-danger-600, #a14634);
+    }
+
+    &.role-user {
+      background-color: var(--color-brand-050, #f6e7db);
+      color: var(--color-brand-600, #9e522c);
+    }
+  }
+
+  /* ── Toggle Spinner ── */
+  .toggle-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ::ng-deep circle {
+      stroke: var(--primary-color, #8B4513) !important;
+    }
+  }
+
+  .modern-paginator {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: transparent;
+  }
+}
+
+/* ── Table Styles ── */
+::ng-deep .admin-users-table.mat-mdc-table {
+  background: transparent !important;
+
+  thead {
+    background: rgba(248, 245, 241, 0.6);
+
+    th.mat-mdc-header-cell {
+      color: var(--color-neutral-700, #555);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--color-neutral-300, #eaeaea);
+    }
+  }
+
+  tbody {
+    tr.mat-mdc-row {
+      transition: background-color 0.15s ease;
+
+      &:hover {
+        background-color: rgba(255, 250, 245, 0.9) !important;
+      }
+
+      td.mat-mdc-cell {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(87, 61, 44, 0.08);
+        color: var(--color-neutral-900, #444);
+        font-size: 0.95rem;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+
+@media (max-width: 768px) {
+  .page-container {
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+
+        .search-field {
+          width: 100%;
+        }
+
+        mat-form-field {
+          flex: 1;
+        }
+      }
+    }
+  }
+}

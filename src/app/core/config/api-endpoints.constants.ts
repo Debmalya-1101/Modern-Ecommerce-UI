@@ -60,7 +60,13 @@ export const API_ENDPOINTS = {
     attributeKeys: '/api/admin/attribute-keys',
     attributeKeyDetail: (keyId: number | string) => `/api/admin/attribute-keys/${keyId}`,
     scraperAmazon: '/api/admin/scraper/amazon',
-    scraperFlipkart: '/api/admin/scraper/flipkart'
+    scraperFlipkart: '/api/admin/scraper/flipkart',
+    users: {
+      root: '/api/admin/users',
+      detail: (id: number | string) => `/api/admin/users/${id}`,
+      role: (id: number | string) => `/api/admin/users/${id}/roles`,
+      status: (id: number | string) => `/api/admin/users/${id}/status`
+    }
   },
   oauth2: {
     google: '/oauth2/authorization/google',

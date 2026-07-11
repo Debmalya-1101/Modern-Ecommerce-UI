@@ -63,11 +63,11 @@ export class AdminShipmentAssignDialogComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.partnersService.getPartners(DeliveryPartnerStatus.APPROVED)
+    this.partnersService.getPartners(DeliveryPartnerStatus.APPROVED, 0, 100)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (response: DeliveryPartnerResponseDTO[]) => {
-          this.availablePartners.set(response);
+        next: (pageResponse) => {
+          this.availablePartners.set(pageResponse.content);
         },
         error: (err: any) => {
           this.error.set(err.error?.message || 'Failed to load approved partners');

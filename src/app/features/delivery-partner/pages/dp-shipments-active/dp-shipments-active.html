@@ -1,12 +1,12 @@
 <div class="page-container">
-  <div class="page-header">
+  <mat-card class="page-header" appearance="outlined">
     <div class="header-main">
       <div class="title-area">
         <h1>Active Shipments</h1>
       </div>
       <p class="subtitle">Manage your current deliveries.</p>
     </div>
-  </div>
+  </mat-card>
 
   @if (isLoading()) {
     <mat-card class="shared-card" appearance="outlined">
@@ -70,5 +70,17 @@
         </mat-card>
       }
     </div>
+
+    <mat-card class="paginator-container" appearance="outlined">
+      <mat-paginator 
+        [length]="totalElements()"
+        [pageSize]="pageSize()"
+        [pageIndex]="pageIndex()"
+        [pageSizeOptions]="[10, 25, 50]"
+        (page)="onPageChange($event)"
+        aria-label="Select page"
+        class="modern-paginator">
+      </mat-paginator>
+    </mat-card>
   }
 </div>

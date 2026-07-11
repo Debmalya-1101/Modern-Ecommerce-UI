@@ -1,14 +1,20 @@
-<h2 mat-dialog-title>{{ data.title }}</h2>
+<div class="premium-dialog-header">
+  <div class="dialog-icon-container">
+    <mat-icon class="dialog-icon">help_outline</mat-icon>
+  </div>
+  <h2 mat-dialog-title class="dialog-title">{{ data.title }}</h2>
+</div>
 
-<mat-dialog-content>
-  <p>{{ data.message }}</p>
+<mat-dialog-content class="dialog-content">
+  <p class="dialog-message" [innerHTML]="data.message"></p>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
+<mat-dialog-actions class="dialog-actions">
   <button
     mat-button
     appButtonStyle="secondary"
     type="button"
+    class="action-btn cancel-btn"
     (click)="cancel()"
   >
     {{ data.cancelLabel || 'Cancel' }}
@@ -18,6 +24,7 @@
     mat-flat-button
     appButtonStyle="primary"
     type="button"
+    class="action-btn confirm-btn"
     (click)="confirm()"
   >
     {{ data.confirmLabel || 'Confirm' }}

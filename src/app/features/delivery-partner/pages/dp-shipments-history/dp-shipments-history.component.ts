@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { finalize } from 'rxjs';
 
 import { DeliveryPartnerShipmentsService } from '../../../../core/services/delivery-partner-shipments.service';
@@ -23,6 +24,7 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
+    MatPaginatorModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent,
@@ -38,6 +40,11 @@ export class DpShipmentsHistoryComponent implements OnInit {
   readonly isLoading = signal(true);
   readonly error = signal<string | null>(null);
 
+  // Pagination
+  protected totalElements = signal(0);
+  protected pageSize = signal(10);
+  protected pageIndex = signal(0);
+
   ngOnInit(): void {
     this.loadHistoryShipments();
   }
@@ -46,15 +53,22 @@ export class DpShipmentsHistoryComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.shipmentsService.getShipmentHistory()
+    this.shipmentsService.getShipmentHistory(this.pageIndex(), this.pageSize())
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (data) => {
-          this.shipments.set(data);
+        next: (pageResponse) => {
+          this.shipments.set(pageResponse.content);
+          this.totalElements.set(pageResponse.totalElements);
         },
         error: (err) => {
           this.error.set(err.error?.message || 'Failed to load shipment history');
         }
       });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadHistoryShipments();
   }
 }

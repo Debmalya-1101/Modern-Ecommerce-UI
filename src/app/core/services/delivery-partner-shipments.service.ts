@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { PageResponse } from '../models/api.model';
 
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import {
@@ -23,18 +24,18 @@ export class DeliveryPartnerShipmentsService {
     );
   }
 
-  getActiveShipments(): Observable<ShipmentResponseDTO[]> {
-    return this.apiService.get<ShipmentResponseDTO[]>(
+  getActiveShipments(page = 0, size = 10): Observable<PageResponse<ShipmentResponseDTO>> {
+    return this.apiService.get<PageResponse<ShipmentResponseDTO>>(
       API_ENDPOINTS.deliveryPartner.shipments.active,
-      undefined,
+      { page, size },
       { trackLoading: true }
     );
   }
 
-  getShipmentHistory(): Observable<ShipmentResponseDTO[]> {
-    return this.apiService.get<ShipmentResponseDTO[]>(
+  getShipmentHistory(page = 0, size = 10): Observable<PageResponse<ShipmentResponseDTO>> {
+    return this.apiService.get<PageResponse<ShipmentResponseDTO>>(
       API_ENDPOINTS.deliveryPartner.shipments.history,
-      undefined,
+      { page, size },
       { trackLoading: true }
     );
   }

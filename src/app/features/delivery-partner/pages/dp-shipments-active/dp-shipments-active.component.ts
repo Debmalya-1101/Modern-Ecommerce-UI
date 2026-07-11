@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { finalize } from 'rxjs';
 
@@ -27,6 +28,7 @@ import { DpShipmentFailureDialogComponent, DpShipmentFailureDialogResult } from 
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
+    MatPaginatorModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent,
@@ -46,6 +48,11 @@ export class DpShipmentsActiveComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly StatusEnum = ShipmentStatus;
 
+  // Pagination
+  protected totalElements = signal(0);
+  protected pageSize = signal(10);
+  protected pageIndex = signal(0);
+
   ngOnInit(): void {
     this.loadActiveShipments();
   }
@@ -54,16 +61,23 @@ export class DpShipmentsActiveComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.shipmentsService.getActiveShipments()
+    this.shipmentsService.getActiveShipments(this.pageIndex(), this.pageSize())
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (data) => {
-          this.shipments.set(data);
+        next: (pageResponse) => {
+          this.shipments.set(pageResponse.content);
+          this.totalElements.set(pageResponse.totalElements);
         },
         error: (err) => {
           this.error.set(err.error?.message || 'Failed to load active shipments');
         }
       });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadActiveShipments();
   }
 
   updateStatus(shipment: ShipmentResponseDTO, newStatus: ShipmentStatus): void {

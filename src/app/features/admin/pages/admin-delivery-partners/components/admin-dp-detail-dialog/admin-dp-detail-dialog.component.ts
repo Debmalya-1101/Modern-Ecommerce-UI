@@ -7,6 +7,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { DeliveryPartnerResponseDTO, DeliveryPartnerStatus } from '../../../../../../core/models/delivery-partner.model';
 import { DeliveryFeedbackService } from '../../../../../../core/services/delivery-feedback.service';
 import { AdminDeliveryFeedbackResponseDTO } from '../../../../../../core/models/delivery-feedback.model';
@@ -32,6 +33,7 @@ export interface AdminDpDetailDialogResult {
     MatTabsModule,
     MatProgressSpinnerModule,
     MatIconModule,
+    MatPaginatorModule,
     DatePipe
   ],
   templateUrl: './admin-dp-detail-dialog.html',
@@ -48,6 +50,11 @@ export class AdminDpDetailDialogComponent implements OnInit {
   readonly isLoadingFeedback = signal<boolean>(true);
   readonly feedbackError = signal<string | null>(null);
 
+  // Pagination
+  protected totalElements = signal(0);
+  protected pageSize = signal(5);
+  protected pageIndex = signal(0);
+
   ngOnInit(): void {
     this.loadFeedback();
   }
@@ -55,9 +62,10 @@ export class AdminDpDetailDialogComponent implements OnInit {
   loadFeedback(): void {
     this.isLoadingFeedback.set(true);
     this.feedbackError.set(null);
-    this.feedbackService.getAdminPartnerFeedback(this.partner.id).subscribe({
-      next: (list) => {
-        this.feedbackList.set(list);
+    this.feedbackService.getAdminPartnerFeedback(this.partner.id, this.pageIndex(), this.pageSize()).subscribe({
+      next: (pageResponse) => {
+        this.feedbackList.set(pageResponse.content);
+        this.totalElements.set(pageResponse.totalElements);
         this.isLoadingFeedback.set(false);
       },
       error: (err) => {
@@ -66,6 +74,12 @@ export class AdminDpDetailDialogComponent implements OnInit {
         this.isLoadingFeedback.set(false);
       }
     });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadFeedback();
   }
 
   close(): void {

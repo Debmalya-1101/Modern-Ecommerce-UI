@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { PageResponse } from '../models/api.model';
 
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import { ShipmentResponseDTO } from '../models/shipment.model';
@@ -11,10 +12,10 @@ import { ApiService } from './api.service';
 export class AdminShipmentsService {
   private readonly apiService = inject(ApiService);
 
-  getUnassignedShipments(): Observable<ShipmentResponseDTO[]> {
-    return this.apiService.get<ShipmentResponseDTO[]>(
+  getUnassignedShipments(page = 0, size = 10): Observable<PageResponse<ShipmentResponseDTO>> {
+    return this.apiService.get<PageResponse<ShipmentResponseDTO>>(
       API_ENDPOINTS.adminDelivery.shipments.unassigned,
-      undefined,
+      { page, size },
       { trackLoading: true }
     );
   }

@@ -53,7 +53,7 @@
         } @else {
           <div class="cards-grid">
             @for (feedback of feedbackList(); track feedback.id) {
-              <div class="premium-feedback-card">
+              <mat-card class="premium-feedback-card" appearance="outlined">
                 <mat-icon class="quote-watermark">format_quote</mat-icon>
                 <div class="card-header">
                   <div class="avatar-circle">
@@ -80,9 +80,21 @@
                 <div class="card-footer">
                   <span class="order-id">Order #{{ feedback.orderId }}</span>
                 </div>
-              </div>
+              </mat-card>
             }
           </div>
+          
+          <mat-card class="paginator-container" appearance="outlined">
+            <mat-paginator 
+              [length]="totalElements()"
+              [pageSize]="pageSize()"
+              [pageIndex]="pageIndex()"
+              [pageSizeOptions]="[12, 24, 48]"
+              (page)="onPageChange($event)"
+              aria-label="Select page"
+              class="modern-paginator">
+            </mat-paginator>
+          </mat-card>
         }
       </div>
     </div>

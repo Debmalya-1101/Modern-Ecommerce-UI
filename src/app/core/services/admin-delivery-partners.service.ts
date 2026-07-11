@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { PageResponse } from '../models/api.model';
 
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import {
@@ -15,12 +16,12 @@ import { ApiService } from './api.service';
 export class AdminDeliveryPartnersService {
   private readonly apiService = inject(ApiService);
 
-  getPartners(status?: string): Observable<DeliveryPartnerResponseDTO[]> {
-    const params: Record<string, string> = {};
-    if (status) {
+  getPartners(status?: string, page = 0, size = 10): Observable<PageResponse<DeliveryPartnerResponseDTO>> {
+    const params: Record<string, string | number> = { page, size };
+    if (status && status !== 'ALL') {
       params['status'] = status;
     }
-    return this.apiService.get<DeliveryPartnerResponseDTO[]>(
+    return this.apiService.get<PageResponse<DeliveryPartnerResponseDTO>>(
       API_ENDPOINTS.adminDelivery.partners.root,
       params,
       { trackLoading: true }

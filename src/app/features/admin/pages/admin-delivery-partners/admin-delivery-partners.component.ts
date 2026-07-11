@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { finalize, forkJoin } from 'rxjs';
 
@@ -36,6 +37,7 @@ export interface PartnerRowData extends DeliveryPartnerResponseDTO {
     MatChipsModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatPaginatorModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent
@@ -56,14 +58,15 @@ export class AdminDeliveryPartnersComponent implements OnInit {
   readonly isLoading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
   
+  // Pagination
+  protected totalElements = signal(0);
+  protected pageSize = signal(10);
+  protected pageIndex = signal(0);
+
   readonly statusFilter = signal<DeliveryPartnerStatus | 'ALL'>('ALL');
 
   readonly filteredPartners = computed(() => {
-    const filter = this.statusFilter();
-    if (filter === 'ALL') {
-      return this.partners();
-    }
-    return this.partners().filter(p => p.status === filter);
+    return this.partners();
   });
 
   ngOnInit(): void {
@@ -75,21 +78,22 @@ export class AdminDeliveryPartnersComponent implements OnInit {
     this.error.set(null);
     
     forkJoin({
-      partners: this.partnersService.getPartners(),
+      partnersPage: this.partnersService.getPartners(this.statusFilter() === 'ALL' ? undefined : this.statusFilter(), this.pageIndex(), this.pageSize()),
       ratings: this.feedbackService.getAdminPartnerRatings()
     })
     .pipe(finalize(() => this.isLoading.set(false)))
     .subscribe({
-      next: ({ partners, ratings }) => {
+      next: ({ partnersPage, ratings }) => {
         const ratingsMap = new Map<number, DeliveryPartnerRatingSummaryDTO>();
         ratings.forEach((r: DeliveryPartnerRatingSummaryDTO) => ratingsMap.set(r.deliveryPartnerId, r));
         
-        const mappedPartners = partners.map(p => ({
+        const mappedPartners = partnersPage.content.map(p => ({
           ...p,
           ratingSummary: ratingsMap.get(p.id)
         }));
         
         this.partners.set(mappedPartners);
+        this.totalElements.set(partnersPage.totalElements);
       },
       error: (err: any) => this.error.set(err.error?.message || 'Failed to load delivery partners')
     });
@@ -97,6 +101,14 @@ export class AdminDeliveryPartnersComponent implements OnInit {
 
   onFilterChange(status: DeliveryPartnerStatus | 'ALL'): void {
     this.statusFilter.set(status);
+    this.pageIndex.set(0);
+    this.loadPartners();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadPartners();
   }
 
   viewPartnerDetails(partner: PartnerRowData): void {

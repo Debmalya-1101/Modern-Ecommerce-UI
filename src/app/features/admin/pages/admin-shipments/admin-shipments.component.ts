@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { finalize } from 'rxjs';
 
 import { AdminShipmentsService } from '../../../../core/services/admin-shipments.service';
@@ -26,6 +27,7 @@ import { AdminShipmentAssignDialogComponent, AdminShipmentAssignDialogData, Admi
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
+    MatPaginatorModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent,
@@ -45,6 +47,11 @@ export class AdminShipmentsComponent implements OnInit {
   readonly isLoading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
 
+  // Pagination
+  protected totalElements = signal(0);
+  protected pageSize = signal(10);
+  protected pageIndex = signal(0);
+
   ngOnInit(): void {
     this.loadUnassignedShipments();
   }
@@ -53,16 +60,23 @@ export class AdminShipmentsComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.shipmentsService.getUnassignedShipments()
+    this.shipmentsService.getUnassignedShipments(this.pageIndex(), this.pageSize())
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (data) => {
-          this.shipments.set(data);
+        next: (pageResponse) => {
+          this.shipments.set(pageResponse.content);
+          this.totalElements.set(pageResponse.totalElements);
         },
         error: (err) => {
           this.error.set(err.error?.message || 'Failed to load unassigned shipments');
         }
       });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex.set(event.pageIndex);
+    this.pageSize.set(event.pageSize);
+    this.loadUnassignedShipments();
   }
 
   openAssignDialog(shipment: ShipmentResponseDTO): void {

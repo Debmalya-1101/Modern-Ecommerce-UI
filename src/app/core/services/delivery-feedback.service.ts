@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { PageResponse } from '../models/api.model';
 
 import { API_ENDPOINTS } from '../config/api-endpoints.constants';
 import {
@@ -35,10 +36,10 @@ export class DeliveryFeedbackService {
   }
 
   // DP: View own feedback
-  getPartnerFeedback(): Observable<DeliveryFeedbackResponseDTO[]> {
-    return this.apiService.get<DeliveryFeedbackResponseDTO[]>(
+  getPartnerFeedback(page = 0, size = 10): Observable<PageResponse<DeliveryFeedbackResponseDTO>> {
+    return this.apiService.get<PageResponse<DeliveryFeedbackResponseDTO>>(
       API_ENDPOINTS.deliveryPartner.feedback.root,
-      undefined,
+      { page, size },
       { trackLoading: true }
     );
   }
@@ -53,10 +54,10 @@ export class DeliveryFeedbackService {
   }
 
   // Admin: View a specific DP's feedback
-  getAdminPartnerFeedback(partnerId: number): Observable<AdminDeliveryFeedbackResponseDTO[]> {
-    return this.apiService.get<AdminDeliveryFeedbackResponseDTO[]>(
+  getAdminPartnerFeedback(partnerId: number, page = 0, size = 10): Observable<PageResponse<AdminDeliveryFeedbackResponseDTO>> {
+    return this.apiService.get<PageResponse<AdminDeliveryFeedbackResponseDTO>>(
       API_ENDPOINTS.adminDelivery.partners.feedback(partnerId),
-      undefined,
+      { page, size },
       { trackLoading: true }
     );
   }

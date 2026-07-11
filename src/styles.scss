@@ -244,6 +244,43 @@ a {
   overflow: hidden !important;
 }
 
+/* ── Premium slide toggle: direct element overrides ── */
+
+/* INACTIVE track: lighter neutral gray */
+mat-slide-toggle.premium-toggle .mdc-switch__track::before,
+mat-slide-toggle.premium-toggle .mdc-switch__track::after {
+  background-color: #d4d4d4 !important;
+  border-color: #d4d4d4 !important;
+}
+
+/* INACTIVE handle: white */
+mat-slide-toggle.premium-toggle .mdc-switch__handle::before,
+mat-slide-toggle.premium-toggle .mdc-switch__handle::after {
+  background-color: #ffffff !important;
+}
+
+/* ACTIVE track: brand primary dark brown */
+mat-slide-toggle.premium-toggle.mat-mdc-slide-toggle-checked .mdc-switch__track::before,
+mat-slide-toggle.premium-toggle.mat-mdc-slide-toggle-checked .mdc-switch__track::after,
+mat-slide-toggle.premium-toggle .mdc-switch--selected .mdc-switch__track::before,
+mat-slide-toggle.premium-toggle .mdc-switch--selected .mdc-switch__track::after {
+  background-color: #9e522c !important; /* --color-brand-600 */
+  border-color: #9e522c !important;
+}
+
+/* ACTIVE handle: white */
+mat-slide-toggle.premium-toggle.mat-mdc-slide-toggle-checked .mdc-switch__handle::before,
+mat-slide-toggle.premium-toggle.mat-mdc-slide-toggle-checked .mdc-switch__handle::after,
+mat-slide-toggle.premium-toggle .mdc-switch--selected .mdc-switch__handle::before,
+mat-slide-toggle.premium-toggle .mdc-switch--selected .mdc-switch__handle::after {
+  background-color: #ffffff !important;
+}
+
+/* Hide default MDC icons inside toggle */
+mat-slide-toggle.premium-toggle .mdc-switch__icons {
+  display: none !important;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Shared Page Header Block — use class="page-header-block"
    to apply consistent page-level h1 + subtitle styling.

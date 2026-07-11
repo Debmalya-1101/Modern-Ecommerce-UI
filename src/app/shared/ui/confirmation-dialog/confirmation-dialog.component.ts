@@ -1,13 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 import { ButtonStyleDirective } from '../../directives/button-style.directive';
 import { ConfirmationDialogData } from './confirmation-dialog.types';
 
 @Component({
   selector: 'app-confirmation-dialog',
-  imports: [MatButtonModule, MatDialogModule, ButtonStyleDirective],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule, ButtonStyleDirective],
   templateUrl: './confirmation-dialog.component.html',
   styleUrl: './confirmation-dialog.component.scss'
 })
