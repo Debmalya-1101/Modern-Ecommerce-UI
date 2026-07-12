@@ -6157,3 +6157,28 @@ changeSort(event: MatSelectChange) {
 }
 \\\
 
+---
+
+## Premium Home Page Redesign (Style-Only)
+
+**Date:** July 12, 2026
+
+**What was done:** Upgraded the home page to match the premium look of the products catalog — all changes in a single SCSS file (`home.page.scss`). No TS or HTML changes.
+
+### Key Concepts
+
+#### 1. Carousel Image Scrim (Gradient Overlay)
+A "scrim" is a semi-transparent gradient layered over an image so text remains readable — the gradient goes from opaque near text to transparent near the image focal point.
+
+#### 2. Frosted Glass Containers for UI Controls
+The carousel indicator dots sit inside a frosted glass pill — visible over any image using `backdrop-filter: blur()` + dark semi-transparent background.
+
+#### 3. Staggered Animations on Flex Scroll Layouts
+The same `@for` stagger pattern from the products grid also works for horizontally-scrolling flex containers — creating a pleasing "wave" entrance.
+
+What I learned:
+- Image scrims ensure text readability over any background image.
+- Frosted glass containers make floating UI controls visible regardless of what's behind them.
+- Consistent use of design tokens across pages creates visual coherence without duplicating magic values.
+
+

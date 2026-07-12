@@ -282,3 +282,74 @@
     }
   }
 }
+
+// ── Small phone layout for 2-column grid (≤ 480px, e.g. Samsung S8+) ──────
+// Cards are narrow here (~170-190px), so we must be extremely space efficient
+@media (max-width: 480px) {
+  .product-card {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .product-card__media {
+    padding: 0.25rem;
+  }
+
+  .product-card__meta {
+    display: none; // Hide category/brand to save vertical space
+  }
+
+  .product-card__title-text {
+    font-size: 0.85rem;
+    -webkit-line-clamp: 1;
+  }
+
+  .product-card__description {
+    display: none; // Hide description
+  }
+
+  .product-card__content {
+    gap: 0.35rem;
+  }
+
+  .product-card__actions {
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: 0.2rem;
+
+    button {
+      font-size: 0.75rem;
+      padding: 0;
+      height: 2rem;
+      line-height: 2rem;
+      width: 100%;
+    }
+
+    button:nth-child(1), button:nth-child(2) {
+      flex: unset;
+    }
+  }
+
+  .product-card__wishlist {
+    top: 0.4rem;
+    right: 0.4rem;
+
+    .wishlist-btn {
+      width: 28px;
+      height: 28px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .product-card__badge {
+    top: 0.4rem;
+    left: 0.4rem;
+    transform: scale(0.85);
+    transform-origin: top left;
+  }
+}

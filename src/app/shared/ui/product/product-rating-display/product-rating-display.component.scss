@@ -36,3 +36,18 @@
   color: var(--color-neutral-600);
   font-size: 0.85rem;
 }
+
+@media (max-width: 480px) {
+  .star {
+    font-size: 0.95rem;
+  }
+  .rating-value {
+    font-size: 0.85rem;
+  }
+  .review-count {
+    font-size: 0.75rem;
+  }
+  .rating-display {
+    gap: 0.2rem;
+  }
+}

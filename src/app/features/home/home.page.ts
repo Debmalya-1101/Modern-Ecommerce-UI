@@ -55,6 +55,7 @@ export class HomePage implements OnInit {
   protected readonly backendStatus = signal(createInitialRequestState<BackendConnectionStatus>());
   protected readonly categoriesState = signal(createInitialRequestState<string[]>([]));
   protected readonly featuredProductsState = signal(createInitialRequestState<ProductCardViewModel[]>([]));
+  protected readonly newArrivalsState = signal(createInitialRequestState<ProductCardViewModel[]>([]));
 
   // Carousel Signals and Data
   protected readonly carouselIndex = signal(0);
@@ -112,6 +113,7 @@ export class HomePage implements OnInit {
     this.checkBackendConnection();
     this.loadCategories();
     this.loadFeaturedProducts();
+    this.loadNewArrivals();
     this.startAutoplay();
 
     // Register autoplay cleanup
@@ -202,6 +204,7 @@ export class HomePage implements OnInit {
     this.checkBackendConnection();
     this.loadCategories();
     this.loadFeaturedProducts();
+    this.loadNewArrivals();
   }
 
   private checkBackendConnection(): void {
@@ -280,9 +283,8 @@ export class HomePage implements OnInit {
       loading: true
     });
 
-    // Query for 4 top-rated items to display as "Featured Products"
     this.productsApiService
-      .getProducts({ size: 4, sortBy: 'rating', order: 'desc' })
+      .getHomeFeaturedProducts()
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
@@ -290,8 +292,8 @@ export class HomePage implements OnInit {
         })
       )
       .subscribe({
-        next: (paginatedResponse) => {
-          const mappedProducts = paginatedResponse.products.map((product) => {
+        next: (products) => {
+          const mappedProducts = products.slice(0, 4).map((product) => {
             return {
               id: product.id,
               name: product.name,
@@ -318,6 +320,56 @@ export class HomePage implements OnInit {
           this.featuredProductsState.set({
             data: [],
             error: error.message || 'Could not load featured products.',
+            loading: false
+          });
+        }
+      });
+  }
+
+  private loadNewArrivals(): void {
+    this.newArrivalsState.set({
+      data: [],
+      error: null,
+      loading: true
+    });
+
+    this.productsApiService
+      .getHomeNewArrivals()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.newArrivalsState.update((state) => ({ ...state, loading: false }));
+        })
+      )
+      .subscribe({
+        next: (products) => {
+          const mappedProducts = products.slice(0, 4).map((product) => {
+            return {
+              id: product.id,
+              name: product.name,
+              brand: product.brand,
+              category: product.categoryName,
+              price: product.price,
+              rating: product.rating,
+              imageUrl: product.imageUrl,
+              reviewCount: product.ratingCount ?? 0,
+              imageLabel: product.name,
+              shortDescription: product.shortDescription,
+              badge: undefined,
+              originalPrice: undefined,
+            };
+          });
+
+          this.newArrivalsState.set({
+            data: mappedProducts,
+            error: null,
+            loading: false
+          });
+        },
+        error: (error: AppHttpError) => {
+          this.newArrivalsState.set({
+            data: [],
+            error: error.message || 'Could not load new arrivals.',
             loading: false
           });
         }

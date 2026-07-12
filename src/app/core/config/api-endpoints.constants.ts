@@ -6,6 +6,10 @@ export const API_ENDPOINTS = {
     refresh: '/auth/refresh',
     logout: '/auth/logout'
   },
+  home: {
+    featuredProducts: '/api/home/featured-products',
+    newArrivals: '/api/home/new-arrivals'
+  },
   products: {
     list: '/api/products',
     detail: (id: number | string) => `/api/products/${id}`,

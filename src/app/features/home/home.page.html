@@ -123,7 +123,7 @@
   <section class="section-container products-section">
     <div class="section-header">
       <div class="header-left">
-        <h2 class="section-title">Trending Products</h2>
+        <h2 class="section-title">Featured Products</h2>
         <p class="section-subtitle">Our most popular and highly rated essentials.</p>
       </div>
       <a mat-button appButtonStyle="secondary" routerLink="/products" class="view-all-btn">
@@ -148,6 +148,48 @@
         <app-empty-state
           title="No featured products found"
           description="It looks like there are no active products in our featured collection right now."
+          actionLabel="Refresh List"
+          (action)="retryAllLoading()"
+        />
+      } @else {
+        <app-product-grid 
+          [products]="products" 
+          (quickView)="handleQuickView($event)" 
+          (addToCart)="handleAddToCart($event)"
+        />
+      }
+    }
+  </section>
+
+  <!-- New Arrivals Section -->
+  <section class="section-container products-section">
+    <div class="section-header">
+      <div class="header-left">
+        <h2 class="section-title">New Arrivals</h2>
+        <p class="section-subtitle">Fresh drops and the latest technology additions.</p>
+      </div>
+      <a mat-button appButtonStyle="secondary" routerLink="/products" class="view-all-btn">
+        <span>View all products</span>
+        <mat-icon>arrow_right_alt</mat-icon>
+      </a>
+    </div>
+
+    @if (newArrivalsState().loading) {
+      <app-product-skeleton-loading [cards]="4" />
+    } @else if (newArrivalsState().error) {
+      <div class="state-container">
+        <app-error-state
+          title="Could not retrieve new arrivals"
+          [description]="newArrivalsState().error ?? 'Please check your internet connection.'"
+          actionLabel="Retry Products"
+          (action)="retryAllLoading()"
+        />
+      </div>
+    } @else if (newArrivalsState().data; as products) {
+      @if (products.length === 0) {
+        <app-empty-state
+          title="No new arrivals found"
+          description="It looks like there are no new products added recently."
           actionLabel="Refresh List"
           (action)="retryAllLoading()"
         />

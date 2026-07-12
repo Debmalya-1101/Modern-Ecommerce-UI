@@ -43,3 +43,19 @@ strong {
     font-size: 1.1rem;
   }
 }
+
+@media (max-width: 480px) {
+  strong {
+    font-size: 0.95rem;
+  }
+  .original-price {
+    font-size: 0.75rem;
+  }
+  .price-row {
+    gap: 0.35rem;
+  }
+  .discount-copy {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.35rem;
+  }
+}

@@ -132,6 +132,34 @@ export class ProductsApiService {
   }
 
   /**
+   * Fetches home page featured products (capped to 8).
+   * Calls GET /api/home/featured-products
+   */
+  getHomeFeaturedProducts(): Observable<ProductListItem[]> {
+    return this.apiService
+      .get<ProductListDTO[]>(API_ENDPOINTS.home.featuredProducts, undefined, {
+        trackLoading: true
+      })
+      .pipe(
+        map((dtos) => dtos.map((dto) => this.mapToProductListItem(dto)))
+      );
+  }
+
+  /**
+   * Fetches home page new arrivals (capped to 8).
+   * Calls GET /api/home/new-arrivals
+   */
+  getHomeNewArrivals(): Observable<ProductListItem[]> {
+    return this.apiService
+      .get<ProductListDTO[]>(API_ENDPOINTS.home.newArrivals, undefined, {
+        trackLoading: true
+      })
+      .pipe(
+        map((dtos) => dtos.map((dto) => this.mapToProductListItem(dto)))
+      );
+  }
+
+  /**
    * Fetches a list of distinct category names available in the catalog.
    *
    * Calls the dedicated /api/products/categories endpoint which returns
