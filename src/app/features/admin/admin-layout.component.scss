@@ -20,6 +20,14 @@
     display: flex;
     flex-direction: column;
     min-height: 100%;
+    
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
@@ -344,7 +352,9 @@
   border-radius: var(--border-radius-lg);
   box-shadow: 0 10px 25px rgba(80, 54, 36, 0.08);
   border: 1px solid rgba(87, 61, 44, 0.1);
-  background-color: rgba(255, 252, 247, 0.5);
+  background-color: rgba(255, 252, 247, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 0.35rem 0;
 
   .mat-mdc-menu-item {

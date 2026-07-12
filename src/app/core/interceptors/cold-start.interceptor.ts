@@ -15,7 +15,7 @@ export const coldStartInterceptor: HttpInterceptorFn = (req, next) => {
     if (!resolved) {
       coldStartService.setColdStarting(true);
     }
-  }, 4000);
+  }, 10000);
 
   return next(req).pipe(
     retry({

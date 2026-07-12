@@ -109,7 +109,7 @@ export class AdminOrdersService {
     return this.apiService.post<any, { reason: string }>(`${API_ENDPOINTS.admin.orders}/${id}/cancel`, { reason }).pipe(
       catchError(error => {
         console.warn(`Backend unavailable or error cancelling order ${id}. Using mock data.`, error);
-        const orderIndex = this.mockOrders.findIndex(o => o.orderId === id);
+        const orderIndex = this.mockOrders.findIndex(o => o.orderId == id);
         if (orderIndex !== -1) {
           this.mockOrders[orderIndex].status = 'CANCELLED';
           return of(this.mockOrders[orderIndex]);

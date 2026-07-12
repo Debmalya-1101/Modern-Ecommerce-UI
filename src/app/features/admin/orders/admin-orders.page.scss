@@ -45,7 +45,9 @@
   border: none !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
   
-  
+  mat-card-content {
+    position: relative;
+  }
   
   background: rgba(255, 255, 255, 0.5);
   overflow: hidden;
@@ -97,17 +99,18 @@
     background: #e5e7eb;
     
   }
+}
 
-  .loading-shade {
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(4px);
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.loading-shade {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
 }
 
 .order-table {

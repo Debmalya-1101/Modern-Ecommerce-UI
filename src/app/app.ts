@@ -19,6 +19,7 @@ import { ButtonStyleDirective } from './shared/directives/button-style.directive
 import { CartDrawerComponent } from './features/cart/components/cart-drawer/cart-drawer.component';
 import { ColdStartBannerComponent } from './shared/components/cold-start-banner/cold-start-banner.component';
 import { ColdStartService } from './core/services/cold-start.service';
+import { StatusFormatPipe } from './shared/pipes/status-format.pipe';
 
 interface NavigationItem {
   label: string;
@@ -44,7 +45,8 @@ interface NavigationItem {
     MatMenuModule,
     ButtonStyleDirective,
     CartDrawerComponent,
-    ColdStartBannerComponent
+    ColdStartBannerComponent,
+    StatusFormatPipe
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'

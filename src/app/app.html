@@ -120,7 +120,7 @@
             @if (isAuthenticated()) {
               <div class="sidebar-session__summary">
                 <strong>{{ currentUserLabel() }}</strong>
-                <span>{{ session().user?.role ?? 'ROLE_USER' }}</span>
+                <span>{{ (session().user?.role ?? 'ROLE_USER') | statusFormat }}</span>
               </div>
 
               <div class="sidebar-session__actions">
@@ -356,8 +356,8 @@
 
       <!-- Mobile Search Overlay -->
       @if (isMobile() && isSearchOpen()) {
-        <div class="mobile-search-overlay">
-          <form class="mobile-search-form" (submit)="onSearch($event, mobileSearchInput.value)">
+        <div class="mobile-search-overlay" (click)="closeSearch()">
+          <form class="mobile-search-form" (submit)="onSearch($event, mobileSearchInput.value)" (click)="$event.stopPropagation()">
             <input
               #mobileSearchInput
               class="mobile-search-input"
