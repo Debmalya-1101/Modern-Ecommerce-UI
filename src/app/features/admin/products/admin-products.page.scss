@@ -212,13 +212,14 @@
   gap: 0.5rem;
   font-weight: 600;
   padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius-pill);
   
   background: #f3f4f6;
 
   .stock-dot {
     width: 8px;
     height: 8px;
-    
+    border-radius: 50%;
   }
 
   &.stock-good {
