@@ -6212,3 +6212,37 @@ In TypeScript, returning float values (e.g., `1.5`, `2.5`) allows the template l
 What I learned:
 - A `linear-gradient` is a great way to visually split a CSS border or divider into partially-completed sections.
 - Using floats (like `1.5`) instead of integers makes the interpolation logic in HTML templates clean and readable without having to create completely custom enums or maps.
+
+### Linking Shipments to Orders (Admin View)
+
+**Concept:** 
+In an e-commerce platform, the Order context (what was bought, who bought it, billing/shipping address) and the Shipment context (how it's delivered, which partner is assigned, tracking status) are often distinct entities in the backend to separate concerns. However, in the frontend (especially for Admins), they need to be displayed cohesively.
+
+When an Admin views an order, we need to show them not just the order items, but also the delivery partner handling it, and allow them to re-assign partners directly from the order details view without navigating away to a separate "Shipments" module.
+
+**Implementation Example:**
+Instead of loading everything in a single API call, we use a modular API approach and combine it in the frontend:
+1. `GET /api/admin/orders/{orderId}` loads basic order info.
+2. In parallel (or sequenced after order load), `GET /api/admin/shipments/order/{orderId}` loads the shipment specific to that order.
+3. If a shipment is returned, `GET /api/admin/delivery-partners` populates a dropdown for assignment.
+4. We combine this into a single cohesive UI using Angular Material components (like Dialog and Form Fields), keeping the user flow seamless.
+
+```typescript
+// Component snippet combining the data
+loadShipmentData(): void {
+  this.adminShipmentsService.getShipmentByOrderId(this.data.orderId).pipe(
+    catchError(err => of(null)) // It's okay if shipment doesn't exist yet (e.g. pending payment)
+  ).subscribe(shipment => {
+    this.shipment = shipment;
+    if (shipment) {
+      this.selectedPartnerId = shipment.deliveryPartnerId || null;
+      this.loadDeliveryPartners(); // Load dropdown options
+    }
+    this.cdr.detectChanges();
+  });
+}
+```
+
+What I learned:
+- Modular services (`AdminOrdersService`, `AdminShipmentsService`, `AdminDeliveryPartnersService`) keep code maintainable. We bring them together in the component (Controller layer).
+- Always use `catchError` returning `of(null)` for dependent entities that might legitimately be missing (like a shipment for a newly placed order), so the main view doesn't break.

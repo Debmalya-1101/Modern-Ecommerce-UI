@@ -102,7 +102,8 @@ export const API_ENDPOINTS = {
     },
     shipments: {
       unassigned: '/api/admin/shipments/unassigned',
-      assign: (shipmentId: number | string, partnerId: number | string) => `/api/admin/shipments/${shipmentId}/assign/${partnerId}`
+      assign: (shipmentId: number | string, partnerId: number | string) => `/api/admin/shipments/${shipmentId}/assign/${partnerId}`,
+      order: (orderId: number | string) => `/api/admin/shipments/order/${orderId}`
     }
   }
 } as const;

@@ -148,12 +148,10 @@
 
     .card-header {
       padding: 1rem;
-      flex-direction: column;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
       gap: 0.5rem;
-      
-      .status-badge {
-        align-self: flex-start;
-      }
     }
 
     mat-card-content {

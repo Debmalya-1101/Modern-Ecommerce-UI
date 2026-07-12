@@ -27,4 +27,12 @@ export class AdminShipmentsService {
       { trackLoading: true }
     );
   }
+
+  getShipmentByOrderId(orderId: number): Observable<ShipmentResponseDTO> {
+    return this.apiService.get<ShipmentResponseDTO>(
+      API_ENDPOINTS.adminDelivery.shipments.order(orderId),
+      undefined,
+      { trackLoading: true }
+    );
+  }
 }

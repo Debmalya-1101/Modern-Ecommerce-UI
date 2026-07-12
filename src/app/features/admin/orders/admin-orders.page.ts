@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -18,6 +18,10 @@ import { MatCardModule } from '@angular/material/card';
 
 import { AdminOrder } from '../../../core/models/admin-order.model';
 import { AdminOrdersService } from '../../../core/services/admin-orders.service';
+import { AdminShipmentsService } from '../../../core/services/admin-shipments.service';
+import { AdminDeliveryPartnersService } from '../../../core/services/admin-delivery-partners.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map, finalize } from 'rxjs/operators';
 import { OrderDetailsDialogComponent } from './components/order-details-dialog/order-details-dialog.component';
 import { AdminCancelOrderDialogComponent } from './components/admin-cancel-order-dialog/admin-cancel-order-dialog.component';
 import { StatusFormatPipe } from '../../../shared/pipes/status-format.pipe';
@@ -62,8 +66,11 @@ export class AdminOrdersPage implements OnInit {
   statusFilter = '';
 
   private adminOrdersService = inject(AdminOrdersService);
+  private adminShipmentsService = inject(AdminShipmentsService);
+  private adminDeliveryPartnersService = inject(AdminDeliveryPartnersService);
   private dialog = inject(MatDialog);
   private snackBar = inject(SnackbarService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.loadOrders();
@@ -105,9 +112,36 @@ export class AdminOrdersPage implements OnInit {
   }
 
   viewOrderDetails(order: AdminOrder): void {
-    this.dialog.open(OrderDetailsDialogComponent, {
-      width: '700px',
-      data: { orderId: order.orderId }
+    if (this.loading) return;
+    this.loading = true;
+
+    forkJoin({
+      order: this.adminOrdersService.getOrderDetails(order.orderId),
+      shipment: this.adminShipmentsService.getShipmentByOrderId(order.orderId).pipe(
+        catchError(() => of(null))
+      ),
+      activePartners: this.adminDeliveryPartnersService.getPartners('APPROVED', 0, 100).pipe(
+        map(r => r.content || []),
+        catchError(() => of([]))
+      )
+    }).subscribe({
+      next: (data) => {
+        this.loading = false;
+        this.cdr.detectChanges();
+        this.dialog.open(OrderDetailsDialogComponent, {
+          width: '700px',
+          data: {
+            orderId: order.orderId,
+            preloadedData: data
+          }
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+        this.cdr.detectChanges();
+        console.error('Error fetching details', err);
+        this.snackBar.error('Failed to load order details');
+      }
     });
   }
 

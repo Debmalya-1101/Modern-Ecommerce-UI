@@ -6,9 +6,19 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
+import { FormsModule } from '@angular/forms';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { catchError, finalize, of } from 'rxjs';
 
 import { AdminOrder } from '../../../../../core/models/admin-order.model';
 import { AdminOrdersService } from '../../../../../core/services/admin-orders.service';
+import { AdminShipmentsService } from '../../../../../core/services/admin-shipments.service';
+import { AdminDeliveryPartnersService } from '../../../../../core/services/admin-delivery-partners.service';
+import { ShipmentResponseDTO } from '../../../../../core/models/shipment.model';
+import { DeliveryPartnerResponseDTO } from '../../../../../core/models/delivery-partner.model';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -21,6 +31,11 @@ import { AdminOrdersService } from '../../../../../core/services/admin-orders.se
     MatIconModule,
     MatDividerModule,
     MatChipsModule,
+    MatSelectModule,
+    MatOptionModule,
+    FormsModule,
+    MatSnackBarModule,
+    MatFormFieldModule,
     CurrencyPipe,
     DatePipe
   ],
@@ -69,6 +84,29 @@ import { AdminOrdersService } from '../../../../../core/services/admin-orders.se
         </div>
 
         <mat-divider></mat-divider>
+
+        <div *ngIf="shipment" class="shipment-section">
+          <h4>Shipment & Delivery</h4>
+          <div class="shipment-details">
+            <p><span class="font-medium text-main">Status:</span> <span class="status-chip" [ngClass]="getStatusClass(shipment.status)">{{ shipment.status }}</span></p>
+            <p><span class="font-medium text-main">Current Partner:</span> {{ getPartnerName(shipment.deliveryPartnerId) }}</p>
+          </div>
+          <div class="assign-partner-control">
+            <mat-form-field appearance="outline" class="partner-select">
+              <mat-label>Assign Delivery Partner</mat-label>
+              <mat-select [(ngModel)]="selectedPartnerId" [disabled]="assigningPartner">
+                <mat-option *ngFor="let partner of activePartners" [value]="partner.id">
+                  {{ partner.fullName }} ({{ partner.vehicleType }})
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button mat-flat-button class="shared-button shared-button--primary" [disabled]="!selectedPartnerId || assigningPartner" (click)="assignPartner()">
+              {{ assigningPartner ? 'Assigning...' : 'Assign' }}
+            </button>
+          </div>
+        </div>
+
+        <mat-divider *ngIf="shipment"></mat-divider>
 
         <div class="items-section">
           <h4>Order Items</h4>
@@ -129,6 +167,7 @@ import { AdminOrdersService } from '../../../../../core/services/admin-orders.se
     .modern-dialog-content {
       padding: 1.5rem !important;
       max-height: 70vh;
+      overflow-x: hidden;
     }
 
     .loading-container, .error-container {
@@ -158,7 +197,7 @@ import { AdminOrdersService } from '../../../../../core/services/admin-orders.se
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
-      min-width: 500px;
+      width: 100%;
       font-family: 'Inter', sans-serif;
     }
 
@@ -212,6 +251,37 @@ import { AdminOrdersService } from '../../../../../core/services/admin-orders.se
         color: var(--color-neutral-600);
         text-transform: uppercase;
         letter-spacing: 0.05em;
+      }
+    }
+    
+    .shipment-section {
+      h4 {
+        margin: 0 0 12px 0;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--color-neutral-600);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+    }
+    
+    .shipment-details {
+      margin-bottom: 16px;
+      p {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+    
+    .assign-partner-control {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      .partner-select {
+        flex: 1;
+        margin-bottom: -1.25em;
       }
     }
 
@@ -351,14 +421,39 @@ export class OrderDetailsDialogComponent implements OnInit {
   order: AdminOrder | null = null;
   loading = true;
   error = '';
+  
+  shipment: ShipmentResponseDTO | null = null;
+  activePartners: DeliveryPartnerResponseDTO[] = [];
+  selectedPartnerId: number | null = null;
+  assigningPartner = false;
 
   private adminOrdersService = inject(AdminOrdersService);
+  private adminShipmentsService = inject(AdminShipmentsService);
+  private adminDeliveryPartnersService = inject(AdminDeliveryPartnersService);
+  private snackBar = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { orderId: number }) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { 
+    orderId: number, 
+    preloadedData?: {
+      order: AdminOrder,
+      shipment: ShipmentResponseDTO | null,
+      activePartners: DeliveryPartnerResponseDTO[]
+    }
+  }) {}
 
   ngOnInit(): void {
-    this.loadOrderDetails();
+    if (this.data.preloadedData) {
+      this.order = this.data.preloadedData.order;
+      this.shipment = this.data.preloadedData.shipment;
+      this.activePartners = this.data.preloadedData.activePartners;
+      if (this.shipment) {
+        this.selectedPartnerId = this.shipment.deliveryPartnerId || null;
+      }
+      this.loading = false;
+    } else {
+      this.loadOrderDetails();
+    }
   }
 
   loadOrderDetails(): void {
@@ -369,6 +464,7 @@ export class OrderDetailsDialogComponent implements OnInit {
       next: (order) => {
         this.order = order;
         this.loading = false;
+        this.loadShipmentData();
         this.cdr.markForCheck();
         this.cdr.detectChanges();
       },
@@ -382,6 +478,58 @@ export class OrderDetailsDialogComponent implements OnInit {
     });
   }
 
+  loadShipmentData(): void {
+    this.adminShipmentsService.getShipmentByOrderId(this.data.orderId).pipe(
+      catchError(err => {
+        console.warn('No shipment found for this order or error fetching:', err);
+        return of(null);
+      })
+    ).subscribe(shipment => {
+      this.shipment = shipment;
+      if (shipment) {
+        this.selectedPartnerId = shipment.deliveryPartnerId || null;
+        this.loadDeliveryPartners();
+      }
+      this.cdr.markForCheck();
+      this.cdr.detectChanges();
+    });
+  }
+
+  loadDeliveryPartners(): void {
+    this.adminDeliveryPartnersService.getPartners('APPROVED', 0, 100).subscribe({
+      next: (response) => {
+        this.activePartners = response.content || [];
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.warn('Failed to load delivery partners', err);
+      }
+    });
+  }
+
+  assignPartner(): void {
+    if (!this.shipment || !this.selectedPartnerId) return;
+
+    this.assigningPartner = true;
+    this.adminShipmentsService.assignShipment(this.shipment.id, this.selectedPartnerId)
+      .pipe(finalize(() => {
+        this.assigningPartner = false;
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: (updatedShipment) => {
+          this.shipment = updatedShipment;
+          this.snackBar.open('Delivery partner assigned successfully', 'Close', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top' });
+        },
+        error: (err) => {
+          console.error('Error assigning partner', err);
+          this.snackBar.open('Failed to assign partner', 'Close', { duration: 3000, horizontalPosition: 'right', verticalPosition: 'top' });
+        }
+      });
+  }
+
   getStatusClass(status: string): string {
     switch (status) {
       case 'CONFIRMED':
@@ -391,5 +539,11 @@ export class OrderDetailsDialogComponent implements OnInit {
       case 'CANCELLED': return 'status-cancelled';
       default: return '';
     }
+  }
+
+  getPartnerName(id?: number): string {
+    if (!id) return 'Unassigned';
+    const partner = this.activePartners.find(p => p.id === id);
+    return partner ? partner.fullName : `Partner #${id}`;
   }
 }
