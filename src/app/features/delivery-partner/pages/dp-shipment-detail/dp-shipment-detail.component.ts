@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 
 import { DeliveryPartnerShipmentsService } from '../../../../core/services/delivery-partner-shipments.service';
@@ -26,6 +27,7 @@ import { DpShipmentFailureDialogComponent, DpShipmentFailureDialogResult } from 
     MatButtonModule,
     MatIconModule,
     MatChipsModule,
+    MatProgressSpinnerModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
     DatePipe
@@ -42,6 +44,7 @@ export class DpShipmentDetailComponent implements OnInit {
 
   readonly shipment = signal<ShipmentResponseDTO | null>(null);
   readonly isLoading = signal(true);
+  readonly isUpdatingStatus = signal(false);
   readonly error = signal<string | null>(null);
   readonly errorTitle = signal<string | null>(null);
   readonly StatusEnum = ShipmentStatus;
@@ -122,7 +125,10 @@ export class DpShipmentDetailComponent implements OnInit {
   }
 
   private executeStatusUpdate(id: number, status: ShipmentStatus, failureReason?: string): void {
-    this.shipmentsService.updateShipmentStatus(id, { status, failureReason }).subscribe({
+    this.isUpdatingStatus.set(true);
+    this.shipmentsService.updateShipmentStatus(id, { status, failureReason })
+      .pipe(finalize(() => this.isUpdatingStatus.set(false)))
+      .subscribe({
       next: (updated) => {
         this.snackbarService.success(`Shipment status updated to ${status}`);
         this.shipment.set(updated);

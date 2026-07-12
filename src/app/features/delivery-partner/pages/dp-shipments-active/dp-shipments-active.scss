@@ -181,4 +181,19 @@
     }
   }
 }
-.paginator-container { margin-top: 1.5rem; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important; border: none !important; overflow: hidden; }
+
+.paginator-container {
+  display: flex;
+  justify-content: flex-end;
+  background: var(--surface-color, var(--shell-surface));
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.5rem;
+}
+
+.button-spinner {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+

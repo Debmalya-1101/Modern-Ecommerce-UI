@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { finalize } from 'rxjs';
 
 import { DeliveryPartnerShipmentsService } from '../../../../core/services/delivery-partner-shipments.service';
@@ -29,6 +30,7 @@ import { DpShipmentFailureDialogComponent, DpShipmentFailureDialogResult } from 
     MatIconModule,
     MatChipsModule,
     MatPaginatorModule,
+    MatProgressSpinnerModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent,
@@ -46,6 +48,7 @@ export class DpShipmentsActiveComponent implements OnInit {
   readonly shipments = signal<ShipmentResponseDTO[]>([]);
   readonly isLoading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly updatingShipmentId = signal<number | null>(null);
   readonly StatusEnum = ShipmentStatus;
 
   // Pagination
@@ -111,7 +114,10 @@ export class DpShipmentsActiveComponent implements OnInit {
   }
 
   private executeStatusUpdate(id: number, status: ShipmentStatus, failureReason?: string): void {
-    this.shipmentsService.updateShipmentStatus(id, { status, failureReason }).subscribe({
+    this.updatingShipmentId.set(id);
+    this.shipmentsService.updateShipmentStatus(id, { status, failureReason })
+      .pipe(finalize(() => this.updatingShipmentId.set(null)))
+      .subscribe({
       next: (updated) => {
         this.snackbarService.success(`Shipment status updated to ${status}`);
         // Remove from active list if terminal state (DELIVERED or DELIVERY_FAILED)

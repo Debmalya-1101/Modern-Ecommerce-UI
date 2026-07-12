@@ -51,18 +51,33 @@
             <div class="spacer"></div>
             
             @if (shipment.status === StatusEnum.ASSIGNED) {
-              <button mat-flat-button color="accent" (click)="updateStatus(shipment, StatusEnum.PICKED_UP)">
-                Mark Picked Up
+              <button mat-flat-button color="accent" (click)="updateStatus(shipment, StatusEnum.PICKED_UP)" [disabled]="updatingShipmentId() === shipment.id">
+                @if (updatingShipmentId() === shipment.id) {
+                  <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                  <span>Updating...</span>
+                } @else {
+                  Mark Picked Up
+                }
               </button>
             } @else if (shipment.status === StatusEnum.PICKED_UP) {
-              <button mat-flat-button color="accent" (click)="updateStatus(shipment, StatusEnum.OUT_FOR_DELIVERY)">
-                Out For Delivery
+              <button mat-flat-button color="accent" (click)="updateStatus(shipment, StatusEnum.OUT_FOR_DELIVERY)" [disabled]="updatingShipmentId() === shipment.id">
+                @if (updatingShipmentId() === shipment.id) {
+                  <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                  <span>Updating...</span>
+                } @else {
+                  Out For Delivery
+                }
               </button>
             } @else if (shipment.status === StatusEnum.OUT_FOR_DELIVERY) {
-              <button mat-flat-button color="primary" (click)="updateStatus(shipment, StatusEnum.DELIVERED)">
-                Mark Delivered
+              <button mat-flat-button color="primary" (click)="updateStatus(shipment, StatusEnum.DELIVERED)" [disabled]="updatingShipmentId() === shipment.id">
+                @if (updatingShipmentId() === shipment.id) {
+                  <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+                  <span>Updating...</span>
+                } @else {
+                  Mark Delivered
+                }
               </button>
-              <button mat-stroked-button color="warn" (click)="markFailed(shipment)">
+              <button mat-stroked-button color="warn" (click)="markFailed(shipment)" [disabled]="updatingShipmentId() === shipment.id">
                 Mark Failed
               </button>
             }
@@ -71,16 +86,15 @@
       }
     </div>
 
-    <mat-card class="paginator-container" appearance="outlined">
+    <div class="paginator-container">
       <mat-paginator 
         [length]="totalElements()"
         [pageSize]="pageSize()"
         [pageIndex]="pageIndex()"
         [pageSizeOptions]="[10, 25, 50]"
         (page)="onPageChange($event)"
-        aria-label="Select page"
-        class="modern-paginator">
+        aria-label="Select page">
       </mat-paginator>
-    </mat-card>
+    </div>
   }
 </div>

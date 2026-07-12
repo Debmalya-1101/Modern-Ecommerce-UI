@@ -79,18 +79,33 @@
 
       <mat-card-actions class="card-actions">
         @if (s.status === StatusEnum.ASSIGNED) {
-          <button mat-flat-button color="accent" (click)="updateStatus(StatusEnum.PICKED_UP)">
-            Mark Picked Up
+          <button mat-flat-button color="accent" (click)="updateStatus(StatusEnum.PICKED_UP)" [disabled]="isUpdatingStatus()">
+            @if (isUpdatingStatus()) {
+              <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+              <span>Updating...</span>
+            } @else {
+              Mark Picked Up
+            }
           </button>
         } @else if (s.status === StatusEnum.PICKED_UP) {
-          <button mat-flat-button color="accent" (click)="updateStatus(StatusEnum.OUT_FOR_DELIVERY)">
-            Out For Delivery
+          <button mat-flat-button color="accent" (click)="updateStatus(StatusEnum.OUT_FOR_DELIVERY)" [disabled]="isUpdatingStatus()">
+            @if (isUpdatingStatus()) {
+              <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+              <span>Updating...</span>
+            } @else {
+              Out For Delivery
+            }
           </button>
         } @else if (s.status === StatusEnum.OUT_FOR_DELIVERY) {
-          <button mat-flat-button color="primary" (click)="updateStatus(StatusEnum.DELIVERED)">
-            Mark Delivered
+          <button mat-flat-button color="primary" (click)="updateStatus(StatusEnum.DELIVERED)" [disabled]="isUpdatingStatus()">
+            @if (isUpdatingStatus()) {
+              <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+              <span>Updating...</span>
+            } @else {
+              Mark Delivered
+            }
           </button>
-          <button mat-stroked-button color="warn" (click)="markFailed()">
+          <button mat-stroked-button color="warn" (click)="markFailed()" [disabled]="isUpdatingStatus()">
             Mark Failed
           </button>
         } @else {

@@ -84,17 +84,16 @@
             }
           </div>
           
-          <mat-card class="paginator-container" appearance="outlined">
+          <div class="paginator-container">
             <mat-paginator 
               [length]="totalElements()"
               [pageSize]="pageSize()"
               [pageIndex]="pageIndex()"
               [pageSizeOptions]="[12, 24, 48]"
               (page)="onPageChange($event)"
-              aria-label="Select page"
-              class="modern-paginator">
+              aria-label="Select page">
             </mat-paginator>
-          </mat-card>
+          </div>
         }
       </div>
     </div>
