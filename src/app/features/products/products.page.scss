@@ -190,6 +190,7 @@
   top: 72px !important; /* Exact height of the top navbar */
   right: 0 !important;
   height: calc(100vh - 72px) !important;
+  height: calc(100dvh - 72px) !important;
   z-index: 1000 !important;
   
   /* Premium aesthetic upgrades */
@@ -237,6 +238,7 @@
   &__footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
     border-top: 1px solid rgba(87, 61, 44, 0.1);
     flex-shrink: 0;
   }
