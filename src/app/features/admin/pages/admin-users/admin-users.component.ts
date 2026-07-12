@@ -22,6 +22,7 @@ import { ErrorStateComponent } from '../../../../shared/ui/error-state/error-sta
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state.component';
 import { SnackbarService } from '../../../../shared/services/snackbar.service';
 import { ConfirmationDialogComponent } from '../../../../shared/ui/confirmation-dialog/confirmation-dialog.component';
+import { StatusFormatPipe } from '../../../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-admin-users',
@@ -44,7 +45,8 @@ import { ConfirmationDialogComponent } from '../../../../shared/ui/confirmation-
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent,
-    DatePipe
+    DatePipe,
+    StatusFormatPipe
   ],
   templateUrl: './admin-users.html',
   styleUrls: ['./admin-users.scss']

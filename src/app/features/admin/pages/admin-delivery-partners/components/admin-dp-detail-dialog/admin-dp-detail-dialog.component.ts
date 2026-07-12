@@ -11,6 +11,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { DeliveryPartnerResponseDTO, DeliveryPartnerStatus } from '../../../../../../core/models/delivery-partner.model';
 import { DeliveryFeedbackService } from '../../../../../../core/services/delivery-feedback.service';
 import { AdminDeliveryFeedbackResponseDTO } from '../../../../../../core/models/delivery-feedback.model';
+import { StatusFormatPipe } from '../../../../../../shared/pipes/status-format.pipe';
 
 export interface AdminDpDetailDialogData {
   partner: DeliveryPartnerResponseDTO;
@@ -34,7 +35,8 @@ export interface AdminDpDetailDialogResult {
     MatProgressSpinnerModule,
     MatIconModule,
     MatPaginatorModule,
-    DatePipe
+    DatePipe,
+    StatusFormatPipe
   ],
   templateUrl: './admin-dp-detail-dialog.html',
   styleUrls: ['./admin-dp-detail-dialog.scss']

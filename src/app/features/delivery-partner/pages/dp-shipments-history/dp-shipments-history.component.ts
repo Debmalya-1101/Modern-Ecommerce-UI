@@ -13,6 +13,7 @@ import { ShipmentResponseDTO } from '../../../../core/models/shipment.model';
 import { LoadingSpinnerComponent } from '../../../../shared/ui/loading-spinner/loading-spinner.component';
 import { ErrorStateComponent } from '../../../../shared/ui/error-state/error-state.component';
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state.component';
+import { StatusFormatPipe } from '../../../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-dp-shipments-history',
@@ -28,7 +29,8 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent,
-    DatePipe
+    DatePipe,
+    StatusFormatPipe
   ],
   templateUrl: './dp-shipments-history.html',
   styleUrls: ['./dp-shipments-history.scss']

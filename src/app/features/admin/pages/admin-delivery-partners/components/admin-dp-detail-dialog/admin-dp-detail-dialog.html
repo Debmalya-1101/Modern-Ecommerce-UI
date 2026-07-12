@@ -7,7 +7,7 @@
       <div class="details-container">
         <div class="header-section" style="margin-top: 16px;">
           <h3>{{ partner.fullName }}</h3>
-          <mat-chip [color]="getStatusColor(partner.status)" highlighted>{{ partner.status }}</mat-chip>
+          <mat-chip [color]="getStatusColor(partner.status)" highlighted>{{ partner.status | statusFormat }}</mat-chip>
         </div>
         
         <mat-divider style="margin: 16px 0;"></mat-divider>

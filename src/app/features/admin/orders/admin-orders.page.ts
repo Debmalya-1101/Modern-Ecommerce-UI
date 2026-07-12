@@ -20,6 +20,7 @@ import { AdminOrder } from '../../../core/models/admin-order.model';
 import { AdminOrdersService } from '../../../core/services/admin-orders.service';
 import { OrderDetailsDialogComponent } from './components/order-details-dialog/order-details-dialog.component';
 import { AdminCancelOrderDialogComponent } from './components/admin-cancel-order-dialog/admin-cancel-order-dialog.component';
+import { StatusFormatPipe } from '../../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-admin-orders',
@@ -41,7 +42,8 @@ import { AdminCancelOrderDialogComponent } from './components/admin-cancel-order
     MatMenuModule,
     MatCardModule,
     CurrencyPipe,
-    DatePipe
+    DatePipe,
+    StatusFormatPipe
   ],
   templateUrl: './admin-orders.page.html',
   styleUrl: './admin-orders.page.scss'

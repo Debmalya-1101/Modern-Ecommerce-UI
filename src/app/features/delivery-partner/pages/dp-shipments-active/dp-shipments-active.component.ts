@@ -18,6 +18,7 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
 import { SnackbarService } from '../../../../shared/services/snackbar.service';
 import { ConfirmationDialogService } from '../../../../shared/services/confirmation-dialog.service';
 import { DpShipmentFailureDialogComponent, DpShipmentFailureDialogResult } from '../../components/dp-shipment-failure-dialog/dp-shipment-failure-dialog.component';
+import { StatusFormatPipe } from '../../../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-dp-shipments-active',
@@ -34,7 +35,8 @@ import { DpShipmentFailureDialogComponent, DpShipmentFailureDialogResult } from 
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent,
-    DatePipe
+    DatePipe,
+    StatusFormatPipe
   ],
   templateUrl: './dp-shipments-active.html',
   styleUrls: ['./dp-shipments-active.scss']

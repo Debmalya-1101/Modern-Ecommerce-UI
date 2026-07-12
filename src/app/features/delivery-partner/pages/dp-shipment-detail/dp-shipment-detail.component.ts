@@ -16,6 +16,7 @@ import { ErrorStateComponent } from '../../../../shared/ui/error-state/error-sta
 import { SnackbarService } from '../../../../shared/services/snackbar.service';
 import { ConfirmationDialogService } from '../../../../shared/services/confirmation-dialog.service';
 import { DpShipmentFailureDialogComponent, DpShipmentFailureDialogResult } from '../../components/dp-shipment-failure-dialog/dp-shipment-failure-dialog.component';
+import { StatusFormatPipe } from '../../../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-dp-shipment-detail',
@@ -30,7 +31,8 @@ import { DpShipmentFailureDialogComponent, DpShipmentFailureDialogResult } from 
     MatProgressSpinnerModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
-    DatePipe
+    DatePipe,
+    StatusFormatPipe
   ],
   templateUrl: './dp-shipment-detail.html',
   styleUrls: ['./dp-shipment-detail.scss']

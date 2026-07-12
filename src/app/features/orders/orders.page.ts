@@ -10,6 +10,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { OrdersApiService } from '../../core/services/orders-api.service';
 import { OrderResponse } from '../../core/models/order.model';
 import { APP_CONSTANTS } from '../../core/config/app.constants';
+import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-orders-page',
@@ -21,7 +22,8 @@ import { APP_CONSTANTS } from '../../core/config/app.constants';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    StatusFormatPipe
   ],
   templateUrl: './orders.page.html',
   styleUrls: ['./orders.page.scss']
@@ -79,6 +81,29 @@ export class OrdersPage implements OnInit {
       case 'OUT_FOR_DELIVERY': return 2.5;
       case 'DELIVERED': return 3;
       default: return 1;
+    }
+  }
+
+  getStatusClass(status: string): string {
+    if (!status) return '';
+    const s = status.toUpperCase();
+    switch (s) {
+      case 'PENDING_PAYMENT': 
+      case 'PENDING':
+      case 'INITIATED': return 'status-pending';
+      case 'PAYMENT_FAILED': 
+      case 'FAILED': return 'status-failed';
+      case 'SUCCESS':
+      case 'COMPLETED': return 'status-delivered';
+      case 'CONFIRMED': return 'status-placed';
+      case 'PROCESSING': return 'status-processing';
+      case 'SHIPPED': return 'status-shipped';
+      case 'OUT_FOR_DELIVERY': return 'status-out-for-delivery';
+      case 'DELIVERED': return 'status-delivered';
+      case 'DELIVERY_FAILED': return 'status-failed';
+      case 'CANCELLED': return 'status-cancelled';
+      case 'RETURNED': return 'status-returned';
+      default: return '';
     }
   }
 

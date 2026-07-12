@@ -16,7 +16,7 @@
         <div class="info-item">
           <span class="label">Status</span>
           <span class="value">
-            <mat-chip color="accent" highlighted>{{ shipment.status }}</mat-chip>
+            <mat-chip color="accent" highlighted>{{ shipment.status | statusFormat }}</mat-chip>
           </span>
         </div>
         <div class="info-item">

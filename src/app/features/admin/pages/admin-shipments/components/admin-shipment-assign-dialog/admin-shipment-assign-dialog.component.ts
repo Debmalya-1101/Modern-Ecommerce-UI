@@ -14,6 +14,7 @@ import { ShipmentResponseDTO } from '../../../../../../core/models/shipment.mode
 import { DeliveryPartnerResponseDTO, DeliveryPartnerStatus } from '../../../../../../core/models/delivery-partner.model';
 import { AdminDeliveryPartnersService } from '../../../../../../core/services/admin-delivery-partners.service';
 import { ConfirmationDialogService } from '../../../../../../shared/services/confirmation-dialog.service';
+import { StatusFormatPipe } from '../../../../../../shared/pipes/status-format.pipe';
 
 export interface AdminShipmentAssignDialogData {
   shipment: ShipmentResponseDTO;
@@ -36,7 +37,8 @@ export interface AdminShipmentAssignDialogResult {
     MatChipsModule,
     MatDividerModule,
     FormsModule,
-    DatePipe
+    DatePipe,
+    StatusFormatPipe
   ],
   templateUrl: './admin-shipment-assign-dialog.html',
   styleUrls: ['./admin-shipment-assign-dialog.scss']

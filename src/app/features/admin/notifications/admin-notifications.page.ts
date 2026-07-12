@@ -14,6 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { ActivatedRoute } from '@angular/router';
 import { AdminNotificationService } from '../../../core/services/admin-notification.service';
 import { NotificationLogDTO } from '../../../core/models/admin-notification.model';
+import { StatusFormatPipe } from '../../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-admin-notifications',
@@ -29,7 +30,8 @@ import { NotificationLogDTO } from '../../../core/models/admin-notification.mode
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatSelectModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    StatusFormatPipe
   ],
   templateUrl: './admin-notifications.page.html',
   styleUrl: './admin-notifications.page.scss'

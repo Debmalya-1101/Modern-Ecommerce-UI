@@ -12,10 +12,10 @@
         <mat-label>Filter Status</mat-label>
         <mat-select [value]="statusFilter()" (selectionChange)="onFilterChange($event.value)">
           <mat-option value="ALL">All Partners</mat-option>
-          <mat-option [value]="StatusEnum.PENDING">Pending</mat-option>
-          <mat-option [value]="StatusEnum.APPROVED">Approved</mat-option>
-          <mat-option [value]="StatusEnum.REJECTED">Rejected</mat-option>
-          <mat-option [value]="StatusEnum.SUSPENDED">Suspended</mat-option>
+          <mat-option [value]="StatusEnum.PENDING">{{ 'PENDING' | statusFormat }}</mat-option>
+          <mat-option [value]="StatusEnum.APPROVED">{{ 'APPROVED' | statusFormat }}</mat-option>
+          <mat-option [value]="StatusEnum.REJECTED">{{ 'REJECTED' | statusFormat }}</mat-option>
+          <mat-option [value]="StatusEnum.SUSPENDED">{{ 'SUSPENDED' | statusFormat }}</mat-option>
         </mat-select>
       </mat-form-field>
     </div>
@@ -82,7 +82,7 @@
           <ng-container matColumnDef="status">
             <th mat-header-cell *matHeaderCellDef> Status </th>
             <td mat-cell *matCellDef="let p">
-              <mat-chip [color]="getStatusColor(p.status)" highlighted>{{ p.status }}</mat-chip>
+              <mat-chip [color]="getStatusColor(p.status)" highlighted>{{ p.status | statusFormat }}</mat-chip>
             </td>
           </ng-container>
 

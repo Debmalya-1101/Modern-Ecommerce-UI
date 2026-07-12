@@ -32,7 +32,7 @@
               <span class="tracking">{{ shipment.trackingNumber || 'Pending Tracking' }}</span>
               <span class="order">Order #{{ shipment.orderId }}</span>
             </div>
-            <mat-chip color="primary" highlighted>{{ shipment.status }}</mat-chip>
+            <mat-chip color="primary" highlighted>{{ shipment.status | statusFormat }}</mat-chip>
           </div>
           
           <mat-card-content>

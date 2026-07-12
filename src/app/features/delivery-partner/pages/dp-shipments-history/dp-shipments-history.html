@@ -35,7 +35,7 @@
             <mat-chip 
               [color]="shipment.status === 'DELIVERED' ? 'primary' : 'warn'" 
               highlighted>
-              {{ shipment.status }}
+              {{ shipment.status | statusFormat }}
             </mat-chip>
           </div>
           

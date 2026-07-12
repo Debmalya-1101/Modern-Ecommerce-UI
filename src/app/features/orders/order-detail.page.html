@@ -30,8 +30,8 @@
               <mat-icon>receipt_long</mat-icon>
             </div>
             <h1>Order #{{ order()!.orderId }}</h1>
-            <span class="status-badge" [class]="order()!.orderStatus.toLowerCase()">
-              {{ order()!.orderStatus }}
+            <span class="status-chip" [ngClass]="getStatusClass(order()!.orderStatus)">
+              {{ order()!.orderStatus | statusFormat }}
             </span>
           </div>
           <p class="subtitle">

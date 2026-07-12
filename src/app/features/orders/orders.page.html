@@ -44,11 +44,11 @@
               </div>
               <div class="meta-item">
                 <span class="label">Payment</span>
-                <span class="value" [ngClass]="{'status-warning': order.paymentStatus === 'INITIATED' || order.paymentStatus === 'PENDING', 'status-success': order.paymentStatus === 'COMPLETED'}">{{ order.paymentStatus }}</span>
+                <span class="status-chip" [ngClass]="getStatusClass(order.paymentStatus)">{{ order.paymentStatus | statusFormat }}</span>
               </div>
               <div class="meta-item">
-                <span class="label">Delivery</span>
-                <span class="value" [ngClass]="{'status-info': order.deliveryStatus === 'OUT_FOR_DELIVERY', 'status-success': order.deliveryStatus === 'DELIVERED'}">{{ order.deliveryStatus }}</span>
+                <span class="label">Status</span>
+                <span class="status-chip" [ngClass]="getStatusClass(order.status)">{{ order.status | statusFormat }}</span>
               </div>
             </div>
             <div class="header-right">

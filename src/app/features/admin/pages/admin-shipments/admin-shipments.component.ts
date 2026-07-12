@@ -16,6 +16,7 @@ import { ErrorStateComponent } from '../../../../shared/ui/error-state/error-sta
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state.component';
 import { SnackbarService } from '../../../../shared/services/snackbar.service';
 import { AdminShipmentAssignDialogComponent, AdminShipmentAssignDialogData, AdminShipmentAssignDialogResult } from './components/admin-shipment-assign-dialog/admin-shipment-assign-dialog.component';
+import { StatusFormatPipe } from '../../../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-admin-shipments',
@@ -31,7 +32,8 @@ import { AdminShipmentAssignDialogComponent, AdminShipmentAssignDialogData, Admi
     LoadingSpinnerComponent,
     ErrorStateComponent,
     EmptyStateComponent,
-    DatePipe
+    DatePipe,
+    StatusFormatPipe
   ],
   templateUrl: './admin-shipments.html',
   styleUrls: ['./admin-shipments.scss']

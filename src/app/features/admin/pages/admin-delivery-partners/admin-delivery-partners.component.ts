@@ -20,6 +20,7 @@ import { ErrorStateComponent } from '../../../../shared/ui/error-state/error-sta
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state.component';
 import { SnackbarService } from '../../../../shared/services/snackbar.service';
 import { AdminDpDetailDialogComponent, AdminDpDetailDialogData, AdminDpDetailDialogResult } from './components/admin-dp-detail-dialog/admin-dp-detail-dialog.component';
+import { StatusFormatPipe } from '../../../../shared/pipes/status-format.pipe';
 
 export interface PartnerRowData extends DeliveryPartnerResponseDTO {
   ratingSummary?: DeliveryPartnerRatingSummaryDTO;
@@ -40,7 +41,8 @@ export interface PartnerRowData extends DeliveryPartnerResponseDTO {
     MatPaginatorModule,
     LoadingSpinnerComponent,
     ErrorStateComponent,
-    EmptyStateComponent
+    EmptyStateComponent,
+    StatusFormatPipe
   ],
   templateUrl: './admin-delivery-partners.html',
   styleUrls: ['./admin-delivery-partners.scss']

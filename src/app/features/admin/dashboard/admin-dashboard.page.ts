@@ -20,6 +20,7 @@ import { DashboardAnalyticsDTO } from '../../../core/models/admin-analytics.mode
 import { AdminOrder } from '../../../core/models/admin-order.model';
 import { AdminProductDTO } from '../../../core/models/admin-product.model';
 import { InventoryAnalyticsDashboardDTO } from '../../../core/models/admin-inventory.model';
+import { StatusFormatPipe } from '../../../shared/pipes/status-format.pipe';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -36,7 +37,8 @@ import { InventoryAnalyticsDashboardDTO } from '../../../core/models/admin-inven
     MatTableModule,
     MatProgressSpinnerModule,
     MatDividerModule,
-    MatChipsModule
+    MatChipsModule,
+    StatusFormatPipe
   ],
   templateUrl: './admin-dashboard.page.html',
   styleUrl: './admin-dashboard.page.scss'
