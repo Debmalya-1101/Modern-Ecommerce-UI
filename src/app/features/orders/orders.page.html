@@ -83,14 +83,14 @@
                     </div>
                     <span class="mini-label">Confirmed</span>
                   </div>
-                  <div class="mini-line" [class.active]="getOrderStatusStep(order.status) >= 2"></div>
+                  <div class="mini-line" [class.active]="getOrderStatusStep(order.status) >= 1.5" [class.half-active]="getOrderStatusStep(order.status) === 1.5"></div>
                   <div class="mini-step" [class.active]="getOrderStatusStep(order.status) >= 2" [class.completed]="getOrderStatusStep(order.status) > 2">
                     <div class="mini-icon">
                       <mat-icon>local_shipping</mat-icon>
                     </div>
                     <span class="mini-label">Shipped</span>
                   </div>
-                  <div class="mini-line" [class.active]="getOrderStatusStep(order.status) >= 3"></div>
+                  <div class="mini-line" [class.active]="getOrderStatusStep(order.status) >= 2.5" [class.half-active]="getOrderStatusStep(order.status) === 2.5"></div>
                   <div class="mini-step" [class.active]="getOrderStatusStep(order.status) >= 3" [class.completed]="getOrderStatusStep(order.status) >= 3">
                     <div class="mini-icon">
                       <mat-icon>done_all</mat-icon>

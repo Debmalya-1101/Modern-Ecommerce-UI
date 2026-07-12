@@ -121,7 +121,8 @@
 
   <!-- Featured Products Section -->
   <section class="section-container products-section">
-    <div class="section-header">
+    <!-- Desktop Header -->
+    <div class="section-header desktop-header">
       <div class="header-left">
         <h2 class="section-title">Featured Products</h2>
         <p class="section-subtitle">Our most popular and highly rated essentials.</p>
@@ -129,6 +130,23 @@
       <a mat-button appButtonStyle="secondary" routerLink="/products" class="view-all-btn">
         <span>View all products</span>
         <mat-icon>arrow_right_alt</mat-icon>
+      </a>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="section-header-card mobile-header">
+      <div class="header-content">
+        <div class="header-icon-box">
+          <mat-icon>star_outline</mat-icon>
+        </div>
+        <div class="header-text">
+          <h2 class="section-title">Featured Products</h2>
+          <p class="section-subtitle">Top picks & customer favorites.</p>
+        </div>
+      </div>
+      <a routerLink="/products" class="view-all-link">
+        <span>View all</span>
+        <mat-icon>arrow_forward</mat-icon>
       </a>
     </div>
 
@@ -163,7 +181,8 @@
 
   <!-- New Arrivals Section -->
   <section class="section-container products-section">
-    <div class="section-header">
+    <!-- Desktop Header -->
+    <div class="section-header desktop-header">
       <div class="header-left">
         <h2 class="section-title">New Arrivals</h2>
         <p class="section-subtitle">Fresh drops and the latest technology additions.</p>
@@ -171,6 +190,23 @@
       <a mat-button appButtonStyle="secondary" routerLink="/products" class="view-all-btn">
         <span>View all products</span>
         <mat-icon>arrow_right_alt</mat-icon>
+      </a>
+    </div>
+
+    <!-- Mobile Header -->
+    <div class="section-header-card mobile-header">
+      <div class="header-content">
+        <div class="header-icon-box">
+          <mat-icon>redeem</mat-icon>
+        </div>
+        <div class="header-text">
+          <h2 class="section-title">New Arrivals</h2>
+          <p class="section-subtitle">Fresh drops & latest tech.</p>
+        </div>
+      </div>
+      <a routerLink="/products" class="view-all-link">
+        <span>View all</span>
+        <mat-icon>arrow_forward</mat-icon>
       </a>
     </div>
 

@@ -253,6 +253,134 @@
   }
 }
 
+// Visibility toggles for headers
+.mobile-header {
+  display: none !important; // Hide mobile version by default
+}
+
+.section-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  background: rgba(255, 252, 247, 0.95);
+  border-radius: var(--border-radius-xl);
+  border: 1px solid rgba(181, 95, 52, 0.08);
+  box-shadow: 0 4px 12px rgba(80, 54, 36, 0.02);
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(80, 54, 36, 0.04);
+  }
+
+  @media (max-width: 580px) {
+    padding: 1rem;
+    border-radius: var(--border-radius-lg);
+  }
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+
+  @media (max-width: 580px) {
+    gap: 0.85rem;
+  }
+}
+
+.header-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--border-radius-circle);
+  background: var(--color-brand-050);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    color: var(--color-brand-600);
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+  }
+
+  @media (max-width: 580px) {
+    width: 44px;
+    height: 44px;
+    
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+  }
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  
+  .section-title {
+    margin-bottom: 0;
+    line-height: 1.2;
+  }
+
+  @media (max-width: 580px) {
+    .section-title {
+      font-size: 1.15rem; // Make it small enough to fit 'Featured Products' on one line
+    }
+    .section-subtitle {
+      font-size: 0.8rem;
+    }
+  }
+  
+  @media (max-width: 360px) {
+    .section-title {
+      font-size: 1.05rem;
+    }
+    .section-subtitle {
+      font-size: 0.75rem;
+    }
+  }
+}
+
+.view-all-link {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-brand-600);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 0.5rem;
+  flex-shrink: 0;
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  &:hover {
+    color: var(--color-brand-500);
+    mat-icon {
+      transform: translateX(4px);
+    }
+  }
+
+  @media (max-width: 580px) {
+    font-size: 0.85rem;
+    padding: 0.25rem;
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════
 // 3. CATEGORIES GRID — Horizontally scrollable cards
 // ═══════════════════════════════════════════════════════════════════════
@@ -883,12 +1011,7 @@
   .section-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.65rem;
-  }
-  
-  .view-all-btn {
-    align-self: flex-start;
-    padding: 0;
+    gap: 0.75rem;
   }
 }
 
@@ -985,5 +1108,22 @@
 
   .slide-title {
     font-size: 1.15rem;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// HEADER VISIBILITY TOGGLES
+// ═══════════════════════════════════════════════════════════════════════
+.mobile-header {
+  display: none !important;
+}
+
+@media (max-width: 580px) {
+  .desktop-header {
+    display: none !important;
+  }
+  
+  .mobile-header {
+    display: flex !important;
   }
 }

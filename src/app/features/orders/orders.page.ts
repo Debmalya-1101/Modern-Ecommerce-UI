@@ -73,9 +73,10 @@ export class OrdersPage implements OnInit {
       case 'PENDING_PAYMENT':
       case 'PAYMENT_FAILED':
       case 'CONFIRMED': return 1;
-      case 'PROCESSING':
+      case 'ASSIGNED':
+      case 'PROCESSING': return 1.5;
       case 'SHIPPED': return 2;
-      case 'OUT_FOR_DELIVERY':
+      case 'OUT_FOR_DELIVERY': return 2.5;
       case 'DELIVERED': return 3;
       default: return 1;
     }

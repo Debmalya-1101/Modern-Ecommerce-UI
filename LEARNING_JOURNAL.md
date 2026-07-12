@@ -6181,4 +6181,34 @@ What I learned:
 - Frosted glass containers make floating UI controls visible regardless of what's behind them.
 - Consistent use of design tokens across pages creates visual coherence without duplicating magic values.
 
+---
 
+## Order Status Tracker Intermediate States
+
+**Date:** July 12, 2026
+
+**What was done:** Updated the order progress tracker in both `order-detail.page.html` and `orders.page.html` to display "in-between" visually accurate states (e.g., intermediate progress lines) when the order is 'Assigned' or 'Out for Delivery'.
+
+### Key Concepts
+
+#### 1. Intermediate Active States for Visual Lines
+Instead of binary states (active/inactive) for a progress tracker, intermediate CSS classes like `.half-active` provide a visual indication that the tracker is currently moving toward the next step, without fully activating that next step icon.
+
+```css
+.mini-line.half-active {
+  background: linear-gradient(to right, var(--shell-accent) 50%, var(--shell-border) 50%);
+}
+```
+
+#### 2. Fine-grained Stepper Values
+In TypeScript, returning float values (e.g., `1.5`, `2.5`) allows the template logic to easily check if the progress has passed an intermediate threshold:
+```html
+<div class="mini-line" 
+     [class.active]="step >= 2" 
+     [class.half-active]="step === 1.5">
+</div>
+```
+
+What I learned:
+- A `linear-gradient` is a great way to visually split a CSS border or divider into partially-completed sections.
+- Using floats (like `1.5`) instead of integers makes the interpolation logic in HTML templates clean and readable without having to create completely custom enums or maps.

@@ -304,9 +304,41 @@
             &.active {
               background: var(--shell-accent);
             }
+
+            &.half-active {
+              background: linear-gradient(to right, var(--shell-accent) 50%, var(--shell-border) 50%);
+              position: relative;
+
+              &::after {
+                content: '';
+                display: block;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 10px;
+                height: 10px;
+                background-color: var(--shell-accent);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                animation: pulse-dot 1.5s infinite;
+                z-index: 10;
+              }
+            }
           }
         }
       }
+    }
+  }
+
+  @keyframes pulse-dot {
+    0% {
+      box-shadow: 0 0 0 0 rgba(181, 95, 52, 0.5);
+    }
+    70% {
+      box-shadow: 0 0 0 6px rgba(181, 95, 52, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(181, 95, 52, 0);
     }
   }
 
@@ -790,11 +822,65 @@
       }
     }
 
+    .order-header-card {
+      .header-card-content {
+        gap: 1rem; // compact
+        padding: 1.25rem 1.25rem 1.75rem; // extra padding at the bottom for absolute labels
+        
+        .header-main {
+          gap: 0.5rem; // compact
+
+          .title-area {
+            gap: 0.5rem; // compact
+            
+            .title-icon-wrapper {
+              width: 42px; // smaller
+              height: 42px;
+              
+              mat-icon {
+                font-size: 20px;
+                width: 20px;
+                height: 20px;
+              }
+            }
+
+            h1 {
+              font-size: 1.5rem !important; // override any other styles for mobile compact view
+            }
+          }
+          
+          .subtitle {
+            font-size: 0.85rem; // smaller
+            gap: 0.25rem; // compact
+          }
+        }
+
+        .header-tracker {
+          min-width: 0 !important; // Override the 320px min-width from desktop
+          width: 100%;
+          justify-content: center; // Center the tracker on mobile
+          margin-top: 0.25rem;
+          
+          .mini-tracker {
+            max-width: 100%;
+            padding: 0 1rem; // padding so absolutely positioned labels don't clip at the edges
+            padding-bottom: 28px; // Ensure there is enough vertical room for the absolute labels
+          }
+        }
+      }
+    }
+
     .order-tracker-card {
       padding: 1.25rem 1rem; // reduced
     }
 
     .items-list {
+      &::-webkit-scrollbar {
+        display: none; // Hide custom scrollbar on mobile to prevent the grey vertical bar artifact
+      }
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+
       .item-row {
         gap: 1rem;
 
