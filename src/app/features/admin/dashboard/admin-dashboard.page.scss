@@ -478,6 +478,18 @@
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+
+  .kpi-title {
+    font-size: 0.8rem;
+  }
+
+  .kpi-value {
+    font-size: 1.75rem;
+  }
+
+  .status-info .status-count {
+    font-size: 1.25rem;
+  }
   
   .dashboard-widgets {
     gap: 1.5rem;

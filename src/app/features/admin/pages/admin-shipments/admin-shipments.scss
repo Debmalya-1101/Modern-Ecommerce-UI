@@ -11,7 +11,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
 
@@ -22,13 +22,13 @@
       gap: 1rem;
 
       h1 {
-      margin: 0;
-      font-size: 1.85rem;
-      font-weight: 800;
-      color: var(--primary-color, #8B4513);
-      letter-spacing: -0.03em;
-      line-height: 1.2;
-    }
+        margin: 0;
+        font-size: 1.85rem;
+        font-weight: 800;
+        color: var(--primary-color, #8B4513);
+        letter-spacing: -0.03em;
+        line-height: 1.2;
+      }
     }
 
     .subtitle {
@@ -45,6 +45,7 @@
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08) !important;
   padding: 0;
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.5);
 
   .table-container {
     overflow-x: auto;
@@ -55,16 +56,156 @@
   width: 100%;
 }
 
-.table-row {
-  transition: background-color 0.2s ease;
-  
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+.table-container {
+  position: relative;
+  min-height: 400px;
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
   }
 }
 
+.shipments-table {
+  width: 100%;
+  background: transparent;
 
+  th.mat-mdc-header-cell, th.mat-header-cell {
+    color: var(--color-neutral-600);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: #f9fafb;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(87, 61, 44, 0.1);
 
+    &:first-child {
+      padding-left: 1.5rem;
+    }
+    &:last-child {
+      padding-right: 1.5rem;
+    }
+  }
 
+  td.mat-mdc-cell, td.mat-cell {
+    padding: 1rem 1.5rem;
+    color: var(--color-neutral-900);
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(87, 61, 44, 0.05);
+    vertical-align: middle;
 
+    &:first-child {
+      padding-left: 1.5rem;
+    }
+    &:last-child {
+      padding-right: 1.5rem;
+    }
+  }
 
+  .table-row {
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: #f9fafb;
+    }
+  }
+
+  .font-medium {
+    font-weight: 600;
+  }
+  .text-main {
+    color: var(--color-neutral-900);
+  }
+  .text-sub {
+    color: var(--color-neutral-600);
+  }
+
+  .actions-header {
+    text-align: right;
+    padding-right: 1.5rem !important;
+  }
+
+  .actions-cell {
+    text-align: right;
+    padding-right: 1.5rem !important;
+  }
+}
+
+/* Status Chip Styles */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--border-radius-pill);
+  
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  &.status-created {
+    background: var(--color-info-050, #eff6ff);
+    color: var(--color-info-700, #1d4ed8);
+    border: 1px solid rgba(29, 78, 216, 0.1);
+  }
+  &.status-assigned {
+    background: var(--color-warning-050, #fffbeb);
+    color: var(--color-warning-700, #b45309);
+    border: 1px solid rgba(180, 83, 9, 0.1);
+  }
+  &.status-shipped {
+    background: var(--color-brand-050, #fef3c7);
+    color: var(--color-brand-600, #d97706);
+    border: 1px solid rgba(217, 119, 6, 0.1);
+  }
+  &.status-delivered {
+    background: var(--color-success-050, #ecfdf5);
+    color: var(--color-success-700, #047857);
+    border: 1px solid rgba(4, 120, 87, 0.1);
+  }
+}
+
+/* Actions Menu */
+.action-btn {
+  color: var(--color-neutral-600);
+  &:hover {
+    color: var(--color-brand-500);
+    background: rgba(181, 95, 52, 0.05);
+  }
+}
+
+/* --- Mobile Responsiveness Fixes --- */
+@media (max-width: 768px) {
+  .page-container {
+    gap: 1rem;
+  }
+  
+  .page-header {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .table-container {
+    margin: 0;
+    border-radius: 12px;
+  }
+  
+  .shipments-table {
+    th.mat-mdc-header-cell, td.mat-mdc-cell,
+    th.mat-header-cell, td.mat-cell {
+      padding: 0.75rem 1rem;
+      &:first-child { padding-left: 1rem; }
+      &:last-child { padding-right: 1rem; }
+    }
+  }
+}
