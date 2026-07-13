@@ -44,5 +44,6 @@ __screenshots__/
 Thumbs.db
 
 #prompt files
-/docs
+/docs/*
+!/docs/screenshots/
 /ai-context
