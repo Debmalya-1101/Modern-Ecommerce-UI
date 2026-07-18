@@ -6246,3 +6246,63 @@ loadShipmentData(): void {
 What I learned:
 - Modular services (`AdminOrdersService`, `AdminShipmentsService`, `AdminDeliveryPartnersService`) keep code maintainable. We bring them together in the component (Controller layer).
 - Always use `catchError` returning `of(null)` for dependent entities that might legitimately be missing (like a shipment for a newly placed order), so the main view doesn't break.
+
+---
+
+## Premium Product Details Page Redesign (Style-Only)
+
+**Date:** July 18, 2026
+
+**What was done:** Upgraded the product details page and its review sub-components to match the premium look of the home page and products catalog — all changes in SCSS files only. No TS or HTML changes.
+
+### Key Concepts
+
+#### 1. Alternating Spec Row Backgrounds
+Using `:nth-child(odd)` to give specification rows alternating tinted backgrounds improves scannability without adding extra HTML:
+
+```scss
+.spec-grid__item {
+  &:nth-child(odd) {
+    background: rgba(245, 236, 227, 0.3);  // Subtle warm tint
+  }
+  &:hover {
+    background: rgba(245, 236, 227, 0.55); // Slightly stronger on hover
+  }
+}
+```
+
+#### 2. Staggered Entrance Animations for Dynamic Lists
+Review cards use a `@for` loop to create cascading entrance animations. Since reviews load dynamically (and more can be loaded via "Load More"), each card gets a delay based on its position:
+
+```scss
+.review-card {
+  animation: review-entrance 0.4s ease backwards;
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * 0.06}s;
+    }
+  }
+}
+```
+
+#### 3. Frosted Glass Indicator Pill
+Slider dots sit inside a frosted pill container — visible regardless of the background image:
+
+```scss
+.slider-dots {
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: var(--border-radius-pill);
+}
+
+.slider-dot--active {
+  background: #fff;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.4); // Subtle white glow
+}
+```
+
+What I learned:
+- `:nth-child(odd)` alternating backgrounds improve data table readability without any HTML changes.
+- Staggered animations on dynamically-loaded lists (like reviews with pagination) still work well — the `@for` loop covers enough items and the animation replays on re-render.
+- The same glassmorphism + layered shadow pattern from the home page and products page creates visual consistency across the entire application.
+

@@ -15,8 +15,9 @@ mat-dialog-content {
 
 .rating-label {
   margin: 0;
-  font-weight: 500;
-  color: #2d241f;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  color: var(--color-neutral-900);
 }
 
 .star-selector {
@@ -29,21 +30,23 @@ mat-dialog-content {
   border: none;
   padding: 0;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
 
   mat-icon {
     font-size: 2.5rem;
     height: 2.5rem;
     width: 2.5rem;
     color: #d7c0ab;
+    transition: color 0.2s ease, filter 0.2s ease;
   }
 
   &.active mat-icon {
-    color: #b9782f;
+    color: #f59e0b;
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.3));
   }
 
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.12);
   }
 
   &:disabled {
