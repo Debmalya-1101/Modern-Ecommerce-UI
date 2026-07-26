@@ -75,6 +75,11 @@ export const routes: Routes = [
       import('./features/wishlist/wishlist.routes').then((m) => m.routes)
   },
   {
+    path: 'faq',
+    loadComponent: () =>
+      import('./features/faq/faq.page').then((m) => m.FaqPage)
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, adminGuard],
     loadChildren: () =>

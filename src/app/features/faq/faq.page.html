@@ -1,0 +1,37 @@
+<div class="faq-container">
+  <div class="faq-header page-header-block">
+    <h1>Frequently Asked Questions</h1>
+    <p class="page-subtitle">Find answers to common questions about Nexis Store, shipping, payments, and more.</p>
+  </div>
+
+  <div class="faq-list" *ngIf="faqs$ | async as faqs; else loading">
+    <div 
+      class="faq-item" 
+      *ngFor="let faq of faqs" 
+      [class.active]="expandedFaqId === faq.id"
+      (click)="toggleFaq(faq.id)"
+    >
+      <div class="faq-question">
+        <h3>{{ faq.question }}</h3>
+        <span class="icon">
+          <svg *ngIf="expandedFaqId !== faq.id" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <svg *ngIf="expandedFaqId === faq.id" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </span>
+      </div>
+      <div class="faq-answer" *ngIf="expandedFaqId === faq.id">
+        <p>{{ faq.answer }}</p>
+      </div>
+    </div>
+    
+    <div class="empty-state" *ngIf="faqs.length === 0">
+      <p>No FAQs available at the moment.</p>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading FAQs...</p>
+    </div>
+  </ng-template>
+</div>

@@ -475,6 +475,32 @@
   margin: 0;
 }
 
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footer-divider {
+  width: 1px;
+  height: 1.25rem;
+  background-color: var(--shell-border);
+}
+
+.footer-link {
+  color: var(--shell-muted);
+  font-weight: 500;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: var(--shell-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
 .footer-socials {
   display: flex;
   align-items: center;

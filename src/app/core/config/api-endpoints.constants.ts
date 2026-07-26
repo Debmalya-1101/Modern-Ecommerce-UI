@@ -10,6 +10,9 @@ export const API_ENDPOINTS = {
     featuredProducts: '/api/home/featured-products',
     newArrivals: '/api/home/new-arrivals'
   },
+  faqs: {
+    list: '/api/faqs'
+  },
   products: {
     list: '/api/products',
     detail: (id: number | string) => `/api/products/${id}`,
