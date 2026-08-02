@@ -108,5 +108,6 @@ export const API_ENDPOINTS = {
       assign: (shipmentId: number | string, partnerId: number | string) => `/api/admin/shipments/${shipmentId}/assign/${partnerId}`,
       order: (orderId: number | string) => `/api/admin/shipments/order/${orderId}`
     }
-  }
+  },
+  chatbot: '/api/v1/chatbot'
 } as const;

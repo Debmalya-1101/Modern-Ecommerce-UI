@@ -1,0 +1,106 @@
+<!-- Floating Action Button -->
+@if (!isOpen()) {
+  <button 
+    class="chatbot-fab" 
+    mat-fab 
+    color="primary" 
+    (click)="toggleChat()"
+    [attr.aria-expanded]="isOpen()"
+    aria-label="Open AI Assistant"
+    matRipple
+  >
+    <mat-icon>chat_bubble</mat-icon>
+  </button>
+}
+
+<!-- Chat Window Overlay -->
+@if (isOpen()) {
+  <div 
+    class="chatbot-window" 
+    @chatWindowAnimation
+  >
+    <!-- Header -->
+    <header class="chatbot-header">
+      <div class="chatbot-header__title">
+        <div class="avatar-container">
+          <mat-icon>smart_toy</mat-icon>
+          <div class="online-indicator"></div>
+        </div>
+        <div>
+          <h3 class="title-text">AI Shopping Assistant</h3>
+          <span class="subtitle-text">Powered by Nexis AI</span>
+        </div>
+      </div>
+      <button mat-icon-button (click)="closeChat()" class="close-btn" aria-label="Close chat">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+
+    <!-- Message List -->
+    <div class="chatbot-messages" #scrollContainer (click)="onMessagesClick($event)">
+      @if (messages().length === 0) {
+        <div class="empty-state">
+          <div class="welcome-icon"><mat-icon>waving_hand</mat-icon></div>
+          <h4>Hi there!</h4>
+          <p>I'm your AI assistant. How can I help you shop today?</p>
+        </div>
+      }
+
+      @for (msg of messages(); track msg.id) {
+        <div class="message-wrapper" [class.message-wrapper--user]="msg.sender === 'USER'">
+          @if (msg.sender === 'BOT') {
+            <div class="bot-avatar">
+              <mat-icon>smart_toy</mat-icon>
+            </div>
+          }
+          
+          <div class="message-bubble" [class.message-bubble--user]="msg.sender === 'USER'">
+            <!-- For user, just output text. For bot, we output parsed HTML (to allow links) -->
+            @if (msg.sender === 'USER') {
+              {{ msg.text }}
+            } @else {
+              <span [innerHTML]="parseMessage(msg.text)"></span>
+            }
+            
+            <span class="timestamp">{{ msg.timestamp | date:'shortTime' }}</span>
+          </div>
+        </div>
+      }
+
+      @if (isTyping()) {
+        <div class="message-wrapper">
+          <div class="bot-avatar">
+            <mat-icon>smart_toy</mat-icon>
+          </div>
+          <div class="message-bubble typing-bubble">
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+            <span class="typing-dot"></span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Input Area -->
+    <form class="chatbot-input" (submit)="sendMessage($event)">
+      <input 
+        type="text" 
+        [ngModel]="userInput()" 
+        (ngModelChange)="userInput.set($event)"
+        name="messageInput"
+        placeholder="Ask anything..." 
+        autocomplete="off"
+        [disabled]="isTyping()"
+      />
+      <button 
+        mat-icon-button 
+        color="primary" 
+        type="submit" 
+        [disabled]="!userInput().trim() || isTyping()"
+        aria-label="Send message"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </form>
+  </div>
+}

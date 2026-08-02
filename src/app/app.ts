@@ -28,6 +28,8 @@ interface NavigationItem {
   icon: string;
 }
 
+import { ChatbotComponent } from './features/chatbot/chatbot.component';
+
 @Component({
   selector: 'app-root',
   imports: [
@@ -46,7 +48,8 @@ interface NavigationItem {
     ButtonStyleDirective,
     CartDrawerComponent,
     ColdStartBannerComponent,
-    StatusFormatPipe
+    StatusFormatPipe,
+    ChatbotComponent
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'

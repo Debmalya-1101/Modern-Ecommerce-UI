@@ -409,4 +409,8 @@
       </footer>
     </mat-drawer-content>
   </mat-drawer-container>
+
+  @if (isAuthenticated()) {
+    <app-chatbot />
+  }
 }

@@ -1,0 +1,399 @@
+@use '@angular/material' as mat;
+
+:host {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none; // Allow clicks to pass through wrapper
+}
+
+// Variables & Theming - Matching Application Color Palette
+$primary-color: var(--primary-color, #9e522c);
+$on-primary: #fff8f2;
+$surface: var(--shell-surface, #fcf8f3);
+$on-surface: var(--text-primary, #2d241f);
+$surface-container: var(--color-neutral-100, #f3e9df);
+$outline: var(--border-color, rgba(87, 61, 44, 0.25));
+
+.chatbot-fab {
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: $primary-color !important;
+  color: $on-primary !important;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  @media (max-width: 768px) {
+    transform: scale(0.85);
+    transform-origin: bottom right;
+    
+    &:hover {
+      transform: scale(0.85) translateY(-2px);
+    }
+  }
+}
+
+.chatbot-window {
+  pointer-events: auto;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 450px;
+  height: 600px;
+  max-height: calc(100vh - 48px);
+  transform-origin: bottom right;
+  background-color: $surface;
+  border-radius: 24px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(255, 242, 229, 0.3);
+  
+  // Glassmorphism effect
+  @supports (backdrop-filter: blur(10px)) {
+    background-color: var(--shell-surface, rgba(255, 252, 247, 0.88));
+    backdrop-filter: blur(16px);
+  }
+
+  // Mobile responsiveness
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    bottom: 0 !important;
+  }
+}
+
+.chatbot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  // Use a pseudo-element or just a standard color to avoid darken on var
+  background: $primary-color;
+  position: relative;
+  overflow: hidden;
+  color: $on-primary;
+  
+  // Fake gradient using a dark overlay
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(0,0,0,0.2));
+    pointer-events: none;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1;
+  }
+  
+  .avatar-container {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 242, 229, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    
+    .online-indicator {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 10px;
+      height: 10px;
+      background: #4caf50;
+      border: 2px solid $primary-color;
+      border-radius: 50%;
+    }
+  }
+
+  .title-text {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.2;
+    z-index: 1;
+  }
+
+  .subtitle-text {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    z-index: 1;
+  }
+
+  .close-btn {
+    color: $on-primary;
+    z-index: 1;
+  }
+}
+
+.chatbot-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: $on-surface;
+  opacity: 0.7;
+
+  .welcome-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba($primary-color, 0.1);
+    color: $primary-color;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    
+    mat-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  h4 {
+    margin: 0 0 8px;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    max-width: 200px;
+  }
+}
+
+.message-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 85%;
+  animation: messageEnter 0.3s ease;
+
+  &--user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+}
+
+@keyframes messageEnter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bot-avatar {
+  width: 28px;
+  height: 28px;
+  background: $surface-container;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: $primary-color;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.message-bubble {
+  padding: 12px 16px;
+  border-radius: 16px;
+  background-color: $surface-container;
+  color: $on-surface;
+  font-size: 0.9375rem;
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+  }
+  line-height: 1.5;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+
+  &--user {
+    background-color: $primary-color;
+    color: $on-primary;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 4px;
+  }
+
+  .timestamp {
+    display: block;
+    font-size: 0.65rem;
+    margin-top: 4px;
+    opacity: 0.7;
+    text-align: right;
+  }
+}
+
+// Special stylings for parsed HTML
+::ng-deep .message-bubble {
+  p {
+    margin: 0 0 8px 0;
+    &:last-child { margin-bottom: 0; }
+  }
+  
+  ul, ol {
+    margin: 4px 0 12px 0;
+    padding-left: 20px;
+    &:last-child { margin-bottom: 0; }
+  }
+  
+  li {
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    margin: 12px 0 8px 0;
+    font-weight: 600;
+    line-height: 1.3;
+    &:first-child { margin-top: 0; }
+  }
+  h1 { font-size: 1.3em; }
+  h2 { font-size: 1.2em; }
+  h3 { font-size: 1.1em; }
+}
+
+::ng-deep .message-bubble strong {
+  font-weight: 600;
+}
+
+::ng-deep .chat-link {
+  color: $primary-color;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+::ng-deep .message-bubble--user .chat-link {
+  color: $on-primary;
+}
+
+::ng-deep .chat-payment-btn {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 8px 16px;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #333;
+  }
+}
+
+// Typing indicator
+.typing-bubble {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 16px;
+}
+
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background-color: currentColor;
+  opacity: 0.4;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.4s; }
+}
+
+@keyframes typing {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(-4px); opacity: 1; }
+}
+
+.chatbot-input {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: $surface;
+  border-top: 1px solid $outline;
+  gap: 8px;
+
+  input {
+    flex: 1;
+    border: none;
+    background: $surface-container;
+    padding: 12px 16px;
+    border-radius: 24px;
+    font-size: 0.9375rem;
+    @media (max-width: 768px) {
+      font-size: 0.85rem;
+    }
+    outline: none;
+    transition: background 0.2s;
+    color: $on-surface;
+
+    &:focus {
+      // Fake a darker background since we can't darken var()
+      filter: brightness(0.95);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+
+  button {
+    flex-shrink: 0;
+  }
+}

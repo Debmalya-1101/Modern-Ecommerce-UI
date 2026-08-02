@@ -6306,3 +6306,61 @@ What I learned:
 - Staggered animations on dynamically-loaded lists (like reviews with pagination) still work well — the `@for` loop covers enough items and the animation replays on re-render.
 - The same glassmorphism + layered shadow pattern from the home page and products page creates visual consistency across the entire application.
 
+## Feature Update: Chatbot UI Expansion & Auto-Scroll Enhancements
+
+What was added:
+- Updated the chatbot layout so the chat window expands directly from the bottom-right corner where the trigger button sits (`bottom: 0`, `right: 0`, `transform-origin: bottom right`).
+- Removed the separate floating bottom toggle button when the chat window is open, allowing the expanded chat window to occupy that bottom area cleanly.
+- Added reactive auto-scroll in Angular `effect()` so that opening the chat window automatically scrolls the message container to the latest message.
+
+Why it was added:
+- Previously, when the chat opened, the floating action button stayed visible underneath with a duplicate close cross mark, cluttering the bottom-right corner.
+- When opening an existing conversation, the scroll container defaulted to top (`scrollTop = 0`), showing oldest messages first instead of the latest response.
+
+### Angular Signals & Reactive Effects for Scrolling
+
+In Angular 17+, `effect()` allows executing side effects whenever tracked signals change.
+
+Small example:
+
+```ts
+constructor() {
+  effect(() => {
+    // Re-run whenever isOpen or messages signals update
+    const open = this.isOpen();
+    const count = this.messages().length;
+    if (open && count > 0) {
+      setTimeout(() => this.scrollToBottom(), 50);
+      setTimeout(() => this.scrollToBottom(), 250);
+    }
+  });
+}
+```
+
+What this means:
+- When `isOpen` switches from `false` to `true`, the effect runs after DOM rendering.
+- `scrollToBottom()` sets `element.scrollTop = element.scrollHeight`, jumping directly to the latest chat message.
+
+### Angular Animations with Transform Origin
+
+Setting `transformOrigin: 'bottom right'` in `@trigger` animations creates a smooth expand/minimize effect anchored to the trigger position.
+
+Small example:
+
+```ts
+trigger('chatWindowAnimation', [
+  transition(':enter', [
+    style({ transform: 'scale(0)', opacity: 0, transformOrigin: 'bottom right' }),
+    animate('280ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({ transform: 'scale(1)', opacity: 1, transformOrigin: 'bottom right' }))
+  ]),
+  transition(':leave', [
+    animate('200ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({ transform: 'scale(0)', opacity: 0, transformOrigin: 'bottom right' }))
+  ])
+])
+```
+
+What I learned:
+- When using `@if` in Angular templates, elements enter/leave DOM dynamically. Watching the `isOpen()` signal inside an `effect()` ensures post-render DOM actions (like `scrollTop`) run as soon as the element appears.
+- Combining `transform-origin: bottom right` with `scale(0)` to `scale(1)` animation creates a natural expand/minimize transition from floating trigger buttons.
+
+
