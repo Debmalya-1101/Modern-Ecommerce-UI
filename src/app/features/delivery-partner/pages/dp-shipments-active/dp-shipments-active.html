@@ -9,21 +9,21 @@
   </mat-card>
 
   @if (isLoading()) {
-    <mat-card class="shared-card" appearance="outlined">
-      <app-loading-spinner label="Loading active shipments..." [diameter]="48"></app-loading-spinner>
-    </mat-card>
-  } @else if (error()) {
+    <app-loading-spinner [fullScreen]="true" label="Loading active shipments"></app-loading-spinner>
+  }
+
+  @if (error()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-error-state [description]="error()!" (action)="loadActiveShipments()"></app-error-state>
     </mat-card>
-  } @else if (shipments().length === 0) {
+  } @else if (shipments().length === 0 && !isLoading()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-empty-state 
         title="No active shipments" 
         description="You do not have any active shipments assigned to you at the moment.">
       </app-empty-state>
     </mat-card>
-  } @else {
+  } @else if (shipments().length > 0) {
     <div class="shipment-cards">
       @for (shipment of shipments(); track shipment.id) {
         <mat-card class="shipment-card" appearance="outlined">

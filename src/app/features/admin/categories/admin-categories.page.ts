@@ -17,6 +17,7 @@ import { CategoryDialogComponent } from './components/category-dialog.component'
 import { AttributeKeyDialogComponent } from './components/attribute-key-dialog.component';
 import { ConfirmDeleteDialogComponent } from '../products/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-admin-categories',
@@ -31,7 +32,8 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
     MatDividerModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
+    LoadingSpinnerComponent
   ],
   templateUrl: './admin-categories.page.html',
   styleUrls: ['./admin-categories.page.scss'],

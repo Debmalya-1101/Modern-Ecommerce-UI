@@ -38,21 +38,21 @@
   </div>
 
   @if (isLoading()) {
-    <mat-card class="shared-card" appearance="outlined">
-      <app-loading-spinner label="Loading users..." [diameter]="48"></app-loading-spinner>
-    </mat-card>
-  } @else if (error()) {
+    <app-loading-spinner [fullScreen]="true" label="Loading users"></app-loading-spinner>
+  }
+
+  @if (error()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-error-state [description]="error()!" (action)="loadUsers()"></app-error-state>
     </mat-card>
-  } @else if (users().length === 0) {
+  } @else if (users().length === 0 && !isLoading()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-empty-state 
         title="No users found" 
         description="There are no users registered in the system yet.">
       </app-empty-state>
     </mat-card>
-  } @else {
+  } @else if (users().length > 0) {
     <mat-card class="table-card" appearance="outlined">
       <div class="table-container">
         <table mat-table [dataSource]="users()" class="full-width admin-users-table">

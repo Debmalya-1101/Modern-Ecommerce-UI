@@ -1,3 +1,7 @@
+@if (product().loading) {
+  <app-loading-spinner [fullScreen]="true" label="Loading product details" />
+}
+
 <section class="product-details-page">
   <div class="back-navigation">
     <a routerLink="/products" class="back-link">
@@ -7,9 +11,7 @@
   </div>
 
   @if (product().loading) {
-    <mat-card class="detail-loading" appearance="outlined">
-      <app-loading-spinner label="Loading product details" [diameter]="52" />
-    </mat-card>
+    <div class="detail-loading" style="min-height: 60vh;"></div>
   } @else if (product().error) {
     <app-error-state
       title="Could not load this product"

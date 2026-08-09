@@ -3,11 +3,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
-import { ButtonStyleDirective } from '../../directives/button-style.directive';
 
 @Component({
   selector: 'app-empty-state',
-  imports: [MatButtonModule, MatCardModule, MatIconModule, ButtonStyleDirective],
+  imports: [MatButtonModule, MatCardModule, MatIconModule],
   templateUrl: './empty-state.component.html',
   styleUrl: './empty-state.component.scss'
 })

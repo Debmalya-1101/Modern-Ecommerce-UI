@@ -12,6 +12,10 @@
     </div>
   </div>
 
+  @if (isLoading) {
+    <app-loading-spinner [fullScreen]="true" label="Loading notifications"></app-loading-spinner>
+  }
+
   <mat-card class="table-card">
     <mat-card-content>
       <div class="table-toolbar">
@@ -28,9 +32,7 @@
       </div>
 
       <div class="table-container">
-        <div class="loading-shade" *ngIf="isLoading">
-          <mat-spinner diameter="40"></mat-spinner>
-        </div>
+
 
         <table mat-table [dataSource]="dataSource" class="notifications-table">
           

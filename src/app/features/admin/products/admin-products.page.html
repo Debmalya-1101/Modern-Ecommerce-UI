@@ -22,9 +22,9 @@
       </div>
 
       <div class="table-container">
-        <div class="loading-shade" *ngIf="isLoading()">
-          <mat-spinner diameter="40"></mat-spinner>
-        </div>
+        @if (isLoading()) {
+          <app-loading-spinner [fullScreen]="true" label="Loading products"></app-loading-spinner>
+        }
 
         <table mat-table [dataSource]="dataSource" matSort class="product-table">
           <!-- Image Column -->

@@ -16,6 +16,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DeliveryFeedbackService } from '../../core/services/delivery-feedback.service';
 import { DeliveryFeedbackStatusDTO } from '../../core/models/delivery-feedback.model';
 import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
+import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-order-detail-page',
@@ -28,7 +29,8 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
     MatIconModule,
     MatProgressSpinnerModule,
     MatDividerModule,
-    StatusFormatPipe
+    StatusFormatPipe,
+    LoadingSpinnerComponent
   ],
   templateUrl: './order-detail.page.html',
   styleUrls: ['./order-detail.page.scss']

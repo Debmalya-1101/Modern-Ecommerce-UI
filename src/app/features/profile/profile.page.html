@@ -1,7 +1,7 @@
 <div class="profile-container">
   @if (isLoading()) {
     <div class="loading-state">
-      <app-loading-spinner label="Loading your profile..." [diameter]="60"></app-loading-spinner>
+      <app-loading-spinner label="Loading your profile" [diameter]="60"></app-loading-spinner>
     </div>
   } @else if (error()) {
     <mat-card class="error-card" appearance="outlined">

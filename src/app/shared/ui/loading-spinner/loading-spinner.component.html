@@ -1,7 +1,56 @@
-<div class="loading-spinner" role="status" [attr.aria-label]="label">
-  <mat-progress-spinner
-    mode="indeterminate"
-    [diameter]="diameter"
-  />
-  <p>{{ label }}</p>
+@if (fullScreen) {
+  <div class="global-loading-backdrop" aria-hidden="true"></div>
+}
+<div
+  class="global-loading-container"
+  [class.global-loading-container--fullscreen]="fullScreen"
+  role="status"
+  [attr.aria-label]="label"
+  [style.--spinner-size.px]="diameter"
+>
+  <div class="logo-spinner-wrapper">
+    <!-- Ambient Glow Background -->
+    <div class="logo-spinner-glow"></div>
+
+    <!-- Outer Gradient Orbital Ring -->
+    <svg class="logo-spinner-ring" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="var(--color-brand-600, #c05621)" />
+          <stop offset="50%" stop-color="var(--color-accent-500, #f59e0b)" />
+          <stop offset="100%" stop-color="var(--color-brand-500, #dd6b20)" />
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="43" stroke="rgba(226, 232, 240, 0.4)" stroke-width="4" class="ring-track" />
+      <circle
+        cx="50"
+        cy="50"
+        r="43"
+        stroke="url(#spinnerGradient)"
+        stroke-width="5"
+        stroke-linecap="round"
+        class="ring-arc"
+      />
+    </svg>
+
+    <!-- Inner Orbit Dot -->
+    <svg class="logo-spinner-orbit" viewBox="0 0 100 100" fill="none">
+      <circle cx="50" cy="7" r="4.5" fill="var(--color-brand-500, #dd6b20)" class="orbit-dot" />
+    </svg>
+
+    <!-- Central Logo Badge -->
+    <div class="logo-spinner-badge">
+      <img [src]="logoUrl" alt="App Logo" class="logo-spinner-img" />
+    </div>
+  </div>
+
+  @if (label) {
+    <div class="loading-label-box">
+      <span class="loading-label-text">{{ label }}</span>
+      <span class="loading-dots" aria-hidden="true">
+        <span class="dot dot-1">.</span><span class="dot dot-2">.</span><span class="dot dot-3">.</span>
+      </span>
+    </div>
+  }
 </div>
+

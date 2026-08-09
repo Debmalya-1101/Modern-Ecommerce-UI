@@ -5,25 +5,24 @@
   </div>
 
   @if (isLoading()) {
-    <div class="loading-state">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading your orders...</p>
-    </div>
-  } @else if (error()) {
+    <app-loading-spinner [fullScreen]="true" label="Loading your orders" />
+  }
+
+  @if (error()) {
     <div class="error-state">
       <mat-icon color="warn">error_outline</mat-icon>
       <h2>Oops! Something went wrong.</h2>
       <p>{{ error() }}</p>
       <button mat-flat-button color="primary" (click)="loadOrders()">Try Again</button>
     </div>
-  } @else if (orders().length === 0) {
+  } @else if (orders().length === 0 && !isLoading()) {
     <div class="empty-state">
       <mat-icon>receipt_long</mat-icon>
       <h2>No orders found</h2>
       <p>Looks like you haven't placed any orders yet.</p>
       <button mat-flat-button color="primary" routerLink="/">Start Shopping</button>
     </div>
-  } @else {
+  } @else if (orders().length > 0) {
     <div class="orders-list">
       @for (order of orders(); track order.orderId) {
         <div class="order-card-horizontal">

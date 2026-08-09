@@ -9,12 +9,13 @@ import { Chart, registerables } from 'chart.js';
 
 import { AdminAnalyticsService } from '../../../core/services/admin-analytics.service';
 import { DashboardAnalyticsDTO } from '../../../core/models/admin-analytics.model';
+import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-admin-analytics',
-  imports: [CommonModule, MatCardModule, MatIconModule, MatTableModule, MatProgressSpinnerModule, RouterLink],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatTableModule, MatProgressSpinnerModule, RouterLink, LoadingSpinnerComponent],
   templateUrl: './admin-analytics.page.html',
   styleUrl: './admin-analytics.page.scss'
 })

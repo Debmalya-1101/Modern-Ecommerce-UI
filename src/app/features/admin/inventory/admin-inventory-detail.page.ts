@@ -18,6 +18,7 @@ import { AdminInventoryService } from '../../../core/services/admin-inventory.se
 import { InventoryResponseDTO, InventoryTransactionDTO } from '../../../core/models/admin-inventory.model';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { AdjustmentDialogComponent } from './components/adjustment-dialog/adjustment-dialog.component';
+import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-admin-inventory-detail',
@@ -35,7 +36,8 @@ import { AdjustmentDialogComponent } from './components/adjustment-dialog/adjust
     MatDialogModule,
     MatTabsModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    LoadingSpinnerComponent
   ],
   templateUrl: './admin-inventory-detail.page.html',
   styleUrls: ['./admin-inventory-detail.page.scss']

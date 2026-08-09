@@ -15,6 +15,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AdminNotificationService } from '../../../core/services/admin-notification.service';
 import { NotificationLogDTO } from '../../../core/models/admin-notification.model';
 import { StatusFormatPipe } from '../../../shared/pipes/status-format.pipe';
+import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-admin-notifications',
@@ -31,7 +32,8 @@ import { StatusFormatPipe } from '../../../shared/pipes/status-format.pipe';
     MatTooltipModule,
     MatSelectModule,
     MatFormFieldModule,
-    StatusFormatPipe
+    StatusFormatPipe,
+    LoadingSpinnerComponent
   ],
   templateUrl: './admin-notifications.page.html',
   styleUrl: './admin-notifications.page.scss'

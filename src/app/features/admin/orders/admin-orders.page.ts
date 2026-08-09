@@ -25,6 +25,7 @@ import { catchError, map, finalize } from 'rxjs/operators';
 import { OrderDetailsDialogComponent } from './components/order-details-dialog/order-details-dialog.component';
 import { AdminCancelOrderDialogComponent } from './components/admin-cancel-order-dialog/admin-cancel-order-dialog.component';
 import { StatusFormatPipe } from '../../../shared/pipes/status-format.pipe';
+import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-admin-orders',
@@ -47,7 +48,8 @@ import { StatusFormatPipe } from '../../../shared/pipes/status-format.pipe';
     MatCardModule,
     CurrencyPipe,
     DatePipe,
-    StatusFormatPipe
+    StatusFormatPipe,
+    LoadingSpinnerComponent
   ],
   templateUrl: './admin-orders.page.html',
   styleUrl: './admin-orders.page.scss'

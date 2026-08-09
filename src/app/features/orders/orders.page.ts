@@ -11,6 +11,7 @@ import { OrdersApiService } from '../../core/services/orders-api.service';
 import { OrderResponse } from '../../core/models/order.model';
 import { APP_CONSTANTS } from '../../core/config/app.constants';
 import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
+import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-orders-page',
@@ -23,7 +24,8 @@ import { StatusFormatPipe } from '../../shared/pipes/status-format.pipe';
     MatIconModule,
     MatProgressSpinnerModule,
     MatPaginatorModule,
-    StatusFormatPipe
+    StatusFormatPipe,
+    LoadingSpinnerComponent
   ],
   templateUrl: './orders.page.html',
   styleUrls: ['./orders.page.scss']

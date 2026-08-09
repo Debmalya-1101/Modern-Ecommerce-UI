@@ -8,9 +8,9 @@
 
   <mat-card class="table-card">
     <mat-card-content>
-      <div class="loading-shade" *ngIf="loading">
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
+      @if (loading) {
+        <app-loading-spinner [fullScreen]="true" label="Loading orders"></app-loading-spinner>
+      }
 
       <div class="table-toolbar">
         <mat-form-field appearance="outline" class="status-filter" subscriptSizing="dynamic">

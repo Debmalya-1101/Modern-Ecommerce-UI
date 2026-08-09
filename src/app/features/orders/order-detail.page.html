@@ -1,10 +1,9 @@
 <div class="order-detail-container">
   @if (isLoading()) {
-    <div class="loading-state">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading order details...</p>
-    </div>
-  } @else if (error()) {
+    <app-loading-spinner [fullScreen]="true" label="Loading order details" />
+  }
+
+  @if (error()) {
     <div class="error-state">
       <mat-icon color="warn">error_outline</mat-icon>
       <h2>Oops! Something went wrong.</h2>

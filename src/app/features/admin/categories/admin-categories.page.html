@@ -13,9 +13,9 @@
   <mat-card class="table-card">
     <mat-card-content>
       <div class="table-container">
-        <div class="loading-shade" *ngIf="isLoading()">
-          <mat-spinner diameter="40"></mat-spinner>
-        </div>
+        @if (isLoading()) {
+          <app-loading-spinner [fullScreen]="true" label="Loading categories"></app-loading-spinner>
+        }
 
         <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="category-table">
           <!-- Name Column -->

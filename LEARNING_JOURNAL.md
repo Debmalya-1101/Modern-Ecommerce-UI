@@ -6363,4 +6363,44 @@ What I learned:
 - When using `@if` in Angular templates, elements enter/leave DOM dynamically. Watching the `isOpen()` signal inside an `effect()` ensures post-render DOM actions (like `scrollTop`) run as soon as the element appears.
 - Combining `transform-origin: bottom right` with `scale(0)` to `scale(1)` animation creates a natural expand/minimize transition from floating trigger buttons.
 
+---
+
+## Global Screen Loading Spinner Redesign with Logo
+
+### Concept Explained Simply
+
+In backend terms, a screen loader is like a middleware or interceptor status indicator — when a route or long-running query is pending, the frontend shows feedback to keep the user engaged.
+
+Instead of generic circular progress spinners, enterprise applications use a branded loader with a logo centerpiece surrounded by smooth orbital rings and subtle breathing animations.
+
+### Component Design Pattern
+
+We encapsulated the custom loader in a standalone Angular component (`LoadingSpinnerComponent`) that handles:
+- **Logo Centerpiece**: Central badge with `/logo.png` and subtle breathing scale animation (`logo-breath`).
+- **Gradient SVG Orbital Rings**: Dual concentric SVG circles with linear gradients rotating in opposite directions.
+- **Ambient Glow**: CSS radial gradient pulse (`glow-pulse`) behind the logo for a glowing backdrop effect.
+- **In-Button Spinner Separation**: Action buttons retain lightweight `<mat-progress-spinner>` (18–20px) so button layout and text alignment remain tight.
+
+Small example:
+
+```html
+<div class="global-loading-container" [style.--spinner-size.px]="diameter">
+  <div class="logo-spinner-wrapper">
+    <div class="logo-spinner-glow"></div>
+    <svg class="logo-spinner-ring" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="43" stroke="url(#spinnerGradient)" stroke-width="5" />
+    </svg>
+    <div class="logo-spinner-badge">
+      <img [src]="logoUrl" alt="Logo" class="logo-spinner-img" />
+    </div>
+  </div>
+  <p>{{ label }}</p>
+</div>
+```
+
+What I learned:
+- Decoupling screen-level loading spinners from Material component defaults allows full visual customization without affecting inline button action spinners.
+- Dynamic CSS custom properties (`[style.--spinner-size.px]="diameter"`) allow responsive scaling while keeping SVG paths and keyframe animations resolution-independent.
+
+
 

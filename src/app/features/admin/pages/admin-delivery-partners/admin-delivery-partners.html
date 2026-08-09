@@ -22,21 +22,21 @@
   </div>
 
   @if (isLoading()) {
-    <mat-card class="shared-card" appearance="outlined">
-      <app-loading-spinner label="Loading partners..." [diameter]="48"></app-loading-spinner>
-    </mat-card>
-  } @else if (error()) {
+    <app-loading-spinner [fullScreen]="true" label="Loading partners"></app-loading-spinner>
+  }
+
+  @if (error()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-error-state [description]="error()!" (action)="loadPartners()"></app-error-state>
     </mat-card>
-  } @else if (filteredPartners().length === 0) {
+  } @else if (filteredPartners().length === 0 && !isLoading()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-empty-state 
         title="No partners found" 
         [description]="statusFilter() === 'ALL' ? 'There are no delivery partners in the system yet.' : 'There are no partners matching the selected status.'">
       </app-empty-state>
     </mat-card>
-  } @else {
+  } @else if (filteredPartners().length > 0) {
     <mat-card class="shared-card table-card" appearance="outlined">
       <div class="table-container">
         <table mat-table [dataSource]="filteredPartners()" class="full-width">

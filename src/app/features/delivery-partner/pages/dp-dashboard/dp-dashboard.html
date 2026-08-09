@@ -23,10 +23,10 @@
   </div>
 
   @if (isLoading()) {
-    <mat-card class="shared-card" appearance="outlined">
-      <app-loading-spinner label="Loading dashboard..." [diameter]="48"></app-loading-spinner>
-    </mat-card>
-  } @else if (error()) {
+    <app-loading-spinner [fullScreen]="true" label="Loading dashboard"></app-loading-spinner>
+  }
+
+  @if (error()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-error-state [description]="error()!" (action)="loadDashboard()"></app-error-state>
     </mat-card>

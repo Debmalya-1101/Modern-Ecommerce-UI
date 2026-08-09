@@ -25,6 +25,7 @@ import { ConfirmDeleteDialogComponent } from './components/confirm-delete-dialog
 import { StockDialogComponent } from './components/stock-dialog/stock-dialog.component';
 import { ProductDialogComponent } from './components/product-dialog/product-dialog.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-admin-products',
@@ -46,7 +47,8 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
     MatSnackBarModule,
     MatChipsModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    LoadingSpinnerComponent
   ],
   templateUrl: './admin-products.page.html',
   styleUrls: ['./admin-products.page.scss']

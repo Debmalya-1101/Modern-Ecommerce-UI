@@ -1,16 +1,294 @@
 :host {
-  display: block;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+
+  &.is-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    pointer-events: auto;
+  }
 }
 
-.loading-spinner {
-  display: grid;
-  justify-items: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  color: #6e5d52;
+/* Full Viewport Hazy Backdrop Overlay */
+.global-loading-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255, 252, 247, 0.35);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.global-loading-container {
+  --size: var(--spinner-size, 56px);
+
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 2.5rem 3.5rem;
+  color: var(--color-neutral-800, #2d3748);
   text-align: center;
+  border-radius: var(--border-radius-xl, 24px);
+
+  /* Hazy Frosted Glass Card */
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 24px 56px -12px rgba(181, 95, 52, 0.2),
+    0 12px 24px -8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 2px rgba(255, 255, 255, 1);
+  margin: auto;
+  transition: all 0.3s ease;
+
+  &--fullscreen {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
 }
 
-.loading-spinner p {
-  margin: 0;
+.logo-spinner-wrapper {
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  min-width: var(--size);
+  min-height: var(--size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: width 0.3s ease, height 0.3s ease;
 }
+
+/* Ambient Radial Glow */
+.logo-spinner-glow {
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(225, 93, 40, 0.28) 0%,
+    rgba(245, 158, 11, 0.15) 50%,
+    transparent 75%
+  );
+  animation: glow-pulse 2.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Main Orbital Gradient Ring */
+.logo-spinner-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: logo-spinner-rotate 1.4s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+  transform-origin: center center;
+}
+
+.ring-track {
+  stroke: rgba(226, 232, 240, 0.6);
+}
+
+.ring-arc {
+  stroke-dasharray: 270;
+  stroke-dashoffset: 100;
+  animation: ring-dash 1.8s ease-in-out infinite alternate;
+}
+
+/* Secondary Inner Orbit Dot */
+.logo-spinner-orbit {
+  position: absolute;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+  animation: logo-spinner-rotate-reverse 2.2s linear infinite;
+  transform-origin: center center;
+  pointer-events: none;
+}
+
+.orbit-dot {
+  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.85));
+}
+
+/* Central Logo Badge */
+.logo-spinner-badge {
+  position: relative;
+  width: 58%;
+  height: 58%;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 4px 18px rgba(192, 86, 33, 0.18),
+    0 1px 4px rgba(0, 0, 0, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12%;
+  overflow: hidden;
+  animation: logo-breath 2.4s ease-in-out infinite;
+}
+
+.logo-spinner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* Label & Typography */
+.loading-label-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-neutral-700, #4a5568);
+  white-space: nowrap;
+}
+
+.loading-label-text {
+  background: linear-gradient(135deg, var(--color-neutral-900, #1a202c) 0%, var(--color-brand-600, #c05621) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.loading-dots {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.dot {
+  display: inline-block;
+  color: var(--color-brand-600, #c05621);
+  font-weight: 800;
+  font-size: 1.1rem;
+  animation: dot-bounce 1.4s infinite;
+
+  &.dot-1 {
+    animation-delay: 0s;
+  }
+  &.dot-2 {
+    animation-delay: 0.2s;
+  }
+  &.dot-3 {
+    animation-delay: 0.4s;
+  }
+}
+
+/* Desktop Styles — Larger loader and spacious hazy background */
+@media (min-width: 768px) {
+  :host:not(.is-fullscreen) {
+    min-height: 60vh;
+  }
+
+  .global-loading-container {
+    --size: calc(var(--spinner-size, 56px) * 1.45); /* Desktop spinner size (approx 82px - 90px) */
+    padding: 3.8rem 6rem;
+    gap: 1.6rem;
+    border-radius: var(--border-radius-2xl, 32px);
+  }
+
+  .loading-label-box {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .dot {
+    font-size: 1.35rem;
+  }
+}
+
+/* Keyframe Animations */
+@keyframes logo-spinner-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes logo-spinner-rotate-reverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes ring-dash {
+  0% {
+    stroke-dashoffset: 200;
+  }
+  50% {
+    stroke-dashoffset: 70;
+  }
+  100% {
+    stroke-dashoffset: 200;
+  }
+}
+
+@keyframes logo-breath {
+  0%, 100% {
+    transform: scale(0.95);
+    box-shadow:
+      0 4px 14px rgba(192, 86, 33, 0.12),
+      0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow:
+      0 8px 24px rgba(192, 86, 33, 0.24),
+      0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes dot-bounce {
+  0%, 80%, 100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+

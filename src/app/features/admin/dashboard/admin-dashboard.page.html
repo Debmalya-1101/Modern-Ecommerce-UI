@@ -13,17 +13,16 @@
   </div>
 
   @if (isLoading) {
-    <div class="loading-state">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading dashboard metrics...</p>
-    </div>
-  } @else if (hasError || !analyticsData) {
+    <app-loading-spinner [fullScreen]="true" label="Loading dashboard metrics"></app-loading-spinner>
+  }
+
+  @if (hasError || !analyticsData) {
     <div class="error-state">
       <mat-icon color="warn">error_outline</mat-icon>
       <p>Failed to load dashboard data. Please try again later.</p>
       <button mat-stroked-button color="primary" (click)="retry()">Retry</button>
     </div>
-  } @else {
+  } @else if (analyticsData) {
     <!-- KPIs Section -->
     <div class="kpi-grid">
       <mat-card class="kpi-card">

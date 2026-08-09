@@ -1,13 +1,19 @@
-import { Component, Input } from '@angular/core';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Component, Input, HostBinding } from '@angular/core';
 
 @Component({
   selector: 'app-loading-spinner',
-  imports: [MatProgressSpinnerModule],
+  imports: [],
   templateUrl: './loading-spinner.component.html',
   styleUrl: './loading-spinner.component.scss'
 })
 export class LoadingSpinnerComponent {
   @Input() label = 'Loading content';
-  @Input() diameter = 44;
+  @Input() diameter = 56;
+  @Input() fullScreen = false;
+  @Input() logoUrl = '/logo.png';
+
+  @HostBinding('class.is-fullscreen') get isFullscreen() {
+    return this.fullScreen;
+  }
 }
+

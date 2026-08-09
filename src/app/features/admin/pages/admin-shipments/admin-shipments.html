@@ -9,21 +9,21 @@
   </div>
 
   @if (isLoading()) {
-    <mat-card class="shared-card" appearance="outlined">
-      <app-loading-spinner label="Loading unassigned shipments..." [diameter]="48"></app-loading-spinner>
-    </mat-card>
-  } @else if (error()) {
+    <app-loading-spinner [fullScreen]="true" label="Loading unassigned shipments"></app-loading-spinner>
+  }
+
+  @if (error()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-error-state [description]="error()!" (action)="loadUnassignedShipments()"></app-error-state>
     </mat-card>
-  } @else if (shipments().length === 0) {
+  } @else if (shipments().length === 0 && !isLoading()) {
     <mat-card class="shared-card" appearance="outlined">
       <app-empty-state 
         title="No unassigned shipments" 
         description="All current shipments have been assigned to delivery partners or there are no active shipments.">
       </app-empty-state>
     </mat-card>
-  } @else {
+  } @else if (shipments().length > 0) {
     <mat-card class="shared-card table-card" appearance="outlined">
       <div class="table-container">
         <table mat-table [dataSource]="shipments()" class="shipments-table full-width">

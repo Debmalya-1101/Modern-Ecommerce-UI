@@ -14,11 +14,11 @@
     </button>
   </div>
 
-  @if (isLoading()) {
-    <div class="loading-state">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
-  } @else if (inventory()) {
+  @if (isLoading() || isLoadingTransactions()) {
+    <app-loading-spinner [fullScreen]="true" label="Loading inventory details"></app-loading-spinner>
+  }
+
+  @if (inventory()) {
     <div class="stock-overview">
       <mat-card class="stock-card highlight-card">
         <mat-card-content>
@@ -58,9 +58,7 @@
         </div>
 
         <div class="table-container">
-          <div class="loading-shade" *ngIf="isLoadingTransactions()">
-            <mat-spinner diameter="40"></mat-spinner>
-          </div>
+
 
           <table mat-table [dataSource]="dataSource" class="transactions-table">
             <ng-container matColumnDef="createdAt">

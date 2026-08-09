@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
@@ -19,6 +19,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { AdminInventoryService } from '../../../core/services/admin-inventory.service';
 import { InventoryResponseDTO, InventoryAnalyticsDashboardDTO } from '../../../core/models/admin-inventory.model';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-admin-inventory-list',
@@ -26,7 +27,6 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
@@ -36,7 +36,8 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
     MatFormFieldModule,
     MatProgressSpinnerModule,
     MatCardModule,
-    MatChipsModule
+    MatChipsModule,
+    LoadingSpinnerComponent
   ],
   templateUrl: './admin-inventory-list.page.html',
   styleUrls: ['./admin-inventory-list.page.scss']

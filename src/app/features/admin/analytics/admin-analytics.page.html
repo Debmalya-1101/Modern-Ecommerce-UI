@@ -3,6 +3,10 @@
   <p>Track your storefront performance and sales metrics.</p>
 </div>
 
+@if (!data()) {
+  <app-loading-spinner [fullScreen]="true" label="Loading analytics"></app-loading-spinner>
+}
+
 @if (data(); as analytics) {
   <div class="analytics-grid">
     <mat-card class="kpi-card">
@@ -126,8 +130,4 @@
       </div>
     </mat-card-content>
   </mat-card>
-} @else {
-  <div class="loading-state">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
 }
