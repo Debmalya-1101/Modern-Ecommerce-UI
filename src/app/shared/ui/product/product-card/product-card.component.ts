@@ -41,13 +41,7 @@ export class ProductCardComponent {
   @Output() addToCart = new EventEmitter<number>();
 
   protected readonly isInWishlist = computed(() => this.wishlistService.hasItem(this.product.id));
-  protected readonly isTitleExpanded = signal(false);
 
-  protected toggleTitleExpand(event: Event): void {
-    event.stopPropagation();
-    event.preventDefault();
-    this.isTitleExpanded.update((v) => !v);
-  }
 
   protected openQuickView(): void {
     this.quickView.emit(this.product.id);

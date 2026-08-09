@@ -32,6 +32,7 @@
 
   // Entrance animation — stagger is applied by the grid via nth-child
   animation: card-entrance 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+  cursor: pointer;
 }
 
 @keyframes card-entrance {
@@ -199,7 +200,7 @@
   line-height: 1.28;
   letter-spacing: -0.01em;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -238,16 +239,12 @@
     -webkit-line-clamp: 1;
   }
 
-  .product-card__title.expanded {
-    height: auto;
-
-    .product-card__title-text {
-      -webkit-line-clamp: unset;
-    }
-  }
-
   .product-card__content {
     gap: 0.45rem;
+  }
+
+  .product-card__details-btn {
+    display: none;
   }
 
   .product-card__description {
