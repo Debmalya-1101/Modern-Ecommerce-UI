@@ -547,6 +547,12 @@ h3 {
     transform: translateY(-1px);
   }
 
+  .buy-spinner {
+    display: inline-block;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+
   &__wishlist-btn {
     width: 3.5rem;
     height: 3.5rem;

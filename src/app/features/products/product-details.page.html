@@ -179,9 +179,14 @@
                     mat-stroked-button
                     appButtonStyle="secondary"
                     class="detail-actions__buy-btn"
-                    (click)="buyNow(productDetail.name)"
+                    (click)="buyNow(productDetail)"
+                    [disabled]="isBuyingNow()"
                   >
-                    Buy Now
+                    @if (isBuyingNow()) {
+                      <mat-spinner diameter="20" class="buy-spinner"></mat-spinner> Wait...
+                    } @else {
+                      Buy Now
+                    }
                   </button>
                 </div>
                 <button

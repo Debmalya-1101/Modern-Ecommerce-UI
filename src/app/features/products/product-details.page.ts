@@ -25,6 +25,7 @@ import { ProductPriceDisplayComponent } from '../../shared/ui/product/product-pr
 import { ProductRatingDisplayComponent } from '../../shared/ui/product/product-rating-display/product-rating-display.component';
 import { ProductStockIndicatorComponent } from '../../shared/ui/product/product-stock-indicator/product-stock-indicator.component';
 import { ProductReviewsComponent } from './components/product-reviews/product-reviews.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 /** A gallery image entry shown as a thumbnail button on the details page. */
 interface GalleryItem {
@@ -49,7 +50,8 @@ interface GalleryItem {
     ProductPriceDisplayComponent,
     ProductRatingDisplayComponent,
     ProductStockIndicatorComponent,
-    ProductReviewsComponent
+    ProductReviewsComponent,
+    MatProgressSpinnerModule
   ],
   templateUrl: './product-details.page.html',
   styleUrl: './product-details.page.scss'
@@ -81,6 +83,7 @@ export class ProductDetailsPage implements OnInit {
   // Mobile state and description toggle
   protected readonly isMobile = signal(this.breakpointObserver.isMatched('(max-width: 768px)'));
   protected readonly isDescriptionExpanded = signal(false);
+  protected readonly isBuyingNow = signal(false);
   private touchStartX = 0;
 
   constructor() {
@@ -249,17 +252,26 @@ export class ProductDetailsPage implements OnInit {
     }
   }
 
-  protected addToCart(productDetail: ProductDetail): void {
-    this.cartService.addToCart(productDetail.id, this.selectedQuantity());
+  protected addToCart(productDetail: ProductDetail, showDrawer = true): Promise<void> {
+    const promise = this.cartService.addToCart(productDetail.id, this.selectedQuantity(), showDrawer);
     this.selectedQuantity.set(1); // Reset after adding
+    return promise;
   }
 
   protected updateQuantity(delta: number): void {
     this.selectedQuantity.update((q) => Math.max(1, q + delta));
   }
 
-  protected buyNow(productName: string): void {
-    this.snackbarService.info(`Buy now flow for ${productName} is coming soon.`);
+  protected async buyNow(productDetail: ProductDetail): Promise<void> {
+    this.isBuyingNow.set(true);
+    try {
+      await this.addToCart(productDetail, false);
+      this.router.navigate(['/cart']);
+    } catch (e) {
+      // Handled by CartService snackbar
+    } finally {
+      this.isBuyingNow.set(false);
+    }
   }
 
   protected isInWishlist(productId: number): boolean {

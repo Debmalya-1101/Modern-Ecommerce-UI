@@ -74,35 +74,40 @@ export class CartService {
     });
   }
 
-  public addToCart(productId: number, quantity = 1): void {
-    // Check if item is already in the cart for optimistic update
-    const currentItems = this._cart().items;
-    const existingItem = currentItems.find(item => item.productId === productId);
-    
-    if (existingItem) {
-      // If it exists, we just update the quantity
-      this.updateQuantity(existingItem.itemId, existingItem.quantity + quantity);
-      if (!this.router.url.includes('/cart')) {
+  public addToCart(productId: number, quantity = 1, showDrawer = true): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Check if item is already in the cart for optimistic update
+      const currentItems = this._cart().items;
+      const existingItem = currentItems.find(item => item.productId === productId);
+      
+      if (existingItem) {
+        // If it exists, we just update the quantity
+        this.updateQuantity(existingItem.itemId, existingItem.quantity + quantity);
+        if (showDrawer && !this.router.url.includes('/cart')) {
+          this.openDrawer();
+        }
+        resolve();
+        return;
+      }
+
+      this._isAddingToCart.set(true);
+      if (showDrawer && !this.router.url.includes('/cart')) {
         this.openDrawer();
       }
-      return;
-    }
 
-    this._isAddingToCart.set(true);
-    if (!this.router.url.includes('/cart')) {
-      this.openDrawer();
-    }
-
-    this.cartApi.addToCart(productId, quantity).subscribe({
-      next: (updatedCart) => {
-        this._cart.set(updatedCart);
-        this._isAddingToCart.set(false);
-        this.snackbar.success('Item added to cart.');
-      },
-      error: () => {
-        this._isAddingToCart.set(false);
-        this.snackbar.error('Could not add item to cart.');
-      }
+      this.cartApi.addToCart(productId, quantity).subscribe({
+        next: (updatedCart) => {
+          this._cart.set(updatedCart);
+          this._isAddingToCart.set(false);
+          this.snackbar.success('Item added to cart.');
+          resolve();
+        },
+        error: () => {
+          this._isAddingToCart.set(false);
+          this.snackbar.error('Could not add item to cart.');
+          reject();
+        }
+      });
     });
   }
 
