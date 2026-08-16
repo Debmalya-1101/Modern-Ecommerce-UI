@@ -20,8 +20,7 @@ The application is deployed and continuously delivered via **Vercel**.
 
 ---
 
-## 🎯 Key Highlights for Project Managers & Recruiters
-
+- **Agentic AI Assistant Integration**: Features an embedded AI Shopping Assistant capable of searching products, managing cart/wishlist, placing orders, and generating payment links via conversational LLM interaction.
 - **Enterprise-Grade Architecture**: Built using a strict `Core` / `Shared` / `Features` domain-driven structure, ensuring the application is highly scalable, maintainable, and predictable.
 - **Modern Angular Paradigms**: Fully utilizes Angular Standalone Components, eliminating `NgModules` for a lighter, faster application bundle. Leverages modern Signals alongside RxJS for reactive state management.
 - **Comprehensive Feature Set**: Not just a generic storefront. This application includes dedicated portals for **Admins** and **Delivery Partners**, demonstrating the ability to handle complex, multi-role user flows.
@@ -35,6 +34,7 @@ The application is deployed and continuously delivered via **Vercel**.
 The application is broken down into modular, lazy-loaded feature boundaries:
 
 ### 👤 Customer Facing
+*   **🤖 AI Shopping Assistant**: Interactive chatbot overlay with real-time markdown parsing, context-aware page awareness, in-app payment redirection buttons, auto-scrolling, and instant session reset (`/clear`).
 *   **Home & Landing**: Engaging hero sections, featured products, and category carousels.
 *   **Product Catalog & Details**: Advanced filtering, search, rich product details, and image galleries.
 *   **Authentication UX**: Secure login, registration, and password recovery flows with a redesigned, user-centric experience.
